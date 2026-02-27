@@ -7,8 +7,8 @@ __pycache__/
 venv/
 runs/
 .env
-.ileo-lab/
-.shareable_maxcut/
-.tests/
-.docs/
-.examples/
+ileo-lab/
+shareable_maxcut/
+tests/
+docs/
+examples/
