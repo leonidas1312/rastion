@@ -1,0 +1,40 @@
+{
+  "schema_version": "0.1.0",
+  "name": "set_cover",
+  "ir_target": "generic",
+  "variables": [
+    {
+      "name": "s0",
+      "vartype": "binary"
+    },
+    {
+      "name": "s1",
+      "vartype": "binary"
+    },
+    {
+      "name": "s2",
+      "vartype": "binary"
+    },
+    {
+      "name": "s3",
+      "vartype": "binary"
+    },
+    {
+      "name": "s4",
+      "vartype": "binary"
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "linear": "costs",
+    "constant": 0.0
+  },
+  "constraints": [
+    {
+      "name": "coverage",
+      "matrix": "A_cover",
+      "rhs": "b_cover",
+      "sense": ">="
+    }
+  ]
+}

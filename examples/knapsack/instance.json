@@ -1,0 +1,11 @@
+{
+  "schema_version": "0.1.0",
+  "arrays": {
+    "profits": [10, 7, 5, 3],
+    "A_capacity": [[4, 3, 2, 1]],
+    "b_capacity": [6]
+  },
+  "params": {
+    "notes": "Small 0/1 knapsack instance"
+  }
+}

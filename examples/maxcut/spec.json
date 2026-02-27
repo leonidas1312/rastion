@@ -1,0 +1,18 @@
+{
+  "schema_version": "0.1.0",
+  "name": "maxcut_square_qubo",
+  "ir_target": "qubo",
+  "variables": [
+    {"name": "x0", "vartype": "binary"},
+    {"name": "x1", "vartype": "binary"},
+    {"name": "x2", "vartype": "binary"},
+    {"name": "x3", "vartype": "binary"}
+  ],
+  "objective": {
+    "sense": "min",
+    "linear": "linear",
+    "quadratic": "Q",
+    "constant": 0.0
+  },
+  "constraints": []
+}
