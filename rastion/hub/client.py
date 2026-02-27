@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import tempfile
 import zipfile
@@ -12,6 +13,7 @@ from typing import Any, Literal
 
 import yaml
 
+from rastion.config import clear_token, get_token, save_token
 from rastion.registry.manager import (
     add_problem,
     hub_config,
@@ -52,9 +54,14 @@ class HubClient:
         init_registry(copy_examples=False)
         cfg = hub_config()
         configured_url = str(cfg.get("url") or "http://localhost:8000")
+        persisted_json_token = get_token()
+        persisted_yaml_token = self._normalize_token(cfg.get("token"))
 
         self.base_url = self._normalize_base_url(base_url or configured_url)
-        self.token = token if token is not None else self._normalize_token(cfg.get("token"))
+        if token is not None:
+            self.token = self._normalize_token(token)
+        else:
+            self.token = persisted_json_token or persisted_yaml_token
         self.timeout_seconds = timeout_seconds
 
     def set_base_url(self, url: str, *, persist: bool = True) -> None:
@@ -62,24 +69,50 @@ class HubClient:
         if persist:
             set_hub_url(self.base_url)
 
+    async def oauth_login_url(self) -> str:
+        payload = await self._request_json("GET", "/auth/login")
+        if isinstance(payload, dict):
+            url = payload.get("url")
+            if isinstance(url, str) and url.strip():
+                return url.strip()
+        raise HubClientError("Hub response did not include an OAuth login URL")
+
+    async def verify_token(self, token: str) -> dict[str, Any]:
+        candidate = token.strip()
+        if not candidate:
+            raise HubClientError("GitHub token cannot be empty")
+
+        try:
+            payload = await self._request_json("POST", "/auth/token", json={"token": candidate})
+        except HubClientError as exc:
+            if self._should_try_legacy_login(exc):
+                return await self._verify_token_via_legacy_login(candidate)
+            raise
+
+        if not isinstance(payload, dict):
+            raise HubClientError("Hub response did not include token verification payload")
+
+        if payload.get("valid") is False:
+            raise HubClientError("GitHub token is invalid or expired.")
+        if payload.get("valid") is not True:
+            raise HubClientError("Hub token verification did not return a valid state.")
+
+        return self._extract_user(payload)
+
     async def login(self, token: str) -> dict[str, Any]:
         candidate = token.strip()
         if not candidate:
             raise HubClientError("GitHub token cannot be empty")
 
-        payload = await self._request_json(
-            "POST",
-            "/auth/login",
-            token_override=candidate,
-        )
-        access_token = self._extract_access_token(payload)
-        user = self._extract_user(payload)
-        self.token = access_token
-        set_hub_token(access_token)
+        user = await self.verify_token(candidate)
+        self.token = candidate
+        save_token(candidate)
+        set_hub_token(candidate)
         return user
 
     async def logout(self) -> None:
         self.token = None
+        clear_token()
         set_hub_token(None)
 
     async def get_user(self) -> dict[str, Any]:
@@ -441,7 +474,7 @@ class HubClient:
         elif self.token:
             headers.setdefault("Authorization", f"Bearer {self.token}")
         elif require_auth:
-            raise HubClientError("Not authenticated. Run `rastion login --token <token>` first.")
+            raise HubClientError("Not authenticated. Run `rastion login` first.")
 
         try:
             async with httpx.AsyncClient(base_url=self.base_url, timeout=self.timeout_seconds) as client:
@@ -472,6 +505,10 @@ class HubClient:
         reason = response.reason_phrase or "Error"
         return f"Hub request failed ({response.status_code} {reason}): {detail}"
 
+    def _should_try_legacy_login(self, exc: HubClientError) -> bool:
+        message = str(exc)
+        return bool(re.search(r"\b(404|405)\b", message))
+
     def _extract_user(self, payload: Any) -> dict[str, Any]:
         if isinstance(payload, dict):
             user = payload.get("user")
@@ -488,6 +525,19 @@ class HubClient:
         if not isinstance(access_token, str) or not access_token.strip():
             raise HubClientError("Hub response did not include access token")
         return access_token.strip()
+
+    async def _verify_token_via_legacy_login(self, token: str) -> dict[str, Any]:
+        payload = await self._request_json(
+            "POST",
+            "/auth/login",
+            token_override=token,
+        )
+        access_token = self._extract_access_token(payload)
+        user = self._extract_user(payload)
+        self.token = access_token
+        save_token(access_token)
+        set_hub_token(access_token)
+        return user
 
     def _load_metadata(self, path: Path) -> dict[str, Any]:
         if not path.exists():

@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+import asyncio
 import argparse
 import json
 import sys
+import webbrowser
 from pathlib import Path
 
 from rastion.backends.local import LocalBackend
 from rastion.benchmark import compare
+from rastion.config import get_token
 from rastion.compile.normalize import compile_to_ir
 from rastion.core.data import InstanceData
 from rastion.core.run_record import append_run_record, create_run_record
@@ -25,6 +28,7 @@ from rastion.registry.manager import (
     runs_root,
     solver_hub_source,
 )
+from rastion.hub import HubClient, HubClientError
 from rastion.solvers.discovery import discover_plugins
 from rastion.solvers.matching import (
     auto_select_solver,
@@ -114,6 +118,15 @@ def build_parser() -> argparse.ArgumentParser:
     bench.add_argument("--time-limit", type=str, default="30s", help="Time limit per run, e.g. 30s")
     bench.add_argument("--runs", type=int, default=3, help="Runs per solver")
     bench.set_defaults(func=cmd_benchmark)
+
+    login = sub.add_parser("login", help="Login to hub via GitHub OAuth browser flow")
+    login.set_defaults(func=cmd_login)
+
+    logout = sub.add_parser("logout", help="Remove local hub token")
+    logout.set_defaults(func=cmd_logout)
+
+    whoami = sub.add_parser("whoami", help="Show current hub user")
+    whoami.set_defaults(func=cmd_whoami)
 
     return parser
 
@@ -392,6 +405,78 @@ def cmd_benchmark(args: argparse.Namespace) -> int:
         for err in result.errors:
             print(f"  error: {err}")
 
+    return 0
+
+
+def cmd_login(args: argparse.Namespace) -> int:
+    _ = args
+    client = HubClient()
+
+    try:
+        oauth_url = asyncio.run(client.oauth_login_url())
+    except (HubClientError, RuntimeError, ValueError) as exc:
+        print(f"Login failed: {exc}")
+        return 1
+
+    print("Opening browser for GitHub authorization...")
+    opened = webbrowser.open(oauth_url)
+    if not opened:
+        print("Unable to open browser automatically.")
+    print(f"Authorize here: {oauth_url}")
+
+    try:
+        token = input("Paste token from callback page: ").strip()
+    except EOFError:
+        print("Login failed: no token provided.")
+        return 1
+
+    if not token:
+        print("Login failed: token cannot be empty.")
+        return 1
+
+    try:
+        user = asyncio.run(client.login(token))
+    except (HubClientError, RuntimeError, ValueError) as exc:
+        print(f"Login failed: {exc}")
+        return 1
+
+    username = str(user.get("username") or user.get("login") or "unknown")
+    print(f"Logged in as {username}")
+    return 0
+
+
+def cmd_logout(args: argparse.Namespace) -> int:
+    _ = args
+    try:
+        client = HubClient()
+        asyncio.run(client.logout())
+    except (HubClientError, RuntimeError, ValueError) as exc:
+        print(f"Logout failed: {exc}")
+        return 1
+    print("Logged out.")
+    return 0
+
+
+def cmd_whoami(args: argparse.Namespace) -> int:
+    _ = args
+    token = get_token()
+    if not token:
+        print("Not logged in. Run `rastion login`.")
+        return 1
+
+    try:
+        client = HubClient(token=token)
+        user = asyncio.run(client.get_user())
+    except (HubClientError, RuntimeError, ValueError) as exc:
+        print(f"whoami failed: {exc}")
+        return 1
+
+    username = str(user.get("username") or user.get("login") or "unknown")
+    user_id = user.get("id")
+    if user_id is not None:
+        print(f"{username} (id={user_id})")
+    else:
+        print(username)
     return 0
 
 

@@ -645,6 +645,11 @@ def _login_with_github(console: Console) -> None:
 
 def _logout(console: Console) -> None:
     previous = _current_username()
+    try:
+        client = HubClient()
+        asyncio.run(client.logout())
+    except (HubClientError, OSError, RuntimeError, ValueError):
+        pass
     _save_login(token=None, username=None)
     console.clear()
     if previous:
