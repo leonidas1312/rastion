@@ -1,9 +1,0 @@
-name: maxcut
-version: 0.1.0
-author: rastion
-tags:
-- qubo
-- graph
-- sampling
-optimization_class: QUBO
-difficulty: easy
