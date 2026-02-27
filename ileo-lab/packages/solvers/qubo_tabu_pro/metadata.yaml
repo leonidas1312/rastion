@@ -1,8 +1,0 @@
-name: qubo_tabu_pro
-version: 0.1.0
-author: ileo-lab
-description: Tabu-search based sampler for QUBO models with restarts.
-tags:
-  - heuristic
-  - qubo
-  - maxcut

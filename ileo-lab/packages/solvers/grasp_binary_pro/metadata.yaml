@@ -1,8 +1,0 @@
-name: grasp_binary_pro
-version: 0.1.0
-author: ileo-lab
-description: GRASP plus repair and hill climbing for binary linear optimization models.
-tags:
-  - heuristic
-  - milp
-  - binary
