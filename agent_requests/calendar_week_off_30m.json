@@ -1,0 +1,23 @@
+{
+  "install_overwrite": true,
+  "instance_name": "default",
+  "output_json": "../.rastion-home/runs/last_agent_run.json",
+  "decision_plugin_path": "../decision_plugins/calendar_week_off_30m",
+  "runs_dir": "../.rastion-home/runs",
+  "solver": {
+    "config": {
+      "time_limit": 30
+    },
+    "name": "auto",
+    "preferred": [
+      "highs",
+      "baseline",
+      "ortools"
+    ]
+  },
+  "solver_policy": {
+    "allow_remote_install": false,
+    "install_urls": [],
+    "overwrite": false
+  }
+}

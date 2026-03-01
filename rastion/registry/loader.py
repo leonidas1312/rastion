@@ -1,4 +1,4 @@
-"""Problem and solver loaders for the local registry."""
+"""Decision plugin and solver loaders for the local registry."""
 
 from __future__ import annotations
 
@@ -78,37 +78,37 @@ class _UnavailableSolverPlugin(SolverPlugin):
         )
 
 
-class Problem:
-    """Load a problem from registry or local path."""
+class DecisionPlugin:
+    """Load a decision plugin from registry or local path."""
 
     def __init__(self, root: str | Path) -> None:
         self._root = Path(root).expanduser().resolve()
         if not self._root.exists() or not self._root.is_dir():
-            raise FileNotFoundError(f"problem folder not found: {self._root}")
+            raise FileNotFoundError(f"decision plugin folder not found: {self._root}")
 
         if not (self._root / "spec.json").exists():
-            raise FileNotFoundError(f"problem folder is missing spec.json: {self._root}")
+            raise FileNotFoundError(f"decision plugin folder is missing spec.json: {self._root}")
 
         self._spec: ProblemSpec | None = None
         self._metadata: dict[str, Any] | None = None
         self._card: str | None = None
 
     @staticmethod
-    def from_registry(name: str) -> "Problem":
-        """Load problem from local registry by name."""
+    def from_registry(name: str) -> "DecisionPlugin":
+        """Load a decision plugin from local registry by name."""
         init_registry()
         root = problems_root() / name
         if not root.exists():
-            raise FileNotFoundError(f"problem '{name}' not found in local registry")
-        return Problem(root)
+            raise FileNotFoundError(f"decision plugin '{name}' not found in local registry")
+        return DecisionPlugin(root)
 
     @staticmethod
-    def from_local(path: str | Path) -> "Problem":
-        """Load problem from local folder."""
+    def from_local(path: str | Path) -> "DecisionPlugin":
+        """Load a decision plugin from a local folder."""
         root = Path(path).expanduser().resolve()
         if root.is_file():
             root = root.parent
-        return Problem(root)
+        return DecisionPlugin(root)
 
     @property
     def root(self) -> Path:
@@ -142,7 +142,7 @@ class Problem:
         if card_path.exists():
             self._card = card_path.read_text(encoding="utf-8")
         else:
-            self._card = f"# {self.spec.name}\n\nNo problem card available."
+            self._card = f"# {self.spec.name}\n\nNo decision plugin card available."
         return self._card
 
     @property
@@ -250,27 +250,34 @@ class Solver:
 
 
 class AutoSolver:
-    """Auto-select solver based on problem."""
+    """Auto-select solver based on decision plugin shape."""
 
     @staticmethod
-    def from_problem(problem: Problem) -> Solver:
-        """Auto-select best solver for a problem."""
-        if "default" in problem.instances:
+    def from_decision_plugin(decision_plugin: DecisionPlugin) -> Solver:
+        """Auto-select best solver for a decision plugin."""
+        if "default" in decision_plugin.instances:
             instance_name = "default"
-        elif problem.instances:
-            instance_name = problem.instances[0]
+        elif decision_plugin.instances:
+            instance_name = decision_plugin.instances[0]
         else:
             instance_name = None
         if instance_name is None:
-            raise ValueError(f"problem '{problem.metadata.get('name', problem.root.name)}' has no instances")
+            raise ValueError(
+                f"decision plugin '{decision_plugin.metadata.get('name', decision_plugin.root.name)}' has no instances"
+            )
 
-        instance = problem.load_instance(instance_name)
-        ir_model = compile_to_ir(problem.spec, instance)
+        instance = decision_plugin.load_instance(instance_name)
+        ir_model = compile_to_ir(decision_plugin.spec, instance)
         plugins = discover_plugins()
         if not plugins:
             raise ValueError("no solver plugins available")
         selected = auto_select_solver(ir_model, plugins)
         return Solver(selected)
+
+    @staticmethod
+    def from_problem(problem: "DecisionPlugin") -> Solver:
+        """Backward-compatible alias for from_decision_plugin()."""
+        return AutoSolver.from_decision_plugin(problem)
 
     @staticmethod
     def from_preferences(
@@ -306,6 +313,9 @@ class AutoSolver:
 
         first = sorted(available)[0]
         return Solver(available[first])
+
+
+Problem = DecisionPlugin
 
 
 def _parse_budget_seconds(budget: str | None) -> float | None:

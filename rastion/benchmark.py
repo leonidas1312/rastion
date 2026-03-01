@@ -13,7 +13,7 @@ from rastion.compile.normalize import compile_to_ir
 from rastion.core.data import InstanceData
 from rastion.core.run_record import append_run_record, create_run_record
 from rastion.core.solution import Solution, SolutionStatus
-from rastion.registry.loader import Problem
+from rastion.registry.loader import DecisionPlugin
 from rastion.registry.manager import init_registry, runs_root
 from rastion.solvers.discovery import discover_plugins
 
@@ -90,17 +90,17 @@ class BenchmarkSuiteResults:
 
 
 def compare(
-    problem: Problem | str,
+    decision_plugin: DecisionPlugin | str,
     instance: str = "default",
     solvers: list[str] | None = None,
     time_limit: str | float | None = "30s",
     runs: int = 1,
     save_to_history: bool = True,
 ) -> list[BenchmarkResult]:
-    """Compare multiple solvers on one problem instance."""
-    problem_obj = _resolve_problem(problem)
-    instance_data = problem_obj.load_instance(instance)
-    ir_model = compile_to_ir(problem_obj.spec, instance_data)
+    """Compare multiple solvers on one decision plugin instance."""
+    plugin_obj = _resolve_decision_plugin(decision_plugin)
+    instance_data = plugin_obj.load_instance(instance)
+    ir_model = compile_to_ir(plugin_obj.spec, instance_data)
 
     plugins = discover_plugins()
     if not plugins:
@@ -149,7 +149,7 @@ def compare(
                 errors.append(str(exc))
                 if save_to_history:
                     _save_benchmark_run(
-                        problem=problem_obj,
+                        decision_plugin=plugin_obj,
                         instance=instance_data,
                         solver_name=plugin.name,
                         solver_version=plugin.version,
@@ -187,7 +187,7 @@ def compare(
 
             if save_to_history:
                 _save_benchmark_run(
-                    problem=problem_obj,
+                    decision_plugin=plugin_obj,
                     instance=instance_data,
                     solver_name=plugin.name,
                     solver_version=plugin.version,
@@ -219,7 +219,7 @@ def compare(
 
 def _save_benchmark_run(
     *,
-    problem: Problem,
+    decision_plugin: DecisionPlugin,
     instance: InstanceData,
     solver_name: str,
     solver_version: str,
@@ -228,7 +228,7 @@ def _save_benchmark_run(
 ) -> None:
     """Persist a benchmark solver run to run-history JSONL."""
     run_record = create_run_record(
-        spec=problem.spec,
+        spec=decision_plugin.spec,
         instance=instance,
         solution=solution,
         solver_name=solver_name,
@@ -246,12 +246,12 @@ def run_benchmark_suite(
     time_limit: str | float | None = "60s",
     runs: int = 1,
 ) -> BenchmarkSuiteResults:
-    """Run solver benchmarks on multiple problems."""
+    """Run solver benchmarks on multiple decision plugins."""
     init_registry()
 
     rows: list[BenchmarkSuiteRow] = []
     for problem_name in problems:
-        problem = Problem.from_registry(problem_name)
+        problem = DecisionPlugin.from_registry(problem_name)
         comparison = compare(
             problem,
             instance=instance,
@@ -275,17 +275,17 @@ def run_benchmark_suite(
     return BenchmarkSuiteResults(rows)
 
 
-def _resolve_problem(problem: Problem | str) -> Problem:
-    if isinstance(problem, Problem):
-        return problem
+def _resolve_decision_plugin(decision_plugin: DecisionPlugin | str) -> DecisionPlugin:
+    if isinstance(decision_plugin, DecisionPlugin):
+        return decision_plugin
 
-    text = str(problem)
+    text = str(decision_plugin)
     candidate = Path(text).expanduser().resolve()
     if candidate.exists():
-        return Problem.from_local(candidate)
+        return DecisionPlugin.from_local(candidate)
 
     init_registry()
-    return Problem.from_registry(text)
+    return DecisionPlugin.from_registry(text)
 
 
 def _parse_time_limit(value: str | float | None) -> float | None:

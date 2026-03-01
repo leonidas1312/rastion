@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "rastion"
-version = "0.1.1"
-description = "Local-first portable optimization problems and solver plugins"
+dynamic = ["version"]
+description = "Local-first portable decision plugins and solver plugins"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
@@ -24,7 +24,6 @@ scip = ["PySCIPOpt>=5.0"]
 neal = ["dwave-neal>=0.6"]
 qiskit = ["qiskit>=0.45", "qiskit-algorithms>=0.3"]
 qaoa = ["qiskit>=0.45", "qiskit-algorithms>=0.3"]
-tui = ["rich>=13.0", "readchar>=4.0"]
 dev = [
   "pytest>=8.0",
   "ruff>=0.6",
@@ -36,18 +35,18 @@ all = [
   "dwave-neal>=0.6",
   "qiskit>=0.45",
   "qiskit-algorithms>=0.3",
-  "rich>=13.0",
-  "readchar>=4.0",
   "pytest>=8.0",
   "ruff>=0.6",
 ]
 
 [project.scripts]
 rastion = "rastion.cli:main"
-rastion-tui = "rastion.tui.menu:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["rastion"]
+
+[tool.hatch.version]
+path = "rastion/version.py"
 
 [tool.pytest.ini_options]
 addopts = "-q"

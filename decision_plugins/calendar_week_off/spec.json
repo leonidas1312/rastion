@@ -1,0 +1,66 @@
+{
+  "constraints": [
+    {
+      "matrix": "A_daily",
+      "name": "daily_limit",
+      "rhs": "b_daily",
+      "sense": "<="
+    },
+    {
+      "matrix": "A_friday_off",
+      "name": "friday_off",
+      "rhs": "b_friday_off",
+      "sense": "<="
+    }
+  ],
+  "ir_target": "generic",
+  "name": "calendar_week_off",
+  "objective": {
+    "constant": 0.0,
+    "linear": "utility",
+    "sense": "max"
+  },
+  "schema_version": "0.1.0",
+  "variables": [
+    {
+      "name": "x_mon_am",
+      "vartype": "binary"
+    },
+    {
+      "name": "x_mon_pm",
+      "vartype": "binary"
+    },
+    {
+      "name": "x_tue_am",
+      "vartype": "binary"
+    },
+    {
+      "name": "x_tue_pm",
+      "vartype": "binary"
+    },
+    {
+      "name": "x_wed_am",
+      "vartype": "binary"
+    },
+    {
+      "name": "x_wed_pm",
+      "vartype": "binary"
+    },
+    {
+      "name": "x_thu_am",
+      "vartype": "binary"
+    },
+    {
+      "name": "x_thu_pm",
+      "vartype": "binary"
+    },
+    {
+      "name": "x_fri_am",
+      "vartype": "binary"
+    },
+    {
+      "name": "x_fri_pm",
+      "vartype": "binary"
+    }
+  ]
+}

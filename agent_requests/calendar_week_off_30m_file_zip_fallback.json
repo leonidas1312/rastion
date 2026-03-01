@@ -1,0 +1,25 @@
+{
+  "install_overwrite": true,
+  "instance_name": "default",
+  "output_json": "../.rastion-home/runs/remote_fallback_result.json",
+  "decision_plugin_path": "../decision_plugins/calendar_week_off_30m",
+  "runs_dir": "../.rastion-home/runs",
+  "solver": {
+    "config": {
+      "time_limit": 30
+    },
+    "name": "zip_baseline",
+    "preferred": [
+      "zip_baseline",
+      "highs",
+      "baseline"
+    ]
+  },
+  "solver_policy": {
+    "allow_remote_install": true,
+    "install_urls": [
+      "file:///mnt/c/Users/gleon/OneDrive/Desktop/Projects/rastion/.local_plugins/zip_baseline_solver_pkg.zip"
+    ],
+    "overwrite": true
+  }
+}

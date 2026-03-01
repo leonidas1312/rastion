@@ -2,33 +2,44 @@
 
 from __future__ import annotations
 
-import asyncio
 import argparse
+import asyncio
+import hashlib
 import json
+import os
+import re
+import shutil
+import subprocess
 import sys
 import webbrowser
 from pathlib import Path
+from typing import Any
 
+from rastion.agent import init_agent_workspace, run_agent_request_file
 from rastion.backends.local import LocalBackend
 from rastion.benchmark import compare
-from rastion.config import get_token
 from rastion.compile.normalize import compile_to_ir
+from rastion.config import get_token
 from rastion.core.data import InstanceData
 from rastion.core.run_record import append_run_record, create_run_record
 from rastion.core.solution import Solution, SolutionStatus
 from rastion.core.spec import ProblemSpec
 from rastion.core.validate import validate_problem_and_instance
-from rastion.registry.loader import Problem
+from rastion.hub import HubClient, HubClientError
+from rastion.registry.loader import DecisionPlugin
 from rastion.registry.manager import (
-    export_problem,
+    export_decision_plugin,
     init_registry,
-    install_problem,
+    install_decision_plugin,
     install_solver_from_url,
-    list_problems,
+    list_decision_plugins,
+    problems_root,
+    read_yaml_file,
+    remove_decision_plugin,
+    runs_file,
     runs_root,
     solver_hub_source,
 )
-from rastion.hub import HubClient, HubClientError
 from rastion.solvers.discovery import discover_plugins
 from rastion.solvers.matching import (
     auto_select_solver,
@@ -43,7 +54,7 @@ from rastion.version import __version__
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="rastion",
-        description="Portable optimization runner.",
+        description="Local decision-plugin optimization runtime.",
     )
     parser.add_argument("--version", action="version", version=f"rastion {__version__}")
 
@@ -51,17 +62,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     info = sub.add_parser("info", help="Show installed solver plugins and capabilities")
     info.add_argument("--verbose", action="store_true", help="Show capabilities and compatibility details")
-    info.add_argument("spec", nargs="?", type=str, help="Problem spec path OR registry problem name")
+    info.add_argument("spec", nargs="?", type=str, help="Decision plugin spec path OR registry plugin name")
     info.add_argument("instance", nargs="?", type=str, help="Instance path OR registry instance name")
     info.set_defaults(func=cmd_info)
 
-    validate = sub.add_parser("validate", help="Validate problem spec + instance data")
-    validate.add_argument("spec", type=str, help="Path to spec.json OR registry problem name")
+    validate = sub.add_parser("validate", help="Validate decision plugin spec + instance data")
+    validate.add_argument("spec", type=str, help="Path to spec.json OR registry plugin name")
     validate.add_argument("instance", type=str, help="Path to instance JSON/NPZ OR registry instance name")
     validate.set_defaults(func=cmd_validate)
 
-    solve = sub.add_parser("solve", help="Solve a problem instance")
-    solve.add_argument("spec", type=str, help="Path to spec.json OR registry problem name")
+    solve = sub.add_parser("solve", help="Solve a decision plugin instance")
+    solve.add_argument("spec", type=str, help="Path to spec.json OR registry plugin name")
     solve.add_argument("instance", type=str, help="Path to instance JSON/NPZ OR registry instance name")
     solve.add_argument("--solver", default="auto", help="Solver name or auto")
     solve.add_argument(
@@ -86,19 +97,82 @@ def build_parser() -> argparse.ArgumentParser:
     solve.add_argument("--runs-dir", type=Path, default=runs_root(), help="Run record directory")
     solve.set_defaults(func=cmd_solve)
 
-    init = sub.add_parser("init-registry", help="Initialize local registry and seed built-in problems")
+    init = sub.add_parser("init-registry", help="Initialize local registry and seed built-in decision plugins")
     init.add_argument("--force", action="store_true", help="Overwrite existing seeded examples")
     init.set_defaults(func=cmd_init_registry)
 
-    export = sub.add_parser("export", help="Export a registry problem folder for sharing")
-    export.add_argument("problem", type=str, help="Problem name in local registry")
-    export.add_argument("destination", type=Path, help="Destination folder")
-    export.set_defaults(func=cmd_export)
+    init_agent = sub.add_parser(
+        "init-agent",
+        help="Scaffold agent-first workspace files (AGENTS.md + decision template)",
+    )
+    init_agent.add_argument("--path", type=Path, default=Path("."), help="Workspace folder to scaffold")
+    init_agent.add_argument("--overwrite", action="store_true", help="Overwrite existing bootstrap files")
+    init_agent.set_defaults(func=cmd_init_agent)
 
-    install = sub.add_parser("install", help="Install a local problem folder into registry")
-    install.add_argument("source", type=Path, help="Path to shareable problem folder")
-    install.add_argument("--overwrite", action="store_true", help="Overwrite if problem already exists")
-    install.set_defaults(func=cmd_install)
+    agent_run = sub.add_parser("agent-run", help="Run a structured agent request JSON end-to-end")
+    agent_run.add_argument("request", type=Path, help="Path to request JSON")
+    agent_run.add_argument(
+        "--output-json",
+        type=Path,
+        default=None,
+        help="Optional path for machine-readable result JSON",
+    )
+    agent_run.set_defaults(func=cmd_agent_run)
+
+    plugin = sub.add_parser("plugin", help="Manage decision plugins locally and on hub")
+    plugin_sub = plugin.add_subparsers(dest="plugin_command")
+
+    plugin_list = plugin_sub.add_parser("list", help="List installed decision plugins")
+    plugin_list.add_argument("--json", action="store_true", help="Print machine-readable JSON output")
+    plugin_list.set_defaults(func=cmd_plugin_list)
+
+    plugin_dev_list = plugin_sub.add_parser("dev-list", help="List local workspace decision plugins")
+    plugin_dev_list.add_argument(
+        "--path",
+        type=Path,
+        default=Path("decision_plugins"),
+        help="Workspace decision plugin root directory",
+    )
+    plugin_dev_list.add_argument("--json", action="store_true", help="Print machine-readable JSON output")
+    plugin_dev_list.set_defaults(func=cmd_plugin_dev_list)
+
+    plugin_status = plugin_sub.add_parser("status", help="Compare installed and workspace state for one plugin")
+    plugin_status.add_argument("name", type=str, help="Decision plugin name")
+    plugin_status.add_argument(
+        "--path",
+        type=Path,
+        default=Path("decision_plugins"),
+        help="Workspace decision plugin root directory",
+    )
+    plugin_status.add_argument("--json", action="store_true", help="Print machine-readable JSON output")
+    plugin_status.set_defaults(func=cmd_plugin_status)
+
+    plugin_install = plugin_sub.add_parser("install", help="Install a local decision plugin folder")
+    plugin_install.add_argument("source", type=Path, help="Path to decision plugin folder")
+    plugin_install.add_argument("--overwrite", action="store_true", help="Overwrite if plugin already exists")
+    plugin_install.set_defaults(func=cmd_plugin_install)
+
+    plugin_export = plugin_sub.add_parser("export", help="Export an installed decision plugin folder")
+    plugin_export.add_argument("name", type=str, help="Installed decision plugin name")
+    plugin_export.add_argument("destination", type=Path, help="Destination folder")
+    plugin_export.set_defaults(func=cmd_plugin_export)
+
+    plugin_remove = plugin_sub.add_parser("remove", help="Remove an installed decision plugin")
+    plugin_remove.add_argument("name", type=str, help="Installed decision plugin name")
+    plugin_remove.set_defaults(func=cmd_plugin_remove)
+
+    plugin_push = plugin_sub.add_parser("push", help="Upload a local decision plugin to Rastion Hub")
+    plugin_push.add_argument("path", type=Path, help="Path to local decision plugin folder")
+    plugin_push.set_defaults(func=cmd_plugin_push)
+
+    plugin_pull = plugin_sub.add_parser("pull", help="Download a decision plugin from Rastion Hub")
+    plugin_pull.add_argument("name", type=str, help="Hub decision plugin name")
+    plugin_pull.add_argument("--overwrite", action="store_true", help="Overwrite local plugin if it exists")
+    plugin_pull.set_defaults(func=cmd_plugin_pull)
+
+    plugin_search = plugin_sub.add_parser("search", help="Search decision plugins on Rastion Hub")
+    plugin_search.add_argument("query", nargs="?", default="", help="Search query (blank lists latest matches)")
+    plugin_search.set_defaults(func=cmd_plugin_search)
 
     install_solver = sub.add_parser("install-solver", help="Install a solver plugin from ZIP URL")
     install_solver.add_argument("url", type=str, help="GitHub ZIP URL, e.g. https://github.com/user/repo/archive/main.zip")
@@ -106,8 +180,8 @@ def build_parser() -> argparse.ArgumentParser:
     install_solver.add_argument("--overwrite", action="store_true", help="Overwrite if solver already exists")
     install_solver.set_defaults(func=cmd_install_solver)
 
-    bench = sub.add_parser("benchmark", help="Benchmark one problem with multiple solvers")
-    bench.add_argument("problem", type=str, help="Problem path or registry name")
+    bench = sub.add_parser("benchmark", help="Benchmark one decision plugin with multiple solvers")
+    bench.add_argument("decision_plugin", type=str, help="Decision plugin path or registry name")
     bench.add_argument("--instance", type=str, default="default", help="Instance path or registry instance name")
     bench.add_argument(
         "--solvers",
@@ -118,6 +192,19 @@ def build_parser() -> argparse.ArgumentParser:
     bench.add_argument("--time-limit", type=str, default="30s", help="Time limit per run, e.g. 30s")
     bench.add_argument("--runs", type=int, default=3, help="Runs per solver")
     bench.set_defaults(func=cmd_benchmark)
+
+    runs = sub.add_parser("runs", help="Inspect local run history")
+    runs_sub = runs.add_subparsers(dest="runs_command")
+
+    runs_list = runs_sub.add_parser("list", help="List recent run records")
+    runs_list.add_argument("--limit", type=int, default=20, help="Number of recent runs to show")
+    runs_list.add_argument("--json", action="store_true", help="Print machine-readable JSON output")
+    runs_list.set_defaults(func=cmd_runs_list)
+
+    runs_show = runs_sub.add_parser("show", help="Show one run record by 1-based run id")
+    runs_show.add_argument("run_id", type=int, help="1-based run id from `rastion runs list`")
+    runs_show.add_argument("--json", action="store_true", help="Print machine-readable JSON output")
+    runs_show.set_defaults(func=cmd_runs_show)
 
     login = sub.add_parser("login", help="Login to hub via GitHub OAuth browser flow")
     login.set_defaults(func=cmd_login)
@@ -148,9 +235,9 @@ def _load_spec_instance(spec_ref: str, instance_ref: str) -> tuple[ProblemSpec, 
         instance = InstanceData.from_path(instance_candidate)
         return spec, instance
 
-    problem = Problem.from_registry(spec_ref)
-    spec = problem.spec
-    instance = problem.load_instance(instance_ref)
+    plugin = DecisionPlugin.from_registry(spec_ref)
+    spec = plugin.spec
+    instance = plugin.load_instance(instance_ref)
     return spec, instance
 
 
@@ -186,7 +273,7 @@ def cmd_info(args: argparse.Namespace) -> int:
 
         ir_model = compile_to_ir(spec, instance)
         requirements = requirements_from_ir(ir_model)
-        print("\nProblem requirements:")
+        print("\nDecision plugin requirements:")
         print("- " + required_capabilities_summary(requirements))
 
         print("\nCompatibility by solver:")
@@ -344,31 +431,251 @@ def cmd_solve(args: argparse.Namespace) -> int:
 
 def cmd_init_registry(args: argparse.Namespace) -> int:
     root = init_registry(force=args.force)
-    count = len(list_problems())
+    count = len(list_decision_plugins())
     print(f"Initialized local registry at: {root}")
-    print(f"Problems available: {count}")
+    print(f"Decision plugins available: {count}")
     return 0
 
 
-def cmd_export(args: argparse.Namespace) -> int:
+def cmd_init_agent(args: argparse.Namespace) -> int:
     try:
-        target = export_problem(args.problem, args.destination)
+        created = init_agent_workspace(args.path, overwrite=args.overwrite)
     except Exception as exc:
-        print(f"Export failed: {exc}")
+        print(f"Agent bootstrap failed: {exc}")
         return 1
 
-    print(f"Exported '{args.problem}' to {target}")
+    root = args.path.expanduser().resolve()
+    print(f"Initialized agent workspace at: {root}")
+    print("Created files:")
+    for path in created:
+        print(f"- {path}")
+    print("Next steps:")
+    print("- Review AGENTS.md and adapt policy to your team.")
+    print("- Convert real decision data into decision_plugins/<name>/instances/default.json.")
+    print("- Run `rastion agent-run ./agent_requests/calendar_week_off_30m.json` for full orchestration.")
+    print(
+        "- Run `rastion plugin install ./decision_plugins/<name> --overwrite` "
+        "then `rastion solve <name> default --solver auto`."
+    )
     return 0
 
 
-def cmd_install(args: argparse.Namespace) -> int:
+def cmd_agent_run(args: argparse.Namespace) -> int:
     try:
-        target = install_problem(args.source, overwrite=args.overwrite)
+        result = run_agent_request_file(args.request, output_json=args.output_json)
     except Exception as exc:
-        print(f"Install failed: {exc}")
+        print(f"Agent run failed: {exc}")
         return 1
 
-    print(f"Installed problem at {target}")
+    plugin_name = str(result["decision_plugin"])
+    print(f"Decision Plugin: {plugin_name} / {result['instance']}")
+    solver = result.get("solver", {})
+    print(f"Solver: {solver.get('name')} {solver.get('version')}")
+    print(f"Status: {result['status']}")
+    if result.get("objective_value") is not None:
+        print(f"Objective: {result['objective_value']:.6g}")
+    if result.get("runtime_s") is not None:
+        print(f"Runtime: {result['runtime_s']:.6g}s")
+    installed = result.get("installed_solver_folders") or []
+    if installed:
+        print("Installed solvers:")
+        for name in installed:
+            print(f"- {name}")
+    if result.get("error_message"):
+        print(f"Error: {result['error_message']}")
+    if result.get("output_json"):
+        print(f"Output JSON: {result['output_json']}")
+    print(f"RunRecord: {result['run_record_file']}")
+
+    return 0 if result["status"] in {SolutionStatus.OPTIMAL.value, SolutionStatus.FEASIBLE.value} else 1
+
+
+def cmd_plugin_list(args: argparse.Namespace) -> int:
+    init_registry(copy_examples=False)
+    plugins = _installed_decision_plugin_entries()
+    if args.json:
+        print(json.dumps(plugins, indent=2, sort_keys=True))
+        return 0
+
+    if not plugins:
+        print("No decision plugins installed.")
+        return 0
+
+    print("Installed decision plugins:")
+    for plugin in plugins:
+        print(f"- {plugin['name']} {plugin['version']} ({plugin['path']})")
+    return 0
+
+
+def cmd_plugin_dev_list(args: argparse.Namespace) -> int:
+    plugins = _workspace_decision_plugin_entries(args.path)
+    if args.json:
+        print(json.dumps(plugins, indent=2, sort_keys=True))
+        return 0
+
+    if not plugins:
+        print(f"No local decision plugins found under {args.path.expanduser().resolve()}.")
+        return 0
+
+    print("Local workspace decision plugins:")
+    for plugin in plugins:
+        print(f"- {plugin['name']} {plugin['version']} ({plugin['path']})")
+    return 0
+
+
+def cmd_plugin_status(args: argparse.Namespace) -> int:
+    installed = [entry for entry in _installed_decision_plugin_entries() if entry["name"] == args.name]
+    workspace = [
+        entry
+        for entry in _workspace_decision_plugin_entries(args.path)
+        if entry["name"] == args.name or Path(entry["path"]).name == args.name
+    ]
+
+    payload: dict[str, Any] = {
+        "name": args.name,
+        "installed": installed[0] if installed else None,
+        "workspace": workspace[0] if workspace else None,
+        "in_sync": None,
+    }
+    if payload["installed"] and payload["workspace"]:
+        payload["in_sync"] = payload["installed"]["fingerprint"] == payload["workspace"]["fingerprint"]
+
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+
+    print(f"Decision plugin: {args.name}")
+    if payload["installed"] is None:
+        print("- Installed: no")
+    else:
+        installed_entry = payload["installed"]
+        print(f"- Installed: yes ({installed_entry['version']}, {installed_entry['path']})")
+    if payload["workspace"] is None:
+        print("- Workspace: no")
+    else:
+        workspace_entry = payload["workspace"]
+        print(f"- Workspace: yes ({workspace_entry['version']}, {workspace_entry['path']})")
+    if payload["in_sync"] is not None:
+        print(f"- In Sync: {'yes' if payload['in_sync'] else 'no'}")
+    return 0
+
+
+def cmd_plugin_install(args: argparse.Namespace) -> int:
+    try:
+        target = install_decision_plugin(args.source, overwrite=args.overwrite)
+    except Exception as exc:
+        print(f"Decision plugin install failed: {exc}")
+        return 1
+
+    print(f"Installed decision plugin at {target}")
+    return 0
+
+
+def cmd_plugin_export(args: argparse.Namespace) -> int:
+    try:
+        target = export_decision_plugin(args.name, args.destination)
+    except Exception as exc:
+        print(f"Decision plugin export failed: {exc}")
+        return 1
+
+    print(f"Exported decision plugin '{args.name}' to {target}")
+    return 0
+
+
+def cmd_plugin_remove(args: argparse.Namespace) -> int:
+    removed = remove_decision_plugin(args.name)
+    if not removed:
+        print(f"Decision plugin '{args.name}' not found.")
+        return 1
+    print(f"Removed decision plugin '{args.name}'.")
+    return 0
+
+
+def cmd_plugin_push(args: argparse.Namespace) -> int:
+    try:
+        client = HubClient()
+        result = asyncio.run(client.push_decision_plugin(args.path))
+    except (HubClientError, RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(f"Decision plugin push failed: {exc}")
+        if _is_hub_auth_error(exc):
+            print("Run `rastion login` and retry.")
+        return 1
+
+    print(f"Pushed decision plugin '{result.get('name', args.path.name)}' to {client.base_url}")
+    return 0
+
+
+def cmd_plugin_pull(args: argparse.Namespace) -> int:
+    try:
+        client = HubClient()
+        result = asyncio.run(client.pull_decision_plugin(args.name, overwrite=args.overwrite))
+    except (HubClientError, RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(f"Decision plugin pull failed: {exc}")
+        return 1
+
+    print(f"Pulled decision plugin '{result.get('name', args.name)}' into {result.get('path', '')}")
+    return 0
+
+
+def cmd_plugin_search(args: argparse.Namespace) -> int:
+    try:
+        client = HubClient()
+        plugins = asyncio.run(client.list_decision_plugins(args.query))
+    except (HubClientError, RuntimeError, ValueError) as exc:
+        print(f"Decision plugin search failed: {exc}")
+        return 1
+
+    if not plugins:
+        print("No decision plugins found on hub.")
+        return 0
+
+    print("Hub decision plugins:")
+    for item in plugins:
+        name = str(item.get("name", "unknown"))
+        version = str(item.get("version", "n/a"))
+        owner = _hub_owner(item)
+        downloads = item.get("download_count", "n/a")
+        rating = item.get("rating", "n/a")
+        print(f"- {name} v{version} ({owner}) downloads={downloads} rating={rating}")
+    return 0
+
+
+def cmd_runs_list(args: argparse.Namespace) -> int:
+    indexed = _indexed_run_records()
+    if args.limit > 0:
+        indexed = indexed[-args.limit :]
+
+    rows = [_run_summary(index, record) for index, record in indexed]
+    if args.json:
+        print(json.dumps(rows, indent=2, sort_keys=True))
+        return 0
+
+    if not rows:
+        print("No run history found.")
+        return 0
+
+    print("Recent runs:")
+    for row in rows:
+        objective = "n/a" if row["objective_value"] is None else f"{row['objective_value']}"
+        print(
+            f"- #{row['run_id']} {row['timestamp']} solver={row['solver']} "
+            f"status={row['status']} objective={objective}"
+        )
+    return 0
+
+
+def cmd_runs_show(args: argparse.Namespace) -> int:
+    indexed = _indexed_run_records()
+    if args.run_id < 1 or args.run_id > len(indexed):
+        print(f"Run id out of range: {args.run_id}. Available range: 1..{len(indexed)}")
+        return 1
+
+    _, record = indexed[args.run_id - 1]
+    if args.json:
+        print(json.dumps(record, indent=2, sort_keys=True))
+        return 0
+
+    print(json.dumps(record, indent=2, sort_keys=True))
     return 0
 
 
@@ -386,14 +693,14 @@ def cmd_install_solver(args: argparse.Namespace) -> int:
 def cmd_benchmark(args: argparse.Namespace) -> int:
     try:
         results = compare(
-            args.problem,
+            args.decision_plugin,
             instance=args.instance,
             solvers=args.solvers,
             time_limit=args.time_limit,
             runs=args.runs,
         )
     except Exception as exc:
-        print(f"Benchmark failed: {exc}")
+        print(f"Decision plugin benchmark failed: {exc}")
         return 1
 
     for result in results:
@@ -415,34 +722,22 @@ def cmd_login(args: argparse.Namespace) -> int:
     try:
         oauth_url = asyncio.run(client.oauth_login_url())
     except (HubClientError, RuntimeError, ValueError) as exc:
+        if isinstance(exc, HubClientError) and _oauth_endpoint_unsupported(exc):
+            print("Hub does not support browser OAuth login; falling back to token login.")
+            return _complete_login_with_token(client, prompt="GitHub token: ")
         print(f"Login failed: {exc}")
         return 1
 
     print("Opening browser for GitHub authorization...")
-    opened = webbrowser.open(oauth_url)
-    if not opened:
-        print("Unable to open browser automatically.")
+    opened, opener = _open_url_in_browser(oauth_url)
+    if opened:
+        if opener:
+            print(f"Browser launch command: {opener}")
+    else:
+        print("Unable to open browser automatically in this terminal session.")
     print(f"Authorize here: {oauth_url}")
 
-    try:
-        token = input("Paste token from callback page: ").strip()
-    except EOFError:
-        print("Login failed: no token provided.")
-        return 1
-
-    if not token:
-        print("Login failed: token cannot be empty.")
-        return 1
-
-    try:
-        user = asyncio.run(client.login(token))
-    except (HubClientError, RuntimeError, ValueError) as exc:
-        print(f"Login failed: {exc}")
-        return 1
-
-    username = str(user.get("username") or user.get("login") or "unknown")
-    print(f"Logged in as {username}")
-    return 0
+    return _complete_login_with_token(client, prompt="Paste token from callback page: ")
 
 
 def cmd_logout(args: argparse.Namespace) -> int:
@@ -487,6 +782,255 @@ def _warn_if_hub_solver(name: str) -> None:
 
     print(f'WARNING: You are about to run solver "{name}" from the hub.')
     print("This is Python code from an untrusted source. Only run if you trust the author.")
+
+
+def _is_hub_auth_error(exc: Exception) -> bool:
+    message = str(exc).casefold()
+    return "not authenticated" in message or "unauthorized" in message or "401" in message
+
+
+def _hub_owner(item: dict[str, object]) -> str:
+    owner = item.get("owner")
+    if isinstance(owner, dict):
+        username = owner.get("username")
+        if isinstance(username, str) and username.strip():
+            return username
+    return "unknown"
+
+
+def _installed_decision_plugin_entries() -> list[dict[str, object]]:
+    entries: list[dict[str, object]] = []
+    for entry in list_decision_plugins():
+        plugin_path = Path(entry.path) if entry.path is not None else (problems_root() / entry.name)
+        entries.append(
+            {
+                "name": entry.name,
+                "version": entry.version,
+                "author": entry.author,
+                "path": str(plugin_path.resolve()),
+                "fingerprint": _decision_plugin_fingerprint(plugin_path),
+            }
+        )
+    entries.sort(key=lambda item: (str(item["name"]), str(item["version"]), str(item["path"])))
+    return entries
+
+
+def _workspace_decision_plugin_entries(path: Path) -> list[dict[str, object]]:
+    root = path.expanduser().resolve()
+    if not root.exists() or not root.is_dir():
+        return []
+
+    entries: list[dict[str, object]] = []
+    for candidate in sorted(root.iterdir(), key=lambda p: p.name):
+        if not candidate.is_dir():
+            continue
+        spec_path = candidate / "spec.json"
+        if not spec_path.exists():
+            continue
+
+        name = candidate.name
+        version = "0.1.0"
+        author = "unknown"
+        metadata_path = candidate / "metadata.yaml"
+        if metadata_path.exists():
+            loaded = read_yaml_file(metadata_path)
+            if isinstance(loaded, dict):
+                raw_name = loaded.get("name")
+                raw_version = loaded.get("version")
+                raw_author = loaded.get("author")
+                if isinstance(raw_name, str) and raw_name.strip():
+                    name = raw_name.strip()
+                if isinstance(raw_version, (str, int, float)):
+                    version = str(raw_version).strip() or version
+                if isinstance(raw_author, str) and raw_author.strip():
+                    author = raw_author.strip()
+
+        entries.append(
+            {
+                "name": name,
+                "version": version,
+                "author": author,
+                "path": str(candidate),
+                "fingerprint": _decision_plugin_fingerprint(candidate),
+            }
+        )
+
+    entries.sort(key=lambda item: (str(item["name"]), str(item["version"]), str(item["path"])))
+    return entries
+
+
+def _decision_plugin_fingerprint(root: Path) -> str:
+    target = root.expanduser().resolve()
+    digest = hashlib.sha256()
+    files: list[Path] = []
+    for relative in ("spec.json", "metadata.yaml", "problem_card.md", "decision.yaml"):
+        candidate = target / relative
+        if candidate.exists() and candidate.is_file():
+            files.append(candidate)
+    instances_dir = target / "instances"
+    if instances_dir.exists() and instances_dir.is_dir():
+        for candidate in sorted(instances_dir.iterdir(), key=lambda p: p.name):
+            if candidate.is_file() and candidate.suffix.lower() in {".json", ".npz"}:
+                files.append(candidate)
+
+    for candidate in sorted(files, key=lambda p: str(p.relative_to(target))):
+        rel = str(candidate.relative_to(target)).replace("\\", "/")
+        digest.update(rel.encode("utf-8"))
+        digest.update(b"\n")
+        digest.update(candidate.read_bytes())
+        digest.update(b"\n")
+    return digest.hexdigest()
+
+
+def _indexed_run_records() -> list[tuple[int, dict[str, Any]]]:
+    history = runs_file()
+    if not history.exists() or not history.is_file():
+        return []
+
+    records: list[tuple[int, dict[str, Any]]] = []
+    for line in history.read_text(encoding="utf-8").splitlines():
+        payload = line.strip()
+        if not payload:
+            continue
+        try:
+            parsed = json.loads(payload)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(parsed, dict):
+            continue
+        records.append((len(records) + 1, parsed))
+    return records
+
+
+def _run_summary(run_id: int, record: dict[str, Any]) -> dict[str, Any]:
+    solution = record.get("solution")
+    if not isinstance(solution, dict):
+        solution = {}
+    return {
+        "run_id": run_id,
+        "timestamp": record.get("timestamp"),
+        "solver": record.get("solver_name"),
+        "status": solution.get("status"),
+        "objective_value": solution.get("objective_value"),
+    }
+
+
+def _complete_login_with_token(client: HubClient, *, prompt: str) -> int:
+    try:
+        entered = input(prompt).strip()
+    except EOFError:
+        print("Login failed: no token provided.")
+        return 1
+
+    token = entered
+    if not token:
+        token = _env_github_token() or ""
+        if token:
+            print("Using GitHub token from local .env/environment.")
+
+    if not token:
+        print("Login failed: token cannot be empty and no token was found in local .env/environment.")
+        return 1
+
+    try:
+        user = asyncio.run(client.login(token))
+    except (HubClientError, RuntimeError, ValueError) as exc:
+        print(f"Login failed: {exc}")
+        return 1
+
+    username = str(user.get("username") or user.get("login") or "unknown")
+    print(f"Logged in as {username}")
+    return 0
+
+
+def _env_github_token() -> str | None:
+    for key in ("RASTION_GITHUB_TOKEN", "GITHUB_TOKEN"):
+        value = os.environ.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+
+    for dotenv_path in _dotenv_candidates():
+        token = _read_dotenv_token(dotenv_path)
+        if token:
+            return token
+    return None
+
+
+def _dotenv_candidates() -> list[Path]:
+    candidates = [
+        Path.cwd() / ".env",
+        Path(__file__).resolve().parents[2] / ".env",
+    ]
+    ordered: list[Path] = []
+    seen: set[Path] = set()
+    for candidate in candidates:
+        normalized = candidate.resolve()
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        ordered.append(normalized)
+    return ordered
+
+
+def _read_dotenv_token(path: Path) -> str | None:
+    if not path.exists() or not path.is_file():
+        return None
+    try:
+        for raw_line in path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            normalized_key = key.strip()
+            if normalized_key not in {"RASTION_GITHUB_TOKEN", "GITHUB_TOKEN"}:
+                continue
+            cleaned = value.strip().strip('"').strip("'")
+            if cleaned:
+                return cleaned
+    except OSError:
+        return None
+    return None
+
+
+def _oauth_endpoint_unsupported(exc: HubClientError) -> bool:
+    message = str(exc).lower()
+    if "method not allowed" in message or "not found" in message:
+        return True
+    return re.search(r"\b(404|405)\b", message) is not None
+
+
+def _open_url_in_browser(url: str) -> tuple[bool, str | None]:
+    try:
+        if webbrowser.open(url, new=2):
+            return True, "python-webbrowser"
+    except Exception:
+        pass
+
+    candidates: list[tuple[str, list[str]]] = []
+    if shutil.which("wslview"):
+        candidates.append(("wslview", ["wslview", url]))
+    if shutil.which("xdg-open"):
+        candidates.append(("xdg-open", ["xdg-open", url]))
+    if shutil.which("gio"):
+        candidates.append(("gio open", ["gio", "open", url]))
+    if shutil.which("open"):
+        candidates.append(("open", ["open", url]))
+    if os.environ.get("WSL_DISTRO_NAME") and shutil.which("cmd.exe"):
+        candidates.append(("cmd.exe start", ["cmd.exe", "/C", "start", "", url]))
+
+    for label, command in candidates:
+        try:
+            subprocess.Popen(
+                command,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True,
+            )
+            return True, label
+        except OSError:
+            continue
+
+    return False, None
 
 
 def main(argv: list[str] | None = None) -> int:

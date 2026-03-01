@@ -15,7 +15,7 @@ import yaml
 
 from rastion.config import clear_token, get_token, save_token
 from rastion.registry.manager import (
-    add_problem,
+    add_decision_plugin,
     hub_config,
     init_registry,
     read_yaml_file,
@@ -30,8 +30,9 @@ try:  # pragma: no cover - optional dependency in some environments
 except ImportError:  # pragma: no cover - handled at runtime in hub commands
     httpx = None  # type: ignore[assignment]
 
-PackageType = Literal["problem", "solver"]
-SearchType = Literal["problem", "solver", "both"]
+CanonicalPackageType = Literal["problem", "solver"]
+PackageType = Literal["problem", "solver", "decision_plugin"]
+SearchType = Literal["problem", "solver", "both", "decision_plugin"]
 
 
 class HubClientError(RuntimeError):
@@ -53,7 +54,7 @@ class HubClient:
 
         init_registry(copy_examples=False)
         cfg = hub_config()
-        configured_url = str(cfg.get("url") or "http://localhost:8000")
+        configured_url = str(cfg.get("url") or "https://rastion-hub.onrender.com")
         persisted_json_token = get_token()
         persisted_yaml_token = self._normalize_token(cfg.get("token"))
 
@@ -70,12 +71,39 @@ class HubClient:
             set_hub_url(self.base_url)
 
     async def oauth_login_url(self) -> str:
-        payload = await self._request_json("GET", "/auth/login")
-        if isinstance(payload, dict):
-            url = payload.get("url")
-            if isinstance(url, str) and url.strip():
-                return url.strip()
-        raise HubClientError("Hub response did not include an OAuth login URL")
+        candidates = [
+            ("POST", "/auth/login"),
+            ("GET", "/auth/login"),
+            ("GET", "/auth/oauth/login"),
+            ("POST", "/auth/oauth/login"),
+            ("GET", "/auth/github/login"),
+            ("POST", "/auth/github/login"),
+        ]
+        errors: list[str] = []
+
+        for method, path in candidates:
+            try:
+                payload = await self._request_json(method, path)
+            except HubClientError as exc:
+                message = str(exc)
+                if any(code in message for code in (" 401 ", " 404 ", " 405 ", "(401", "(404", "(405")):
+                    errors.append(f"{method} {path}: {message}")
+                    continue
+                raise
+
+            if isinstance(payload, dict):
+                url = payload.get("url")
+                if isinstance(url, str) and url.strip():
+                    return url.strip()
+
+            errors.append(f"{method} {path}: response missing OAuth URL")
+
+        details = "; ".join(errors[-3:]) if errors else "no endpoint responded"
+        raise HubClientError(
+            "Hub OAuth login endpoint is unavailable. "
+            "Deploy the updated hub API with GET /auth/login and POST /auth/token. "
+            f"Recent checks: {details}"
+        )
 
     async def verify_token(self, token: str) -> dict[str, Any]:
         candidate = token.strip()
@@ -104,10 +132,30 @@ class HubClient:
         if not candidate:
             raise HubClientError("GitHub token cannot be empty")
 
-        user = await self.verify_token(candidate)
-        self.token = candidate
-        save_token(candidate)
-        set_hub_token(candidate)
+        # Prefer exchanging a GitHub token for a hub session token when supported.
+        # Some hub deployments require session JWTs for /auth/me and package operations.
+        try:
+            payload = await self._request_json(
+                "POST",
+                "/auth/login",
+                token_override=candidate,
+            )
+        except HubClientError as exc:
+            if not self._should_try_legacy_login(exc):
+                raise
+
+            # Fallback path for hubs that only expose /auth/token verification.
+            user = await self.verify_token(candidate)
+            self.token = candidate
+            save_token(candidate)
+            set_hub_token(candidate)
+            return user
+
+        access_token = self._extract_access_token(payload)
+        user = self._extract_user(payload)
+        self.token = access_token
+        save_token(access_token)
+        set_hub_token(access_token)
         return user
 
     async def logout(self) -> None:
@@ -123,30 +171,40 @@ class HubClient:
         search_type = self._normalize_search_type(type)
         term = query.strip()
 
+        if search_type == "decision_plugin":
+            plugins = await self._list_problem_items(term)
+            return {"decision_plugins": plugins, "problems": plugins, "solvers": []}
         if search_type == "problem":
-            return {"problems": await self._list_items("problems", term), "solvers": []}
+            plugins = await self._list_problem_items(term)
+            return {"decision_plugins": plugins, "problems": plugins, "solvers": []}
         if search_type == "solver":
-            return {"problems": [], "solvers": await self._list_items("solvers", term)}
+            return {"decision_plugins": [], "problems": [], "solvers": await self._list_items("solvers", term)}
 
+        plugins = await self._list_problem_items(term)
         return {
-            "problems": await self._list_items("problems", term),
+            "decision_plugins": plugins,
+            "problems": plugins,
             "solvers": await self._list_items("solvers", term),
         }
+
+    async def list_decision_plugins(self, query: str = "") -> list[dict[str, Any]]:
+        return await self._list_problem_items(query.strip())
 
     async def push(self, path: str | Path, type: PackageType | None = None) -> dict[str, Any]:
         source = Path(path).expanduser().resolve()
         if not source.exists() or not source.is_dir():
             raise FileNotFoundError(f"package path does not exist: {source}")
 
-        package_type = self._normalize_package_type(type) if type is not None else self._infer_package_type(source)
+        requested_type = self._normalize_package_type(type) if type is not None else self._infer_package_type(source)
+        package_type = self._canonical_package_type(requested_type)
+        upload_path_candidates = self._upload_paths_for_package_type(requested_type)
 
         with tempfile.TemporaryDirectory(prefix="rastion_hub_push_") as tmp:
             temp_root = Path(tmp)
             archive_path, manifest = self._build_package_archive(source, package_type, temp_root)
-
-            payload = await self._request_json(
+            payload = await self._request_json_with_fallback(
                 "POST",
-                f"/{package_type}s",
+                upload_path_candidates,
                 require_auth=True,
                 files={
                     "file": (
@@ -169,8 +227,11 @@ class HubClient:
         else:
             result = {"response": payload}
         result.setdefault("name", manifest["name"])
-        result.setdefault("type", package_type)
+        result.setdefault("type", self._public_package_type(package_type))
         return result
+
+    async def push_decision_plugin(self, path: str | Path) -> dict[str, Any]:
+        return await self.push(path, type="decision_plugin")
 
     async def pull(
         self,
@@ -190,7 +251,7 @@ class HubClient:
         if download_key is None:
             raise HubClientError("Hub response is missing both 'id' and 'name'; cannot download package")
 
-        archive = await self._request_bytes("GET", f"/{package_type}s/{download_key}/download")
+        archive = await self._download_archive(package_type, download_key)
         installed_path, installed_name = self._install_archive(
             archive=archive,
             package_type=package_type,
@@ -200,10 +261,18 @@ class HubClient:
 
         return {
             "name": installed_name,
-            "type": package_type,
+            "type": self._public_package_type(package_type),
             "path": str(installed_path),
             "source": item,
         }
+
+    async def pull_decision_plugin(
+        self,
+        name: str,
+        *,
+        overwrite: bool = False,
+    ) -> dict[str, Any]:
+        return await self.pull(name, type="decision_plugin", overwrite=overwrite)
 
     async def _list_items(self, endpoint: str, query: str) -> list[dict[str, Any]]:
         params: dict[str, Any] = {}
@@ -212,11 +281,15 @@ class HubClient:
         payload = await self._request_json("GET", f"/{endpoint}", params=params or None)
         return self._coerce_items(payload)
 
-    async def _resolve_remote_item(self, name: str, search_type: SearchType) -> tuple[dict[str, Any], PackageType]:
-        if search_type == "problem":
-            problem = await self._find_best_match("problems", name)
+    async def _resolve_remote_item(
+        self,
+        name: str,
+        search_type: SearchType,
+    ) -> tuple[dict[str, Any], CanonicalPackageType]:
+        if search_type in {"problem", "decision_plugin"}:
+            problem = await self._find_best_problem_match(name)
             if problem is None:
-                raise HubClientError(f"Problem '{name}' not found on hub")
+                raise HubClientError(f"Decision plugin '{name}' not found on hub")
             return problem, "problem"
 
         if search_type == "solver":
@@ -225,24 +298,33 @@ class HubClient:
                 raise HubClientError(f"Solver '{name}' not found on hub")
             return solver, "solver"
 
-        problem = await self._find_best_match("problems", name)
+        problem = await self._find_best_problem_match(name)
         solver = await self._find_best_match("solvers", name)
 
         if problem is not None and solver is not None:
             raise HubClientError(
-                f"Both problem and solver named '{name}' exist. Retry with an explicit type."
+                f"Both decision plugin and solver named '{name}' exist. Retry with an explicit type."
             )
         if problem is not None:
             return problem, "problem"
         if solver is not None:
             return solver, "solver"
-        raise HubClientError(f"No problem or solver named '{name}' found on hub")
+        raise HubClientError(f"No decision plugin or solver named '{name}' found on hub")
+
+    async def _find_best_problem_match(self, name: str) -> dict[str, Any] | None:
+        items = await self._list_problem_items(name)
+        if not items:
+            return None
+        return self._pick_best_match(items, name)
 
     async def _find_best_match(self, endpoint: str, name: str) -> dict[str, Any] | None:
         items = await self._list_items(endpoint, name)
         if not items:
             return None
 
+        return self._pick_best_match(items, name)
+
+    def _pick_best_match(self, items: list[dict[str, Any]], name: str) -> dict[str, Any]:
         lowered = name.casefold()
         exact = [item for item in items if str(item.get("name", "")).casefold() == lowered]
         if exact:
@@ -254,10 +336,29 @@ class HubClient:
 
         return items[0]
 
+    async def _list_problem_items(self, query: str) -> list[dict[str, Any]]:
+        payload = await self._request_json_with_fallback(
+            "GET",
+            ["/decision-plugins", "/problems"],
+            params={"q": query} if query else None,
+        )
+        return self._coerce_items(payload)
+
+    async def _download_archive(self, package_type: CanonicalPackageType, download_key: Any) -> bytes:
+        if package_type == "problem":
+            return await self._request_bytes_with_fallback(
+                "GET",
+                [
+                    f"/decision-plugins/{download_key}/download",
+                    f"/problems/{download_key}/download",
+                ],
+            )
+        return await self._request_bytes("GET", f"/solvers/{download_key}/download")
+
     def _build_package_archive(
         self,
         source: Path,
-        package_type: PackageType,
+        package_type: CanonicalPackageType,
         temp_root: Path,
     ) -> tuple[Path, dict[str, Any]]:
         if package_type == "problem":
@@ -267,7 +368,7 @@ class HubClient:
     def _build_problem_archive(self, source: Path, temp_root: Path) -> tuple[Path, dict[str, Any]]:
         spec_path = source / "spec.json"
         if not spec_path.exists():
-            raise FileNotFoundError(f"problem is missing spec.json: {source}")
+            raise FileNotFoundError(f"decision plugin is missing spec.json: {source}")
 
         metadata = self._load_metadata(source / "metadata.yaml")
         manifest = self._build_manifest(source, metadata, "problem")
@@ -322,7 +423,7 @@ class HubClient:
         self,
         *,
         archive: bytes,
-        package_type: PackageType,
+        package_type: CanonicalPackageType,
         item: dict[str, Any],
         overwrite: bool,
     ) -> tuple[Path, str]:
@@ -352,15 +453,15 @@ class HubClient:
     ) -> tuple[Path, str]:
         payload_root = self._find_problem_root(extract_root)
         if payload_root is None:
-            raise HubClientError("Downloaded archive does not contain a valid problem package")
+            raise HubClientError("Downloaded archive does not contain a valid decision plugin package")
 
         manifest = self._load_manifest(payload_root)
         default_name = str(item.get("name") or payload_root.name)
         name = self._safe_name(str(manifest.get("name") or default_name))
         if not name:
-            raise HubClientError("Problem package is missing a valid name")
+            raise HubClientError("Decision plugin package is missing a valid name")
 
-        installed = add_problem(payload_root, name=name, overwrite=overwrite)
+        installed = add_decision_plugin(payload_root, name=name, overwrite=overwrite)
         return installed, name
 
     def _install_solver_from_extract(
@@ -438,6 +539,34 @@ class HubClient:
         except ValueError as exc:
             raise HubClientError(f"Hub response is not valid JSON for {method} {path}") from exc
 
+    async def _request_json_with_fallback(
+        self,
+        method: str,
+        paths: list[str],
+        *,
+        token_override: str | None = None,
+        require_auth: bool = False,
+        **kwargs: Any,
+    ) -> Any:
+        last_error: HubClientError | None = None
+        for path in paths:
+            try:
+                return await self._request_json(
+                    method,
+                    path,
+                    token_override=token_override,
+                    require_auth=require_auth,
+                    **kwargs,
+                )
+            except HubClientError as exc:
+                if self._is_endpoint_unsupported(exc):
+                    last_error = exc
+                    continue
+                raise
+        if last_error is not None:
+            raise last_error
+        raise HubClientError(f"No valid endpoint available for {method} request")
+
     async def _request_bytes(
         self,
         method: str,
@@ -455,6 +584,34 @@ class HubClient:
             **kwargs,
         )
         return response.content
+
+    async def _request_bytes_with_fallback(
+        self,
+        method: str,
+        paths: list[str],
+        *,
+        token_override: str | None = None,
+        require_auth: bool = False,
+        **kwargs: Any,
+    ) -> bytes:
+        last_error: HubClientError | None = None
+        for path in paths:
+            try:
+                return await self._request_bytes(
+                    method,
+                    path,
+                    token_override=token_override,
+                    require_auth=require_auth,
+                    **kwargs,
+                )
+            except HubClientError as exc:
+                if self._is_endpoint_unsupported(exc):
+                    last_error = exc
+                    continue
+                raise
+        if last_error is not None:
+            raise last_error
+        raise HubClientError(f"No valid endpoint available for {method} request")
 
     async def _request(
         self,
@@ -506,6 +663,10 @@ class HubClient:
         return f"Hub request failed ({response.status_code} {reason}): {detail}"
 
     def _should_try_legacy_login(self, exc: HubClientError) -> bool:
+        message = str(exc)
+        return bool(re.search(r"\b(404|405)\b", message))
+
+    def _is_endpoint_unsupported(self, exc: HubClientError) -> bool:
         message = str(exc)
         return bool(re.search(r"\b(404|405)\b", message))
 
@@ -586,7 +747,7 @@ class HubClient:
         if readme.exists() and readme.is_file():
             return readme.read_text(encoding="utf-8")
 
-        return f"# {manifest['name']}\n\nNo problem card provided.\n"
+        return f"# {manifest['name']}\n\nNo decision plugin card provided.\n"
 
     def _solver_readme(self, source: Path, manifest: dict[str, Any]) -> str:
         solver_card = source / "solver_card.md"
@@ -605,14 +766,14 @@ class HubClient:
 
         if has_problem and has_solver:
             raise HubClientError(
-                "Path contains both problem and solver artifacts. Use an explicit type to disambiguate."
+                "Path contains both decision plugin and solver artifacts. Use an explicit type to disambiguate."
             )
         if has_problem:
             return "problem"
         if has_solver:
             return "solver"
         raise HubClientError(
-            "Could not infer package type. Expected spec.json (problem) or solver.py (solver)."
+            "Could not infer package type. Expected spec.json (decision plugin) or solver.py (solver)."
         )
 
     def _find_solver_file(self, source: Path) -> Path | None:
@@ -660,16 +821,32 @@ class HubClient:
 
     def _normalize_search_type(self, value: str) -> SearchType:
         lowered = value.strip().lower()
+        decision_plugin_aliases = {
+            "decision_plugin",
+            "decision-plugin",
+            "decision_plugins",
+            "decision-plugins",
+            "plugin",
+            "plugins",
+        }
+        if lowered in decision_plugin_aliases:
+            return "decision_plugin"
         if lowered not in {"problem", "solver", "both"}:
-            raise HubClientError(f"Unsupported type '{value}'. Expected problem, solver, or both.")
+            raise HubClientError(
+                f"Unsupported type '{value}'. Expected decision_plugin, solver, or both."
+            )
         return lowered  # type: ignore[return-value]
 
     def _normalize_package_type(self, value: str | None) -> PackageType:
         if value is None:
             raise HubClientError("Package type is required")
         lowered = value.strip().lower()
+        if lowered in {"decision_plugin", "decision-plugin", "decision_plugins", "decision-plugins", "plugin"}:
+            return "decision_plugin"
         if lowered not in {"problem", "solver"}:
-            raise HubClientError(f"Unsupported package type '{value}'. Expected problem or solver.")
+            raise HubClientError(
+                f"Unsupported package type '{value}'. Expected decision_plugin or solver."
+            )
         return lowered  # type: ignore[return-value]
 
     def _coerce_items(self, payload: Any) -> list[dict[str, Any]]:
@@ -683,6 +860,8 @@ class HubClient:
                 items = payload["results"]
             elif isinstance(payload.get("problems"), list):
                 items = payload["problems"]
+            elif isinstance(payload.get("decision_plugins"), list):
+                items = payload["decision_plugins"]
             elif isinstance(payload.get("solvers"), list):
                 items = payload["solvers"]
             elif isinstance(payload.get("data"), list):
@@ -711,3 +890,19 @@ class HubClient:
         if fallback_name:
             return fallback_name
         return "package"
+
+    def _canonical_package_type(self, package_type: PackageType) -> CanonicalPackageType:
+        if package_type in {"problem", "decision_plugin"}:
+            return "problem"
+        return "solver"
+
+    def _public_package_type(self, package_type: CanonicalPackageType) -> str:
+        if package_type == "problem":
+            return "decision_plugin"
+        return package_type
+
+    def _upload_paths_for_package_type(self, package_type: PackageType) -> list[str]:
+        canonical = self._canonical_package_type(package_type)
+        if canonical == "problem":
+            return ["/decision-plugins", "/problems"]
+        return ["/solvers"]

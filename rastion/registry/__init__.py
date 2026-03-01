@@ -1,27 +1,28 @@
 """Registry public API."""
 
-from rastion.registry.loader import AutoSolver, Problem, Solver
+from rastion.registry.loader import AutoSolver, DecisionPlugin, Problem, Solver
 from rastion.registry.manager import (
-    add_problem,
-    export_problem,
+    add_decision_plugin,
+    export_decision_plugin,
     init_registry,
-    install_problem,
+    install_decision_plugin,
     install_solver_from_url,
-    list_problems,
+    list_decision_plugins,
     list_solvers,
-    remove_problem,
+    remove_decision_plugin,
 )
 
 __all__ = [
     "AutoSolver",
+    "DecisionPlugin",
     "Problem",
     "Solver",
-    "add_problem",
-    "export_problem",
+    "add_decision_plugin",
+    "export_decision_plugin",
     "init_registry",
-    "install_problem",
+    "install_decision_plugin",
     "install_solver_from_url",
-    "list_problems",
+    "list_decision_plugins",
     "list_solvers",
-    "remove_problem",
+    "remove_decision_plugin",
 ]

@@ -29,7 +29,7 @@ class RegistryEntry(BaseModel):
 
 
 class ProblemEntry(RegistryEntry):
-    """Problem metadata stored in the local registry."""
+    """Decision plugin metadata stored in the local registry."""
 
     optimization_class: str = "unknown"
     difficulty: str = "medium"

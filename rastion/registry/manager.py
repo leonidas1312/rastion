@@ -22,7 +22,7 @@ _REGISTRY_DIRNAME = "registry"
 _PROBLEMS_DIRNAME = "problems"
 _SOLVERS_DIRNAME = "solvers"
 _RUNS_DIRNAME = "runs"
-_DEFAULT_HUB_URL = "http://localhost:8000"
+_DEFAULT_HUB_URL = "https://rastion-hub.onrender.com"
 
 _OPEN_SOURCE_SOLVERS = {"baseline", "highs", "ortools", "scip", "neal", "qaoa"}
 
@@ -263,6 +263,11 @@ def list_problems() -> list[ProblemEntry]:
     return entries
 
 
+def list_decision_plugins() -> list[ProblemEntry]:
+    """List installed decision plugins."""
+    return list_problems()
+
+
 def list_solvers() -> list[SolverEntry]:
     plugins = discover_plugins()
     entries: list[SolverEntry] = []
@@ -294,20 +299,25 @@ def add_problem(source: str | Path, name: str | None = None, *, overwrite: bool 
 
     src = Path(source).expanduser().resolve()
     if not src.exists() or not src.is_dir():
-        raise FileNotFoundError(f"problem source does not exist: {src}")
+        raise FileNotFoundError(f"decision plugin source does not exist: {src}")
 
     target_name = name or _problem_name_from_source(src)
     dest = problems_root() / target_name
 
     if dest.exists():
         if not overwrite:
-            raise FileExistsError(f"problem '{target_name}' already exists in registry")
+            raise FileExistsError(f"decision plugin '{target_name}' already exists in registry")
         shutil.rmtree(dest)
 
     dest.mkdir(parents=True, exist_ok=True)
     _copy_problem_folder(src, dest)
     _ensure_problem_files(dest)
     return dest
+
+
+def add_decision_plugin(source: str | Path, name: str | None = None, *, overwrite: bool = False) -> Path:
+    """Install a local decision plugin into the registry."""
+    return add_problem(source, name=name, overwrite=overwrite)
 
 
 def remove_problem(name: str) -> bool:
@@ -319,12 +329,17 @@ def remove_problem(name: str) -> bool:
     return True
 
 
+def remove_decision_plugin(name: str) -> bool:
+    """Remove a decision plugin from the local registry."""
+    return remove_problem(name)
+
+
 def export_problem(name: str, destination: str | Path) -> Path:
     init_registry(copy_examples=False)
 
     src = problems_root() / name
     if not src.exists():
-        raise FileNotFoundError(f"problem '{name}' not found in registry")
+        raise FileNotFoundError(f"decision plugin '{name}' not found in registry")
 
     dest = Path(destination).expanduser().resolve()
     if dest.exists() and any(dest.iterdir()):
@@ -338,8 +353,18 @@ def export_problem(name: str, destination: str | Path) -> Path:
     return dest
 
 
+def export_decision_plugin(name: str, destination: str | Path) -> Path:
+    """Export a decision plugin folder from the local registry."""
+    return export_problem(name, destination)
+
+
 def install_problem(source: str | Path, *, overwrite: bool = False) -> Path:
     return add_problem(source, overwrite=overwrite)
+
+
+def install_decision_plugin(source: str | Path, *, overwrite: bool = False) -> Path:
+    """Install a local decision plugin folder into the registry."""
+    return install_problem(source, overwrite=overwrite)
 
 
 def install_solver_from_url(url: str, name: str | None = None, *, overwrite: bool = False) -> Path:
@@ -463,7 +488,7 @@ def _copy_example_problem(source_dir: Path, dest_dir: Path, *, name: str) -> Non
 def _copy_problem_folder(source_dir: Path, dest_dir: Path) -> None:
     spec_src = source_dir / "spec.json"
     if not spec_src.exists():
-        raise FileNotFoundError(f"problem folder missing spec.json: {source_dir}")
+        raise FileNotFoundError(f"decision plugin folder missing spec.json: {source_dir}")
     shutil.copy2(spec_src, dest_dir / "spec.json")
 
     dest_instances = dest_dir / "instances"
@@ -490,6 +515,10 @@ def _copy_problem_folder(source_dir: Path, dest_dir: Path) -> None:
     metadata_src = source_dir / "metadata.yaml"
     if metadata_src.exists():
         shutil.copy2(metadata_src, dest_dir / "metadata.yaml")
+
+    decision_src = source_dir / "decision.yaml"
+    if decision_src.exists():
+        shutil.copy2(decision_src, dest_dir / "decision.yaml")
 
 
 def _ensure_problem_files(problem_dir: Path) -> None:
@@ -562,13 +591,13 @@ def _write_if_missing(path: Path, content: str) -> None:
 def _generated_problem_card(name: str) -> str:
     return (
         f"# {name}\n\n"
-        "This problem was installed into the local Rastion registry.\n\n"
+        "This decision plugin was installed into the local Rastion registry.\n\n"
         "## Variables\n"
         "See `spec.json` for variable definitions.\n\n"
         "## Constraints\n"
         "See `spec.json` + instance payloads in `instances/`.\n\n"
         "## Recommended Solvers\n"
-        "Start with `highs` or `baseline` depending compatibility.\n"
+        "Start with `highs` or `ortools` depending compatibility.\n"
     )
 
 

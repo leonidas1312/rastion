@@ -10,3 +10,7 @@ tests/
 docs/
 examples/
 .env
+.local_plugins/
+.rastion-home/
+.rastion-home-*/
+showcase_uploads/

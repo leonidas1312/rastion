@@ -1,0 +1,10 @@
+name: calendar_week_off_30m
+version: 0.1.0
+author: local
+tags:
+  - scheduling
+  - calendar
+  - agentic
+optimization_class: MILP
+difficulty: easy
+description: "30-minute calendar optimizer with fixed meeting blackout support."
