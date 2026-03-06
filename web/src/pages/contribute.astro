@@ -1,0 +1,52 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Rastion • Contribute" description="How to add an executable TSP solver to the Rastion routing hub.">
+  <section class="card">
+    <p class="kicker">Contribution Contract</p>
+    <h1>Add A TSP Solver</h1>
+    <p>
+      Phase 1 listings require more than a claim. A solver must have a valid card, a working adapter, and official TSP
+      suite outputs so the catalog stays reproducible and useful to the routing community.
+    </p>
+  </section>
+
+  <div class="grid cards" style="margin-top: 1rem;">
+    <article class="card">
+      <h2>1. Add the adapter</h2>
+      <p>Create a local plugin under <code>plugins_local/</code> that exposes <code>get_solver()</code> and supports <code>tsp</code>.</p>
+    </article>
+    <article class="card">
+      <h2>2. Add the solver card</h2>
+      <p>Create <code>catalog/solvers/&lt;solver-id&gt;/card.json</code> plus a short <code>README.md</code> detail file.</p>
+    </article>
+    <article class="card">
+      <h2>3. Validate the catalog</h2>
+      <pre><code>python -m rastion validate-cards</code></pre>
+    </article>
+    <article class="card">
+      <h2>4. Run the official suites</h2>
+      <pre><code>python -m rastion eval-suite tsplib-small-v1
+python -m rastion eval-suite tsplib-medium-v1
+python -m rastion eval-suite tsplib-large-v1</code></pre>
+    </article>
+    <article class="card">
+      <h2>5. Build site artifacts</h2>
+      <pre><code>python -m rastion build-site-data</code></pre>
+    </article>
+    <article class="card">
+      <h2>6. Submit the PR</h2>
+      <p>Include the adapter, solver card, and generated artifacts. Explain the method class, limits, and failure modes honestly.</p>
+    </article>
+  </div>
+
+  <section class="card" style="margin-top: 1rem;">
+    <h2>Listing Rules</h2>
+    <ul class="list-reset">
+      <li>Phase 1 public listings are TSP only.</li>
+      <li>Routing is the umbrella story, but VRP support is roadmap work until the interfaces expand.</li>
+      <li>Official suites are curated and suite-scoped. There is no single global routing leaderboard.</li>
+      <li>Experimental listings are allowed, but dependency and coverage gaps must remain visible.</li>
+    </ul>
+  </section>
+</BaseLayout>

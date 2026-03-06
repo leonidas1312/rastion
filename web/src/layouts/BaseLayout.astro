@@ -1,0 +1,48 @@
+---
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Rastion routing hub with executable solver cards, official TSP evals, and replayable TSPLIB demos" } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/png" href={`${base}owl-favicon.png`} />
+  </head>
+  <body data-base={base}>
+    <div class="site-shell">
+      <Header />
+      <main class="container fade-in">
+        <slot />
+      </main>
+      <Footer />
+    </div>
+    <script>
+      window.__RASTION_BASE__ = document.body.dataset.base || "/";
+
+      const root = document.documentElement;
+      const key = "rastion-theme";
+      const preferred = localStorage.getItem(key);
+      if (preferred === "dark") {
+        root.classList.add("dark");
+      }
+
+      const button = document.querySelector(".toggle-theme");
+      button?.addEventListener("click", () => {
+        root.classList.toggle("dark");
+        localStorage.setItem(key, root.classList.contains("dark") ? "dark" : "light");
+      });
+    </script>
+  </body>
+</html>

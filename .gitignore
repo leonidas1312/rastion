@@ -6,11 +6,13 @@ __pycache__/
 .venv/
 venv/
 runs/
-tests/
 docs/
-examples/
 .env
 .local_plugins/
 .rastion-home/
 .rastion-home-*/
+.rastion/
 showcase_uploads/
+web/node_modules/
+web/dist/
+web/.astro/

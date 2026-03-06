@@ -1,0 +1,636 @@
+{
+  "generated_at": "2026-03-06T15:45:52.609117+00:00",
+  "count": 3,
+  "leaderboards": [
+    {
+      "suite": {
+        "id": "tsplib-large-v1",
+        "title": "TSPLIB Large v1",
+        "description": "Official large-instance TSP suite for the routing-first Phase 1 hub.",
+        "problem_variant": "tsp",
+        "instances": [
+          {
+            "id": "a280",
+            "label": "a280",
+            "path": "examples/tsplib/a280.tsp",
+            "size": "large"
+          }
+        ],
+        "budget_policy": {
+          "iters": 2000,
+          "time_budget_ms": 2000,
+          "repeat": 1
+        },
+        "seed_policy": {
+          "seeds": [
+            0
+          ]
+        },
+        "metric_policy": {
+          "primary_metric": "distance",
+          "objective": "minimize",
+          "runtime_unit": "ms"
+        },
+        "result_schema_version": "1.0",
+        "optional_dependencies": [
+          "ortools>=9.9"
+        ],
+        "listing_tiers": [
+          "official",
+          "experimental"
+        ]
+      },
+      "generated_at": "2026-03-06T15:45:51.649242+00:00",
+      "standings": [
+        {
+          "solver_id": "tsp-two-opt",
+          "solver_name": "2-Opt Local Search",
+          "solver_slug": "tsp-two-opt",
+          "method_class": "metaheuristic",
+          "listing_tier": "official",
+          "status_counts": {
+            "ok": 1
+          },
+          "mean_score": 3193.0,
+          "mean_runtime_ms": 62.047403999713424,
+          "completed_instances": 1,
+          "total_instances": 1
+        },
+        {
+          "solver_id": "tsp-nearest-neighbor",
+          "solver_name": "Nearest Neighbor",
+          "solver_slug": "tsp-nearest-neighbor",
+          "method_class": "heuristic",
+          "listing_tier": "official",
+          "status_counts": {
+            "ok": 1
+          },
+          "mean_score": 3265.0,
+          "mean_runtime_ms": 10.9855220002828,
+          "completed_instances": 1,
+          "total_instances": 1
+        },
+        {
+          "solver_id": "tsp-ortools",
+          "solver_name": "OR-Tools Routing",
+          "solver_slug": "tsp-ortools",
+          "method_class": "hybrid",
+          "listing_tier": "experimental",
+          "status_counts": {
+            "dependency-missing": 1
+          },
+          "mean_score": null,
+          "mean_runtime_ms": null,
+          "completed_instances": 0,
+          "total_instances": 1
+        }
+      ],
+      "instances": [
+        {
+          "id": "a280",
+          "label": "a280",
+          "size": "large",
+          "path": "examples/tsplib/a280.tsp",
+          "n_vars": 280,
+          "results": [
+            {
+              "solver_id": "tsp-two-opt",
+              "solver_name": "2-Opt Local Search",
+              "solver_slug": "tsp-two-opt",
+              "solver_version": "0.1.0",
+              "method_class": "metaheuristic",
+              "listing_tier": "official",
+              "score": 3193.0,
+              "avg_runtime_ms": 62.047403999713424,
+              "status": "ok",
+              "error": null,
+              "run_record": {
+                "suite_id": "tsplib-large-v1",
+                "solver_id": "tsp-two-opt",
+                "solver_version": "0.1.0",
+                "problem_variant": "tsp",
+                "instance_id": "a280",
+                "score": 3193.0,
+                "runtime": 62.047403999713424,
+                "status": "ok",
+                "seed_policy": {
+                  "seeds": [
+                    0
+                  ]
+                },
+                "budget_policy": {
+                  "iters": 2000,
+                  "time_budget_ms": 2000,
+                  "repeat": 1
+                },
+                "generated_at": "2026-03-06T15:45:51.649242+00:00",
+                "artifact_path": "data/evals/tsplib-large-v1.json",
+                "environment": {
+                  "python": "3.12.3",
+                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+                }
+              }
+            },
+            {
+              "solver_id": "tsp-nearest-neighbor",
+              "solver_name": "Nearest Neighbor",
+              "solver_slug": "tsp-nearest-neighbor",
+              "solver_version": "0.1.0",
+              "method_class": "heuristic",
+              "listing_tier": "official",
+              "score": 3265.0,
+              "avg_runtime_ms": 10.9855220002828,
+              "status": "ok",
+              "error": null,
+              "run_record": {
+                "suite_id": "tsplib-large-v1",
+                "solver_id": "tsp-nearest-neighbor",
+                "solver_version": "0.1.0",
+                "problem_variant": "tsp",
+                "instance_id": "a280",
+                "score": 3265.0,
+                "runtime": 10.9855220002828,
+                "status": "ok",
+                "seed_policy": {
+                  "seeds": [
+                    0
+                  ]
+                },
+                "budget_policy": {
+                  "iters": 2000,
+                  "time_budget_ms": 2000,
+                  "repeat": 1
+                },
+                "generated_at": "2026-03-06T15:45:51.649242+00:00",
+                "artifact_path": "data/evals/tsplib-large-v1.json",
+                "environment": {
+                  "python": "3.12.3",
+                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+                }
+              }
+            },
+            {
+              "solver_id": "tsp-ortools",
+              "solver_name": "OR-Tools Routing",
+              "solver_slug": "tsp-ortools",
+              "solver_version": "0.1.0",
+              "method_class": "hybrid",
+              "listing_tier": "experimental",
+              "score": null,
+              "avg_runtime_ms": null,
+              "status": "dependency-missing",
+              "error": "ortools is not installed. Install with: pip install -e '.[ortools]' (No module named 'ortools')",
+              "run_record": {
+                "suite_id": "tsplib-large-v1",
+                "solver_id": "tsp-ortools",
+                "solver_version": "0.1.0",
+                "problem_variant": "tsp",
+                "instance_id": "a280",
+                "score": null,
+                "runtime": null,
+                "status": "dependency-missing",
+                "seed_policy": {
+                  "seeds": [
+                    0
+                  ]
+                },
+                "budget_policy": {
+                  "iters": 2000,
+                  "time_budget_ms": 2000,
+                  "repeat": 1
+                },
+                "generated_at": "2026-03-06T15:45:51.649242+00:00",
+                "artifact_path": "data/evals/tsplib-large-v1.json",
+                "environment": {
+                  "python": "3.12.3",
+                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "artifact_path": "data/evals/tsplib-large-v1.json"
+    },
+    {
+      "suite": {
+        "id": "tsplib-medium-v1",
+        "title": "TSPLIB Medium v1",
+        "description": "Official medium-instance TSP suite for the routing-first Phase 1 hub.",
+        "problem_variant": "tsp",
+        "instances": [
+          {
+            "id": "ch150",
+            "label": "ch150",
+            "path": "examples/tsplib/ch150.tsp",
+            "size": "medium"
+          }
+        ],
+        "budget_policy": {
+          "iters": 1200,
+          "time_budget_ms": 1500,
+          "repeat": 1
+        },
+        "seed_policy": {
+          "seeds": [
+            0
+          ]
+        },
+        "metric_policy": {
+          "primary_metric": "distance",
+          "objective": "minimize",
+          "runtime_unit": "ms"
+        },
+        "result_schema_version": "1.0",
+        "optional_dependencies": [
+          "ortools>=9.9"
+        ],
+        "listing_tiers": [
+          "official",
+          "experimental"
+        ]
+      },
+      "generated_at": "2026-03-06T15:45:52.054116+00:00",
+      "standings": [
+        {
+          "solver_id": "tsp-two-opt",
+          "solver_name": "2-Opt Local Search",
+          "solver_slug": "tsp-two-opt",
+          "method_class": "metaheuristic",
+          "listing_tier": "official",
+          "status_counts": {
+            "ok": 1
+          },
+          "mean_score": 7996.0,
+          "mean_runtime_ms": 20.3508959998544,
+          "completed_instances": 1,
+          "total_instances": 1
+        },
+        {
+          "solver_id": "tsp-nearest-neighbor",
+          "solver_name": "Nearest Neighbor",
+          "solver_slug": "tsp-nearest-neighbor",
+          "method_class": "heuristic",
+          "listing_tier": "official",
+          "status_counts": {
+            "ok": 1
+          },
+          "mean_score": 8197.0,
+          "mean_runtime_ms": 3.5390559996812954,
+          "completed_instances": 1,
+          "total_instances": 1
+        },
+        {
+          "solver_id": "tsp-ortools",
+          "solver_name": "OR-Tools Routing",
+          "solver_slug": "tsp-ortools",
+          "method_class": "hybrid",
+          "listing_tier": "experimental",
+          "status_counts": {
+            "dependency-missing": 1
+          },
+          "mean_score": null,
+          "mean_runtime_ms": null,
+          "completed_instances": 0,
+          "total_instances": 1
+        }
+      ],
+      "instances": [
+        {
+          "id": "ch150",
+          "label": "ch150",
+          "size": "medium",
+          "path": "examples/tsplib/ch150.tsp",
+          "n_vars": 150,
+          "results": [
+            {
+              "solver_id": "tsp-two-opt",
+              "solver_name": "2-Opt Local Search",
+              "solver_slug": "tsp-two-opt",
+              "solver_version": "0.1.0",
+              "method_class": "metaheuristic",
+              "listing_tier": "official",
+              "score": 7996.0,
+              "avg_runtime_ms": 20.3508959998544,
+              "status": "ok",
+              "error": null,
+              "run_record": {
+                "suite_id": "tsplib-medium-v1",
+                "solver_id": "tsp-two-opt",
+                "solver_version": "0.1.0",
+                "problem_variant": "tsp",
+                "instance_id": "ch150",
+                "score": 7996.0,
+                "runtime": 20.3508959998544,
+                "status": "ok",
+                "seed_policy": {
+                  "seeds": [
+                    0
+                  ]
+                },
+                "budget_policy": {
+                  "iters": 1200,
+                  "time_budget_ms": 1500,
+                  "repeat": 1
+                },
+                "generated_at": "2026-03-06T15:45:52.054116+00:00",
+                "artifact_path": "data/evals/tsplib-medium-v1.json",
+                "environment": {
+                  "python": "3.12.3",
+                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+                }
+              }
+            },
+            {
+              "solver_id": "tsp-nearest-neighbor",
+              "solver_name": "Nearest Neighbor",
+              "solver_slug": "tsp-nearest-neighbor",
+              "solver_version": "0.1.0",
+              "method_class": "heuristic",
+              "listing_tier": "official",
+              "score": 8197.0,
+              "avg_runtime_ms": 3.5390559996812954,
+              "status": "ok",
+              "error": null,
+              "run_record": {
+                "suite_id": "tsplib-medium-v1",
+                "solver_id": "tsp-nearest-neighbor",
+                "solver_version": "0.1.0",
+                "problem_variant": "tsp",
+                "instance_id": "ch150",
+                "score": 8197.0,
+                "runtime": 3.5390559996812954,
+                "status": "ok",
+                "seed_policy": {
+                  "seeds": [
+                    0
+                  ]
+                },
+                "budget_policy": {
+                  "iters": 1200,
+                  "time_budget_ms": 1500,
+                  "repeat": 1
+                },
+                "generated_at": "2026-03-06T15:45:52.054116+00:00",
+                "artifact_path": "data/evals/tsplib-medium-v1.json",
+                "environment": {
+                  "python": "3.12.3",
+                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+                }
+              }
+            },
+            {
+              "solver_id": "tsp-ortools",
+              "solver_name": "OR-Tools Routing",
+              "solver_slug": "tsp-ortools",
+              "solver_version": "0.1.0",
+              "method_class": "hybrid",
+              "listing_tier": "experimental",
+              "score": null,
+              "avg_runtime_ms": null,
+              "status": "dependency-missing",
+              "error": "ortools is not installed. Install with: pip install -e '.[ortools]' (No module named 'ortools')",
+              "run_record": {
+                "suite_id": "tsplib-medium-v1",
+                "solver_id": "tsp-ortools",
+                "solver_version": "0.1.0",
+                "problem_variant": "tsp",
+                "instance_id": "ch150",
+                "score": null,
+                "runtime": null,
+                "status": "dependency-missing",
+                "seed_policy": {
+                  "seeds": [
+                    0
+                  ]
+                },
+                "budget_policy": {
+                  "iters": 1200,
+                  "time_budget_ms": 1500,
+                  "repeat": 1
+                },
+                "generated_at": "2026-03-06T15:45:52.054116+00:00",
+                "artifact_path": "data/evals/tsplib-medium-v1.json",
+                "environment": {
+                  "python": "3.12.3",
+                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "artifact_path": "data/evals/tsplib-medium-v1.json"
+    },
+    {
+      "suite": {
+        "id": "tsplib-small-v1",
+        "title": "TSPLIB Small v1",
+        "description": "Official small-instance TSP suite for the routing-first Phase 1 hub.",
+        "problem_variant": "tsp",
+        "instances": [
+          {
+            "id": "berlin52",
+            "label": "Berlin52",
+            "path": "examples/tsplib/berlin52.tsp",
+            "size": "small"
+          }
+        ],
+        "budget_policy": {
+          "iters": 600,
+          "time_budget_ms": 1000,
+          "repeat": 1
+        },
+        "seed_policy": {
+          "seeds": [
+            0
+          ]
+        },
+        "metric_policy": {
+          "primary_metric": "distance",
+          "objective": "minimize",
+          "runtime_unit": "ms"
+        },
+        "result_schema_version": "1.0",
+        "optional_dependencies": [
+          "ortools>=9.9"
+        ],
+        "listing_tiers": [
+          "official",
+          "experimental"
+        ]
+      },
+      "generated_at": "2026-03-06T15:45:52.327988+00:00",
+      "standings": [
+        {
+          "solver_id": "tsp-two-opt",
+          "solver_name": "2-Opt Local Search",
+          "solver_slug": "tsp-two-opt",
+          "method_class": "metaheuristic",
+          "listing_tier": "official",
+          "status_counts": {
+            "ok": 1
+          },
+          "mean_score": 8448.0,
+          "mean_runtime_ms": 4.794954999852052,
+          "completed_instances": 1,
+          "total_instances": 1
+        },
+        {
+          "solver_id": "tsp-nearest-neighbor",
+          "solver_name": "Nearest Neighbor",
+          "solver_slug": "tsp-nearest-neighbor",
+          "method_class": "heuristic",
+          "listing_tier": "official",
+          "status_counts": {
+            "ok": 1
+          },
+          "mean_score": 8980.0,
+          "mean_runtime_ms": 0.6851980001556512,
+          "completed_instances": 1,
+          "total_instances": 1
+        },
+        {
+          "solver_id": "tsp-ortools",
+          "solver_name": "OR-Tools Routing",
+          "solver_slug": "tsp-ortools",
+          "method_class": "hybrid",
+          "listing_tier": "experimental",
+          "status_counts": {
+            "dependency-missing": 1
+          },
+          "mean_score": null,
+          "mean_runtime_ms": null,
+          "completed_instances": 0,
+          "total_instances": 1
+        }
+      ],
+      "instances": [
+        {
+          "id": "berlin52",
+          "label": "Berlin52",
+          "size": "small",
+          "path": "examples/tsplib/berlin52.tsp",
+          "n_vars": 52,
+          "results": [
+            {
+              "solver_id": "tsp-two-opt",
+              "solver_name": "2-Opt Local Search",
+              "solver_slug": "tsp-two-opt",
+              "solver_version": "0.1.0",
+              "method_class": "metaheuristic",
+              "listing_tier": "official",
+              "score": 8448.0,
+              "avg_runtime_ms": 4.794954999852052,
+              "status": "ok",
+              "error": null,
+              "run_record": {
+                "suite_id": "tsplib-small-v1",
+                "solver_id": "tsp-two-opt",
+                "solver_version": "0.1.0",
+                "problem_variant": "tsp",
+                "instance_id": "berlin52",
+                "score": 8448.0,
+                "runtime": 4.794954999852052,
+                "status": "ok",
+                "seed_policy": {
+                  "seeds": [
+                    0
+                  ]
+                },
+                "budget_policy": {
+                  "iters": 600,
+                  "time_budget_ms": 1000,
+                  "repeat": 1
+                },
+                "generated_at": "2026-03-06T15:45:52.327988+00:00",
+                "artifact_path": "data/evals/tsplib-small-v1.json",
+                "environment": {
+                  "python": "3.12.3",
+                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+                }
+              }
+            },
+            {
+              "solver_id": "tsp-nearest-neighbor",
+              "solver_name": "Nearest Neighbor",
+              "solver_slug": "tsp-nearest-neighbor",
+              "solver_version": "0.1.0",
+              "method_class": "heuristic",
+              "listing_tier": "official",
+              "score": 8980.0,
+              "avg_runtime_ms": 0.6851980001556512,
+              "status": "ok",
+              "error": null,
+              "run_record": {
+                "suite_id": "tsplib-small-v1",
+                "solver_id": "tsp-nearest-neighbor",
+                "solver_version": "0.1.0",
+                "problem_variant": "tsp",
+                "instance_id": "berlin52",
+                "score": 8980.0,
+                "runtime": 0.6851980001556512,
+                "status": "ok",
+                "seed_policy": {
+                  "seeds": [
+                    0
+                  ]
+                },
+                "budget_policy": {
+                  "iters": 600,
+                  "time_budget_ms": 1000,
+                  "repeat": 1
+                },
+                "generated_at": "2026-03-06T15:45:52.327988+00:00",
+                "artifact_path": "data/evals/tsplib-small-v1.json",
+                "environment": {
+                  "python": "3.12.3",
+                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+                }
+              }
+            },
+            {
+              "solver_id": "tsp-ortools",
+              "solver_name": "OR-Tools Routing",
+              "solver_slug": "tsp-ortools",
+              "solver_version": "0.1.0",
+              "method_class": "hybrid",
+              "listing_tier": "experimental",
+              "score": null,
+              "avg_runtime_ms": null,
+              "status": "dependency-missing",
+              "error": "ortools is not installed. Install with: pip install -e '.[ortools]' (No module named 'ortools')",
+              "run_record": {
+                "suite_id": "tsplib-small-v1",
+                "solver_id": "tsp-ortools",
+                "solver_version": "0.1.0",
+                "problem_variant": "tsp",
+                "instance_id": "berlin52",
+                "score": null,
+                "runtime": null,
+                "status": "dependency-missing",
+                "seed_policy": {
+                  "seeds": [
+                    0
+                  ]
+                },
+                "budget_policy": {
+                  "iters": 600,
+                  "time_budget_ms": 1000,
+                  "repeat": 1
+                },
+                "generated_at": "2026-03-06T15:45:52.327988+00:00",
+                "artifact_path": "data/evals/tsplib-small-v1.json",
+                "environment": {
+                  "python": "3.12.3",
+                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "artifact_path": "data/evals/tsplib-small-v1.json"
+    }
+  ]
+}

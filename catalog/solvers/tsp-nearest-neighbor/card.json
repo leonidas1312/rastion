@@ -1,0 +1,62 @@
+{
+  "id": "tsp-nearest-neighbor",
+  "name": "Nearest Neighbor",
+  "routing_family": "routing",
+  "problem_variants": ["tsp"],
+  "summary": "Deterministic greedy TSP baseline that grows a tour by repeatedly choosing the nearest unvisited node.",
+  "description": "Nearest Neighbor is the simplest executable TSP baseline in Rastion. It is intentionally easy to read, emits streaming progress, and provides a cheap reference point for official TSPLIB suite comparisons.",
+  "repository": "https://github.com/leonidas1312/rastion",
+  "homepage": "https://github.com/leonidas1312/rastion",
+  "license": "Apache-2.0",
+  "authors": ["rastion contributors"],
+  "maintainers": ["rastion contributors"],
+  "installation": {
+    "command": "pip install -e .",
+    "package": "rastion",
+    "extras": [],
+    "python": ">=3.11",
+    "optional_dependencies": []
+  },
+  "adapter": {
+    "kind": "local_plugin",
+    "solver_name": "tsp_nearest_neighbor",
+    "path": "plugins_local/rastion_tsp_nearest",
+    "entrypoint": null
+  },
+  "capabilities": {
+    "streaming": true,
+    "deterministic_mode": true,
+    "warm_start": false,
+    "local_search": false,
+    "multi_route_ready": false,
+    "notes": "Greedy construction only. Useful as a transparent routing baseline."
+  },
+  "limits": {
+    "tested_max_nodes": 2000,
+    "unsupported_constraints": ["capacities", "time windows", "multiple vehicles"],
+    "depot_assumptions": "Assumes a single depot and a closed Hamiltonian tour.",
+    "notes": "Phase 1 supports TSP only. VRP variants are roadmap items."
+  },
+  "hardware": ["cpu"],
+  "determinism": "Deterministic for a fixed seed; seed only breaks ties between equal-distance candidates.",
+  "method_class": "heuristic",
+  "version": "0.1.0",
+  "citations": [
+    "Nearest-neighbor tour construction is a standard greedy baseline for the travelling salesman problem."
+  ],
+  "references": [
+    "https://en.wikipedia.org/wiki/Nearest_neighbour_algorithm"
+  ],
+  "known_failure_modes": [
+    "Can get trapped in poor local structure on clustered or deceptive TSPLIB instances.",
+    "Tour quality degrades quickly as instance size grows."
+  ],
+  "artifact_paths": {
+    "benchmark_json": "data/benchmarks.json",
+    "arena_json": "data/tsp_arena.json",
+    "suite_results_dir": "data/evals/",
+    "detail_markdown": "catalog/solvers/tsp-nearest-neighbor/README.md"
+  },
+  "tags": ["tsp", "greedy", "baseline", "routing"],
+  "listing_tier": "official"
+}

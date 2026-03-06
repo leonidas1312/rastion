@@ -1,0 +1,209 @@
+{
+  "generated_at": "2026-03-06T15:45:52.327988+00:00",
+  "suite": {
+    "id": "tsplib-small-v1",
+    "title": "TSPLIB Small v1",
+    "description": "Official small-instance TSP suite for the routing-first Phase 1 hub.",
+    "problem_variant": "tsp",
+    "instances": [
+      {
+        "id": "berlin52",
+        "label": "Berlin52",
+        "path": "examples/tsplib/berlin52.tsp",
+        "size": "small"
+      }
+    ],
+    "budget_policy": {
+      "iters": 600,
+      "time_budget_ms": 1000,
+      "repeat": 1
+    },
+    "seed_policy": {
+      "seeds": [
+        0
+      ]
+    },
+    "metric_policy": {
+      "primary_metric": "distance",
+      "objective": "minimize",
+      "runtime_unit": "ms"
+    },
+    "result_schema_version": "1.0",
+    "optional_dependencies": [
+      "ortools>=9.9"
+    ],
+    "listing_tiers": [
+      "official",
+      "experimental"
+    ]
+  },
+  "instances": [
+    {
+      "id": "berlin52",
+      "label": "Berlin52",
+      "size": "small",
+      "path": "examples/tsplib/berlin52.tsp",
+      "n_vars": 52,
+      "results": [
+        {
+          "solver_id": "tsp-two-opt",
+          "solver_name": "2-Opt Local Search",
+          "solver_slug": "tsp-two-opt",
+          "solver_version": "0.1.0",
+          "method_class": "metaheuristic",
+          "listing_tier": "official",
+          "score": 8448.0,
+          "avg_runtime_ms": 4.794954999852052,
+          "status": "ok",
+          "error": null,
+          "run_record": {
+            "suite_id": "tsplib-small-v1",
+            "solver_id": "tsp-two-opt",
+            "solver_version": "0.1.0",
+            "problem_variant": "tsp",
+            "instance_id": "berlin52",
+            "score": 8448.0,
+            "runtime": 4.794954999852052,
+            "status": "ok",
+            "seed_policy": {
+              "seeds": [
+                0
+              ]
+            },
+            "budget_policy": {
+              "iters": 600,
+              "time_budget_ms": 1000,
+              "repeat": 1
+            },
+            "generated_at": "2026-03-06T15:45:52.327988+00:00",
+            "artifact_path": "data/evals/tsplib-small-v1.json",
+            "environment": {
+              "python": "3.12.3",
+              "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+            }
+          }
+        },
+        {
+          "solver_id": "tsp-nearest-neighbor",
+          "solver_name": "Nearest Neighbor",
+          "solver_slug": "tsp-nearest-neighbor",
+          "solver_version": "0.1.0",
+          "method_class": "heuristic",
+          "listing_tier": "official",
+          "score": 8980.0,
+          "avg_runtime_ms": 0.6851980001556512,
+          "status": "ok",
+          "error": null,
+          "run_record": {
+            "suite_id": "tsplib-small-v1",
+            "solver_id": "tsp-nearest-neighbor",
+            "solver_version": "0.1.0",
+            "problem_variant": "tsp",
+            "instance_id": "berlin52",
+            "score": 8980.0,
+            "runtime": 0.6851980001556512,
+            "status": "ok",
+            "seed_policy": {
+              "seeds": [
+                0
+              ]
+            },
+            "budget_policy": {
+              "iters": 600,
+              "time_budget_ms": 1000,
+              "repeat": 1
+            },
+            "generated_at": "2026-03-06T15:45:52.327988+00:00",
+            "artifact_path": "data/evals/tsplib-small-v1.json",
+            "environment": {
+              "python": "3.12.3",
+              "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+            }
+          }
+        },
+        {
+          "solver_id": "tsp-ortools",
+          "solver_name": "OR-Tools Routing",
+          "solver_slug": "tsp-ortools",
+          "solver_version": "0.1.0",
+          "method_class": "hybrid",
+          "listing_tier": "experimental",
+          "score": null,
+          "avg_runtime_ms": null,
+          "status": "dependency-missing",
+          "error": "ortools is not installed. Install with: pip install -e '.[ortools]' (No module named 'ortools')",
+          "run_record": {
+            "suite_id": "tsplib-small-v1",
+            "solver_id": "tsp-ortools",
+            "solver_version": "0.1.0",
+            "problem_variant": "tsp",
+            "instance_id": "berlin52",
+            "score": null,
+            "runtime": null,
+            "status": "dependency-missing",
+            "seed_policy": {
+              "seeds": [
+                0
+              ]
+            },
+            "budget_policy": {
+              "iters": 600,
+              "time_budget_ms": 1000,
+              "repeat": 1
+            },
+            "generated_at": "2026-03-06T15:45:52.327988+00:00",
+            "artifact_path": "data/evals/tsplib-small-v1.json",
+            "environment": {
+              "python": "3.12.3",
+              "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "standings": [
+    {
+      "solver_id": "tsp-two-opt",
+      "solver_name": "2-Opt Local Search",
+      "solver_slug": "tsp-two-opt",
+      "method_class": "metaheuristic",
+      "listing_tier": "official",
+      "status_counts": {
+        "ok": 1
+      },
+      "mean_score": 8448.0,
+      "mean_runtime_ms": 4.794954999852052,
+      "completed_instances": 1,
+      "total_instances": 1
+    },
+    {
+      "solver_id": "tsp-nearest-neighbor",
+      "solver_name": "Nearest Neighbor",
+      "solver_slug": "tsp-nearest-neighbor",
+      "method_class": "heuristic",
+      "listing_tier": "official",
+      "status_counts": {
+        "ok": 1
+      },
+      "mean_score": 8980.0,
+      "mean_runtime_ms": 0.6851980001556512,
+      "completed_instances": 1,
+      "total_instances": 1
+    },
+    {
+      "solver_id": "tsp-ortools",
+      "solver_name": "OR-Tools Routing",
+      "solver_slug": "tsp-ortools",
+      "method_class": "hybrid",
+      "listing_tier": "experimental",
+      "status_counts": {
+        "dependency-missing": 1
+      },
+      "mean_score": null,
+      "mean_runtime_ms": null,
+      "completed_instances": 0,
+      "total_instances": 1
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+<section class="card">
+  <p class="kicker">Routing Catalog</p>
+  <h2>Executable TSP Solvers</h2>
+  <p class="status" id="catalog-status">Loading routing catalog...</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Variant</th>
+          <th>Method</th>
+          <th>Hardware</th>
+          <th>Tested Scale</th>
+          <th>Eval Coverage</th>
+          <th>License</th>
+          <th>Tags</th>
+        </tr>
+      </thead>
+      <tbody id="catalog-body">
+        <tr><td colspan="8">Waiting for data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+  import { fetchJson, formatIso, siteBase } from "./dataLoader";
+
+  const status = document.querySelector("#catalog-status");
+  const body = document.querySelector("#catalog-body");
+
+  function rowHtml(row) {
+    const detailHref = `${siteBase()}${String(row.detail_path || "").replace(/^\/+/, "")}`;
+    const coverage = Array.isArray(row.official_suite_ids) ? row.official_suite_ids.length : 0;
+    const tags = Array.isArray(row.tags) ? row.tags.join(", ") : "";
+    return `<tr>
+      <td><a href="${detailHref}"><strong>${row.name}</strong></a><br><span class="subtle">${row.listing_tier}</span></td>
+      <td>${(row.problem_variants || []).join(", ")}</td>
+      <td>${row.method_class}</td>
+      <td>${(row.hardware || []).join(", ")}</td>
+      <td>${row.limits?.tested_max_nodes ?? "n/a"} nodes</td>
+      <td>${coverage} suite${coverage === 1 ? "" : "s"}</td>
+      <td>${row.license}</td>
+      <td>${tags}</td>
+    </tr>`;
+  }
+
+  async function load() {
+    try {
+      const payload = await fetchJson("data/catalog.json");
+      const rows = Array.isArray(payload.solvers) ? payload.solvers : [];
+      if (!rows.length) {
+        body.innerHTML = '<tr><td colspan="8">No routing solvers exported yet.</td></tr>';
+        status.textContent = "No catalog data available.";
+        return;
+      }
+
+      body.innerHTML = rows.map(rowHtml).join("\n");
+      status.textContent = `Last updated: ${formatIso(payload.generated_at)} • Family: ${payload.family}`;
+    } catch (error) {
+      body.innerHTML = '<tr><td colspan="8">No data found.</td></tr>';
+      status.classList.add("error");
+      status.textContent = "Missing /data/catalog.json. Run: python -m rastion build-site-data";
+      console.error(error);
+    }
+  }
+
+  load();
+</script>

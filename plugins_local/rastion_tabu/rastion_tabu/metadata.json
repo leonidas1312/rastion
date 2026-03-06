@@ -1,0 +1,8 @@
+{
+  "name": "tabu",
+  "supports": ["qubo"],
+  "max_size": 200,
+  "hardware": ["cpu"],
+  "quality": 0.75,
+  "version": "0.1.0"
+}

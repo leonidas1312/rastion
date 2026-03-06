@@ -1,57 +1,57 @@
-"""Solver plugin base classes and capability schemas."""
-
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from enum import Enum
+from collections.abc import Iterator
+from typing import Any
 
-from pydantic import BaseModel, Field
+import numpy as np
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from rastion.core.ir import IRModel
-from rastion.core.solution import Solution
-from rastion.core.spec import VariableType
-
-
-class ObjectiveType(str, Enum):
-    LINEAR = "linear"
-    QUADRATIC = "quadratic"
-    QUBO = "qubo"
+from rastion.ir.types import ProblemIR
 
 
-class ConstraintType(str, Enum):
-    LINEAR = "linear"
+class Solution(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    solver_name: str
+    best_x: np.ndarray
+    best_value: float
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    selection_reason: str | None = None
+
+    @field_validator("best_x", mode="before")
+    @classmethod
+    def _coerce_best_x(cls, value: Any) -> np.ndarray:
+        arr = np.asarray(value, dtype=int)
+        if arr.ndim != 1:
+            raise ValueError("best_x must be a 1D vector")
+        return arr
 
 
-class SolveMode(str, Enum):
-    SOLVE = "solve"
-    SAMPLE = "sample"
+class ProgressEvent(BaseModel):
+    t_ms: int = Field(ge=0)
+    iter: int = Field(ge=0)
+    best_value: float
 
 
-class CapabilitySet(BaseModel):
-    variable_types: set[VariableType] = Field(default_factory=set)
-    objective_types: set[ObjectiveType] = Field(default_factory=set)
-    constraint_types: set[ConstraintType] = Field(default_factory=set)
-    modes: set[SolveMode] = Field(default_factory=lambda: {SolveMode.SOLVE})
-    result_fields: set[str] = Field(default_factory=set)
-    supports_miqp: bool = False
-
-
-class ProblemRequirements(BaseModel):
-    variable_types: set[VariableType] = Field(default_factory=set)
-    objective_type: ObjectiveType
-    constraint_types: set[ConstraintType] = Field(default_factory=set)
-    mode: SolveMode = SolveMode.SOLVE
-    has_integer_variables: bool = False
-
-
-class SolverPlugin(ABC):
+class Solver(ABC):
     name: str
-    version: str
+    supports: list[str]
+    max_size: int
+    hardware: list[str]
+    quality: float = 0.5
 
     @abstractmethod
-    def capabilities(self) -> CapabilitySet:
+    def solve(self, problem_ir: ProblemIR, **kwargs: Any) -> Solution:
         raise NotImplementedError
 
-    @abstractmethod
-    def solve(self, ir_model: IRModel, config: dict[str, object], backend: object) -> Solution:
-        raise NotImplementedError
+    def solve_stream(self, problem_ir: ProblemIR, **kwargs: Any) -> Iterator[ProgressEvent]:
+        solution = self.solve(problem_ir, **kwargs)
+        yield ProgressEvent(t_ms=0, iter=int(kwargs.get("iters", 1)), best_value=solution.best_value)
+
+
+def evaluate_qubo(problem_ir: ProblemIR, x: np.ndarray) -> float:
+    x = np.asarray(x, dtype=float)
+    q = problem_ir.objective.Q
+    c = problem_ir.objective.c
+    return float(x.T @ q @ x + c.T @ x + problem_ir.objective.constant)

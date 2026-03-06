@@ -1,0 +1,62 @@
+<section class="card">
+  <p class="kicker">Registry</p>
+  <h2>Available Solvers</h2>
+  <p class="status" id="solvers-status">Loading solver registry...</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Supports</th>
+          <th>Max Size</th>
+          <th>Hardware</th>
+          <th>Quality</th>
+          <th>Source</th>
+        </tr>
+      </thead>
+      <tbody id="solvers-body">
+        <tr><td colspan="6">Waiting for data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+  import { fetchJson, formatIso } from "./dataLoader";
+
+  const status = document.querySelector("#solvers-status");
+  const body = document.querySelector("#solvers-body");
+
+  function rowHtml(row) {
+    return `<tr>
+      <td><strong>${row.name}</strong></td>
+      <td>${(row.supports || []).join(", ")}</td>
+      <td>${row.max_size}</td>
+      <td>${(row.hardware || []).join(", ")}</td>
+      <td>${Number(row.quality ?? 0).toFixed(2)}</td>
+      <td>${row.source || "unknown"}</td>
+    </tr>`;
+  }
+
+  async function load() {
+    try {
+      const payload = await fetchJson("data/solvers.json");
+      const rows = Array.isArray(payload.solvers) ? payload.solvers : [];
+      if (!rows.length) {
+        body.innerHTML = '<tr><td colspan="6">No solvers exported yet.</td></tr>';
+        status.textContent = "No solver data available.";
+        return;
+      }
+
+      body.innerHTML = rows.map(rowHtml).join("\n");
+      status.textContent = `Last updated: ${formatIso(payload.generated_at)}`;
+    } catch (error) {
+      body.innerHTML = '<tr><td colspan="6">No data found.</td></tr>';
+      status.classList.add("error");
+      status.textContent = "Missing /data/solvers.json. Run: python -m rastion demo-site";
+      console.error(error);
+    }
+  }
+
+  load();
+</script>

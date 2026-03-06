@@ -1,0 +1,8 @@
+{
+  "name": "tsp_ortools",
+  "supports": ["tsp"],
+  "max_size": 5000,
+  "hardware": ["cpu"],
+  "quality": 0.95,
+  "version": "0.1.0"
+}

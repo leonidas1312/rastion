@@ -1,0 +1,17 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import LeaderboardsTable from "../components/LeaderboardsTable.astro";
+---
+<BaseLayout title="Rastion • Leaderboards" description="Official suite-scoped TSP leaderboards for the routing-first hub.">
+  <section class="card">
+    <p class="kicker">Official Evals</p>
+    <h1>Leaderboards</h1>
+    <p>
+      Rankings are suite-scoped, TSP-only, and generated from curated TSPLIB instances with fixed budgets and seeds.
+      Phase 1 does not publish a fake "best routing solver" global ranking.
+    </p>
+  </section>
+  <div class="grid" style="margin-top: 1rem;">
+    <LeaderboardsTable />
+  </div>
+</BaseLayout>

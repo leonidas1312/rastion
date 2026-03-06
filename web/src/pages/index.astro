@@ -1,0 +1,100 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+const base = import.meta.env.BASE_URL;
+---
+<BaseLayout title="Rastion • Routing Solver Hub" description="Executable routing solver cards, official TSP evals, and replayable TSPLIB demos.">
+  <section class="hero">
+    <p class="kicker">Routing-First, TSP Today</p>
+    <h1>Executable Routing Solvers, Official TSP Evals, and Replayable Route Demos</h1>
+    <p>
+      Rastion is a static routing solver hub for the Python OR community. Phase 1 focuses on TSP: solver cards,
+      curated TSPLIB suites, suite-scoped leaderboards, and a replayable arena that shows how each solver behaves on
+      real route geometry.
+    </p>
+    <div class="hero-actions">
+      <a class="button-primary" href={`${base}arena/`}>Open TSP Arena</a>
+      <a class="button-secondary" href={`${base}solvers/`}>Browse Solvers</a>
+      <a class="button-secondary" href={`${base}leaderboards/`}>View Leaderboards</a>
+    </div>
+
+    <div class="grid cards">
+      <article class="card">
+        <h3>TSP Arena</h3>
+        <p>Watch TSPLIB tours, route geometry, and solver progress on small, medium, and large instances.</p>
+        <a href={`${base}arena/`}>Open arena</a>
+      </article>
+      <article class="card">
+        <h3>Solver Catalog</h3>
+        <p>Browse executable routing solver cards with installation, limits, and method-class metadata.</p>
+        <a href={`${base}solvers/`}>Open solver catalog</a>
+      </article>
+      <article class="card">
+        <h3>Official Evals</h3>
+        <p>Compare solvers on curated TSPLIB suites with fixed budgets, seeds, and published artifacts.</p>
+        <a href={`${base}leaderboards/`}>Open leaderboards</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="grid cards" style="margin-top: 1rem;">
+    <article class="card">
+      <p class="kicker">Why Routing First?</p>
+      <h2>Narrow Enough to Be Real</h2>
+      <p>
+        Routing is a more coherent starting point than "all optimization". Rastion ships actual TSP support today and
+        keeps the public schemas VRP-ready so CVRP and other variants can slot in without redoing the catalog contract.
+      </p>
+      <p class="subtle">TSP is supported today. VRP is roadmap work, not implied current capability.</p>
+    </article>
+    <article class="card">
+      <p class="kicker">5-Minute Quickstart</p>
+      <h2>Build The Static Hub Locally</h2>
+      <pre><code>pip install -e .
+python -m rastion build-site-data
+cd web && npm install && npm run dev</code></pre>
+      <p class="status" id="home-updated">Loading latest routing export timestamps...</p>
+    </article>
+    <article class="card">
+      <p class="kicker">Contribute</p>
+      <h2>Add A TSP Solver</h2>
+      <p>
+        Phase 1 listings require a valid solver card, a working adapter, and official TSP suite outputs. The
+        contribution flow is designed so third-party solvers can become reproducible catalog entries rather than
+        unstructured claims.
+      </p>
+      <a href={`${base}contribute/`}>Open contribution path</a>
+    </article>
+  </section>
+
+  <script>
+    import { fetchJson, formatIso } from "../components/dataLoader";
+
+    const status = document.querySelector("#home-updated");
+
+    async function load() {
+      const sources = ["data/catalog.json", "data/leaderboards.json", "data/suites.json", "data/tsp_arena.json"];
+      try {
+        const payloads = await Promise.all(
+          sources.map((path) => fetchJson(path).catch(() => ({ generated_at: null, path }))),
+        );
+        const resolved = payloads
+          .map((payload) => payload.generated_at)
+          .filter((value) => typeof value === "string" && value.length > 0);
+
+        if (!resolved.length) {
+          status.textContent = "No exports found yet. Run: python -m rastion build-site-data";
+          return;
+        }
+
+        const latest = resolved.sort().reverse()[0];
+        status.textContent = `Last updated: ${formatIso(latest)} (from generated routing artifacts)`;
+      } catch (error) {
+        status.classList.add("error");
+        status.textContent = "Could not read export timestamps.";
+        console.error(error);
+      }
+    }
+
+    load();
+  </script>
+</BaseLayout>

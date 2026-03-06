@@ -1,0 +1,17 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CatalogTable from "../components/CatalogTable.astro";
+---
+<BaseLayout title="Rastion • Solver Catalog" description="Routing solver cards for executable TSP integrations.">
+  <section class="card">
+    <p class="kicker">Routing Catalog</p>
+    <h1>Solver Cards</h1>
+    <p>
+      Phase 1 lists executable TSP solvers only. Each entry combines a solver card, a working adapter, and official
+      suite coverage so the catalog stays reproducible and useful to routing practitioners.
+    </p>
+  </section>
+  <div class="grid" style="margin-top: 1rem;">
+    <CatalogTable />
+  </div>
+</BaseLayout>

@@ -1,0 +1,62 @@
+{
+  "id": "tsp-two-opt",
+  "name": "2-Opt Local Search",
+  "routing_family": "routing",
+  "problem_variants": ["tsp"],
+  "summary": "Iterative 2-opt TSP local search seeded from a nearest-neighbor tour.",
+  "description": "2-opt is the main official local-search baseline in Rastion's routing-first phase. It improves a seeded tour with repeated segment reversals, emits progress events, and represents the kind of lightweight heuristic contributors can slot into the hub today.",
+  "repository": "https://github.com/leonidas1312/rastion",
+  "homepage": "https://github.com/leonidas1312/rastion",
+  "license": "Apache-2.0",
+  "authors": ["rastion contributors"],
+  "maintainers": ["rastion contributors"],
+  "installation": {
+    "command": "pip install -e .",
+    "package": "rastion",
+    "extras": [],
+    "python": ">=3.11",
+    "optional_dependencies": []
+  },
+  "adapter": {
+    "kind": "local_plugin",
+    "solver_name": "tsp_two_opt",
+    "path": "plugins_local/rastion_tsp_two_opt",
+    "entrypoint": null
+  },
+  "capabilities": {
+    "streaming": true,
+    "deterministic_mode": true,
+    "warm_start": false,
+    "local_search": true,
+    "multi_route_ready": false,
+    "notes": "Starts from a constructive tour and improves it with repeated 2-opt swaps."
+  },
+  "limits": {
+    "tested_max_nodes": 2000,
+    "unsupported_constraints": ["capacities", "time windows", "multiple vehicles"],
+    "depot_assumptions": "Assumes a single depot and one closed tour.",
+    "notes": "Suitable for Phase 1 TSP leaderboards; not yet generalized to VRP."
+  },
+  "hardware": ["cpu"],
+  "determinism": "Pseudo-deterministic for a fixed seed and budget.",
+  "method_class": "metaheuristic",
+  "version": "0.1.0",
+  "citations": [
+    "2-opt is a standard local-search neighborhood for the travelling salesman problem."
+  ],
+  "references": [
+    "https://en.wikipedia.org/wiki/2-opt"
+  ],
+  "known_failure_modes": [
+    "Can stall in shallow local minima when the iteration budget is too small.",
+    "Performance depends on the initial route quality."
+  ],
+  "artifact_paths": {
+    "benchmark_json": "data/benchmarks.json",
+    "arena_json": "data/tsp_arena.json",
+    "suite_results_dir": "data/evals/",
+    "detail_markdown": "catalog/solvers/tsp-two-opt/README.md"
+  },
+  "tags": ["tsp", "local-search", "2-opt", "routing"],
+  "listing_tier": "official"
+}

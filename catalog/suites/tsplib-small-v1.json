@@ -1,0 +1,30 @@
+{
+  "id": "tsplib-small-v1",
+  "title": "TSPLIB Small v1",
+  "description": "Official small-instance TSP suite for the routing-first Phase 1 hub.",
+  "problem_variant": "tsp",
+  "instances": [
+    {
+      "id": "berlin52",
+      "label": "Berlin52",
+      "path": "examples/tsplib/berlin52.tsp",
+      "size": "small"
+    }
+  ],
+  "budget_policy": {
+    "iters": 600,
+    "time_budget_ms": 1000,
+    "repeat": 1
+  },
+  "seed_policy": {
+    "seeds": [0]
+  },
+  "metric_policy": {
+    "primary_metric": "distance",
+    "objective": "minimize",
+    "runtime_unit": "ms"
+  },
+  "result_schema_version": "1.0",
+  "optional_dependencies": ["ortools>=9.9"],
+  "listing_tiers": ["official", "experimental"]
+}

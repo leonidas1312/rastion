@@ -1,1 +1,0 @@
-"""Bundled registry problem templates."""

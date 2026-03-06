@@ -1,130 +1,168 @@
-<p align="center">
-  <img src="assets/owl-favicon.png" alt="Rastion owl logo" width="96" />
-</p>
-
 # Rastion
 
-Local-first optimization lab for decision plugins.
+Rastion is a routing solver hub for Python: executable solver cards, official TSP evals, and replayable TSPLIB demos.
 
-## MVP Scope
+The current wedge is deliberate:
 
-- Core MVP is local-first: model, run, and inspect decision plugins on your own machine.
-- Hub/community features are optional and can be added after local workflow is stable.
-- User-facing artifact is the decision plugin (`spec.json` + `instances/` + metadata/card).
+- `routing` is the product story
+- `TSP` is the fully supported vertical today
+- `VRP` is roadmap work, not implied current capability
 
-[![PyPI version](https://img.shields.io/pypi/v/rastion.svg)](https://pypi.org/project/rastion/)
-[![Python versions](https://img.shields.io/pypi/pyversions/rastion.svg)](https://pypi.org/project/rastion/)
-[![License](https://img.shields.io/pypi/l/rastion.svg)](LICENSE)
+## Live Demo
 
-## Install
+GitHub Pages publishes the static hub from generated JSON artifacts:
 
-Latest release:
+- solver catalog
+- official TSP leaderboards
+- TSPLIB arena
+- suite definitions
 
-```bash
-pip install rastion
-```
+## Why Routing First?
 
-Run the app:
+Routing is narrow enough to be scientifically coherent and broad enough to grow into a real ecosystem. Rastion starts
+with TSP because the repo already has executable TSPLIB support, route visualization, and baseline heuristics. The
+public schemas are VRP-ready so CVRP and richer routing variants can land without redesigning the catalog contract.
 
-```bash
-rastion
-```
+## TSP Today, VRP Next
 
-## Agent-First Quickstart
+Phase 1 supports:
 
-Scaffold a Codex-friendly workspace:
+- executable TSP solver adapters
+- solver cards in `catalog/solvers/*/card.json`
+- official TSPLIB suites in `catalog/suites/*.json`
+- suite-scoped leaderboards
+- replayable TSP arena artifacts
 
-```bash
-rastion init-agent --path .
-```
+Phase 1 does not support:
 
-This creates:
-- `AGENTS.md` with a local-first optimization workflow policy.
-- `decision_plugins/calendar_week_off/` starter files (half-day model).
-- `decision_plugins/calendar_week_off_30m/` starter files (30-minute slots + fixed meeting blackout).
-- `agent_requests/*.json` structured requests for `rastion agent-run`.
+- CVRP or VRPTW execution
+- multi-vehicle route rendering
+- global cross-family routing rankings
 
-Then run the starter template:
+## 5-Minute Quickstart
 
-```bash
-export RASTION_HOME=.rastion-home
-rastion init-registry
-rastion agent-run ./agent_requests/calendar_week_off_30m.json
-```
-
-To allow agent-orchestrated solver download fallback (trusted URL list in request JSON):
+Install the package:
 
 ```bash
-rastion agent-run ./agent_requests/calendar_week_off_30m_remote_solver.json
+pip install -e .
 ```
 
-## Talk To Your Optimization Lab
-
-Use this prompt shape with your coding agent:
-
-```text
-Convert this request into a Rastion decision plugin.
-Goal: <what outcome you want>
-Hard constraints: <must hold>
-Soft preferences: <nice to have>
-Horizon: <time window>
-Timezone: <timezone>
-Return: decision_plugins/<name>/spec.json, instances/default.json, and an agent_request JSON.
-```
-
-Then run:
+With the optional OR-Tools adapter enabled:
 
 ```bash
-rastion plugin install ./decision_plugins/<name> --overwrite
-rastion info --verbose <name> default
-rastion solve <name> default --solver auto --time-limit 30
+pip install -e '.[ortools]'
 ```
 
-Inspect state deterministically:
+Generate all static site artifacts:
 
 ```bash
-rastion plugin list --json
-rastion plugin dev-list --path ./decision_plugins --json
-rastion plugin status <name> --path ./decision_plugins --json
-rastion runs list --json
+python -m rastion build-site-data
 ```
 
-## Decision Plugin Workflow
-
-Install a local plugin folder into your registry:
+Run the Astro site:
 
 ```bash
-rastion plugin install ./decision_plugins/calendar_week_off_30m --overwrite
+cd web
+npm install
+npm run dev
 ```
 
-List installed plugins:
+## Core Commands
+
+Validate solver cards and suite specs:
 
 ```bash
-rastion plugin list
+python -m rastion validate-cards
 ```
 
-List local workspace plugins (not yet installed):
+Export the public catalog and suite metadata:
 
 ```bash
-rastion plugin dev-list --path ./decision_plugins
+python -m rastion export-catalog --out web/public/data/catalog.json
+python -m rastion export-suites --out web/public/data/suites.json
 ```
 
-View run history:
+Run an official suite and export the suite artifact:
 
 ```bash
-rastion runs list
+python -m rastion eval-suite tsplib-small-v1
 ```
 
-Push a plugin to Rastion Hub:
+Export all leaderboards:
 
 ```bash
-rastion login
-rastion plugin push ./decision_plugins/calendar_week_off_30m
+python -m rastion export-leaderboards --out web/public/data/leaderboards.json
 ```
 
-Search and pull from Rastion Hub:
+Generate the TSP arena artifact:
 
 ```bash
-rastion plugin search calendar
-rastion plugin pull calendar_week_off_30m --overwrite
+python -m rastion tsp-arena --out web/public/data/tsp_arena.json --iters 2000 --seed 0 --emit-every 50
+```
+
+Compatibility alias:
+
+```bash
+python -m rastion demo
+python -m rastion demo-site
+```
+
+## Add A TSP Solver
+
+Phase 1 public listings require:
+
+1. a working adapter under `plugins_local/`
+2. a valid solver card under `catalog/solvers/<solver-id>/card.json`
+3. a solver detail markdown file
+4. successful validation with `python -m rastion validate-cards`
+5. official suite output from the TSP suite set
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the exact flow.
+
+## Official Suite Policy
+
+Leaderboards are:
+
+- `TSP` only in Phase 1
+- versioned
+- curated
+- suite-scoped
+- generated from fixed seeds and budgets
+
+Rastion intentionally does not publish a fake global “best routing solver” ranking.
+
+## Repo Layout
+
+- `catalog/solvers/`: solver cards and detail markdown
+- `catalog/suites/`: official suite definitions
+- `plugins_local/`: executable solver adapters
+- `rastion/catalog/`: catalog loading, validation, exports, and evals
+- `rastion/tsp/`: TSPLIB ingestion and TSP arena utilities
+- `web/`: Astro site
+
+## Roadmap
+
+Phase 2 targets basic CVRP support:
+
+- `CVRPProblem`
+- multi-route result schema
+- CVRP suite definitions
+- multi-vehicle visualizations
+
+Phase 3 can expand into broader routing variants once the contracts are stable.
+
+## GitHub Pages
+
+`web/astro.config.mjs` derives the base path from CI automatically.
+
+Project Pages:
+
+- repository pages default to `/<repo>/`
+- local dev defaults to `/`
+- override with `SITE_BASE=/rastion/` if needed
+
+## Tests
+
+```bash
+pytest -q
 ```

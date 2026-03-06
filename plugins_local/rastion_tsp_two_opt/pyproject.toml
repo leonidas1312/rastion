@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rastion-tsp-two-opt"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.24", "rastion"]
+
+[project.entry-points."rastion.solvers"]
+tsp_two_opt = "rastion_tsp_two_opt.solver:get_solver"

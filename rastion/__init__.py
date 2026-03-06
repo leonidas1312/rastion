@@ -1,15 +1,10 @@
-"""Rastion: portable decision plugins and solver plugins."""
+"""Rastion local MVP package."""
 
-from rastion.benchmark import compare, run_benchmark_suite
-from rastion.registry import AutoSolver, DecisionPlugin, Problem, Solver
-from rastion.version import __version__
+from importlib.metadata import PackageNotFoundError, version
 
-__all__ = [
-    "__version__",
-    "AutoSolver",
-    "DecisionPlugin",
-    "Problem",
-    "Solver",
-    "compare",
-    "run_benchmark_suite",
-]
+try:
+    __version__ = version("rastion")
+except PackageNotFoundError:
+    __version__ = "0.1.0"
+
+__all__ = ["__version__"]

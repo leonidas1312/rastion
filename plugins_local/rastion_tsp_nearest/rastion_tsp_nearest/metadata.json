@@ -1,0 +1,8 @@
+{
+  "name": "tsp_nearest_neighbor",
+  "supports": ["tsp"],
+  "max_size": 2000,
+  "hardware": ["cpu"],
+  "quality": 0.62,
+  "version": "0.1.0"
+}

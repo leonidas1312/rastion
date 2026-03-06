@@ -1,0 +1,117 @@
+{
+  "generated_at": "2026-03-06T15:45:52.595489+00:00",
+  "count": 3,
+  "suites": [
+    {
+      "id": "tsplib-large-v1",
+      "title": "TSPLIB Large v1",
+      "description": "Official large-instance TSP suite for the routing-first Phase 1 hub.",
+      "problem_variant": "tsp",
+      "instances": [
+        {
+          "id": "a280",
+          "label": "a280",
+          "path": "examples/tsplib/a280.tsp",
+          "size": "large"
+        }
+      ],
+      "budget_policy": {
+        "iters": 2000,
+        "time_budget_ms": 2000,
+        "repeat": 1
+      },
+      "seed_policy": {
+        "seeds": [
+          0
+        ]
+      },
+      "metric_policy": {
+        "primary_metric": "distance",
+        "objective": "minimize",
+        "runtime_unit": "ms"
+      },
+      "result_schema_version": "1.0",
+      "optional_dependencies": [
+        "ortools>=9.9"
+      ],
+      "listing_tiers": [
+        "official",
+        "experimental"
+      ]
+    },
+    {
+      "id": "tsplib-medium-v1",
+      "title": "TSPLIB Medium v1",
+      "description": "Official medium-instance TSP suite for the routing-first Phase 1 hub.",
+      "problem_variant": "tsp",
+      "instances": [
+        {
+          "id": "ch150",
+          "label": "ch150",
+          "path": "examples/tsplib/ch150.tsp",
+          "size": "medium"
+        }
+      ],
+      "budget_policy": {
+        "iters": 1200,
+        "time_budget_ms": 1500,
+        "repeat": 1
+      },
+      "seed_policy": {
+        "seeds": [
+          0
+        ]
+      },
+      "metric_policy": {
+        "primary_metric": "distance",
+        "objective": "minimize",
+        "runtime_unit": "ms"
+      },
+      "result_schema_version": "1.0",
+      "optional_dependencies": [
+        "ortools>=9.9"
+      ],
+      "listing_tiers": [
+        "official",
+        "experimental"
+      ]
+    },
+    {
+      "id": "tsplib-small-v1",
+      "title": "TSPLIB Small v1",
+      "description": "Official small-instance TSP suite for the routing-first Phase 1 hub.",
+      "problem_variant": "tsp",
+      "instances": [
+        {
+          "id": "berlin52",
+          "label": "Berlin52",
+          "path": "examples/tsplib/berlin52.tsp",
+          "size": "small"
+        }
+      ],
+      "budget_policy": {
+        "iters": 600,
+        "time_budget_ms": 1000,
+        "repeat": 1
+      },
+      "seed_policy": {
+        "seeds": [
+          0
+        ]
+      },
+      "metric_policy": {
+        "primary_metric": "distance",
+        "objective": "minimize",
+        "runtime_unit": "ms"
+      },
+      "result_schema_version": "1.0",
+      "optional_dependencies": [
+        "ortools>=9.9"
+      ],
+      "listing_tiers": [
+        "official",
+        "experimental"
+      ]
+    }
+  ]
+}

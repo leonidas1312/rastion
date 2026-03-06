@@ -1,11 +1,11 @@
 [build-system]
-requires = ["hatchling>=1.21.0"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "rastion"
-dynamic = ["version"]
-description = "Local-first portable decision plugins and solver plugins"
+version = "0.1.0"
+description = "Local MVP for tensor/matrix optimization IR with plugin-based solvers"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
@@ -13,51 +13,26 @@ authors = [{ name = "rastion contributors" }]
 dependencies = [
   "numpy>=1.24",
   "pydantic>=2.6",
-  "PyYAML>=6.0",
-  "httpx>=0.27",
+  "typer>=0.12",
+  "rich>=13.0"
 ]
 
 [project.optional-dependencies]
-highs = ["highspy>=1.7"]
-ortools = ["ortools>=9.10"]
-scip = ["PySCIPOpt>=5.0"]
-neal = ["dwave-neal>=0.6"]
-qiskit = ["qiskit>=0.45", "qiskit-algorithms>=0.3"]
-qaoa = ["qiskit>=0.45", "qiskit-algorithms>=0.3"]
 dev = [
-  "pytest>=8.0",
-  "ruff>=0.6",
+  "pytest>=8.0"
 ]
-all = [
-  "highspy>=1.7",
-  "ortools>=9.10",
-  "PySCIPOpt>=5.0",
-  "dwave-neal>=0.6",
-  "qiskit>=0.45",
-  "qiskit-algorithms>=0.3",
-  "pytest>=8.0",
-  "ruff>=0.6",
+ortools = [
+  "ortools>=9.9"
 ]
 
 [project.scripts]
-rastion = "rastion.cli:main"
+rastion = "rastion.cli:app"
 
-[tool.hatch.build.targets.wheel]
-packages = ["rastion"]
-
-[tool.hatch.version]
-path = "rastion/version.py"
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rastion*"]
+exclude = ["tests*", "plugins_local*"]
 
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]
-markers = [
-  "integration: integration tests that require optional solver dependencies",
-]
-
-[tool.ruff]
-line-length = 120
-target-version = "py311"
-
-[tool.ruff.lint]
-select = ["E", "F", "I"]

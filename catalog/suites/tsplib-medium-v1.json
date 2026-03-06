@@ -1,0 +1,30 @@
+{
+  "id": "tsplib-medium-v1",
+  "title": "TSPLIB Medium v1",
+  "description": "Official medium-instance TSP suite for the routing-first Phase 1 hub.",
+  "problem_variant": "tsp",
+  "instances": [
+    {
+      "id": "ch150",
+      "label": "ch150",
+      "path": "examples/tsplib/ch150.tsp",
+      "size": "medium"
+    }
+  ],
+  "budget_policy": {
+    "iters": 1200,
+    "time_budget_ms": 1500,
+    "repeat": 1
+  },
+  "seed_policy": {
+    "seeds": [0]
+  },
+  "metric_policy": {
+    "primary_metric": "distance",
+    "objective": "minimize",
+    "runtime_unit": "ms"
+  },
+  "result_schema_version": "1.0",
+  "optional_dependencies": ["ortools>=9.9"],
+  "listing_tiers": ["official", "experimental"]
+}

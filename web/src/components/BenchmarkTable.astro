@@ -1,0 +1,64 @@
+<section class="card">
+  <p class="kicker">Cached Performance</p>
+  <h2>Benchmark Results</h2>
+  <p class="status" id="bench-status">Loading benchmark cache...</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Problem</th>
+          <th>n_vars</th>
+          <th>Solver</th>
+          <th>Best Value</th>
+          <th>Avg Runtime (s)</th>
+          <th>Hint</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody id="bench-body">
+        <tr><td colspan="7">Waiting for data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+  import { fetchJson, formatIso } from "./dataLoader";
+
+  const status = document.querySelector("#bench-status");
+  const body = document.querySelector("#bench-body");
+
+  function rowHtml(row) {
+    return `<tr>
+      <td>${row.problem_type}</td>
+      <td>${row.n_vars}</td>
+      <td>${row.solver_name}</td>
+      <td>${Number(row.best_value ?? 0).toFixed(6)}</td>
+      <td>${Number(row.avg_runtime ?? 0).toFixed(6)}</td>
+      <td>${Number(row.hint ?? 0).toFixed(3)}</td>
+      <td>${formatIso(row.updated_at)}</td>
+    </tr>`;
+  }
+
+  async function load() {
+    try {
+      const payload = await fetchJson("data/benchmarks.json");
+      const rows = Array.isArray(payload.rows) ? payload.rows : [];
+      if (!rows.length) {
+        body.innerHTML = '<tr><td colspan="7">No benchmark rows found.</td></tr>';
+        status.textContent = "No benchmark data available.";
+        return;
+      }
+
+      body.innerHTML = rows.map(rowHtml).join("\n");
+      status.textContent = `Last updated: ${formatIso(payload.generated_at)}`;
+    } catch (error) {
+      body.innerHTML = '<tr><td colspan="7">No data found.</td></tr>';
+      status.classList.add("error");
+      status.textContent = "Missing /data/benchmarks.json. Run: python -m rastion demo-site";
+      console.error(error);
+    }
+  }
+
+  load();
+</script>

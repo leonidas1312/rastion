@@ -1,0 +1,8 @@
+{
+  "name": "simulated_annealing",
+  "supports": ["qubo"],
+  "max_size": 200,
+  "hardware": ["cpu"],
+  "quality": 0.70,
+  "version": "0.1.0"
+}

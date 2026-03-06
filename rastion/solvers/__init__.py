@@ -1,24 +1,19 @@
-from rastion.solvers.base import CapabilitySet, SolverPlugin
-from rastion.solvers.discovery import discover_plugins
-from rastion.solvers.matching import (
-    auto_select_solver,
-    compatible_plugins,
-    match,
-    match_report,
-    missing_capabilities,
-    ranked_plugins,
-    requirements_from_ir,
+"""Solver package."""
+
+from .registry import (
+    RegisteredSolver,
+    clear_registry,
+    get_registered_solver,
+    get_solver,
+    list_solvers,
+    register_solver,
 )
 
 __all__ = [
-    "CapabilitySet",
-    "SolverPlugin",
-    "auto_select_solver",
-    "compatible_plugins",
-    "discover_plugins",
-    "match",
-    "match_report",
-    "missing_capabilities",
-    "ranked_plugins",
-    "requirements_from_ir",
+    "RegisteredSolver",
+    "clear_registry",
+    "register_solver",
+    "get_solver",
+    "get_registered_solver",
+    "list_solvers",
 ]

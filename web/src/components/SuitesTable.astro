@@ -1,0 +1,66 @@
+<section class="card">
+  <p class="kicker">Evaluation Policy</p>
+  <h2>Official TSP Suites</h2>
+  <p class="status" id="suites-status">Loading official suite specs...</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Suite</th>
+          <th>Variant</th>
+          <th>Instances</th>
+          <th>Budget</th>
+          <th>Seeds</th>
+          <th>Schema</th>
+        </tr>
+      </thead>
+      <tbody id="suites-body">
+        <tr><td colspan="6">Waiting for data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+  import { fetchJson, formatIso } from "./dataLoader";
+
+  const status = document.querySelector("#suites-status");
+  const body = document.querySelector("#suites-body");
+
+  function rowHtml(row) {
+    const instances = Array.isArray(row.instances)
+      ? row.instances.map((instance) => `${instance.label} (${instance.size})`).join(", ")
+      : "";
+    const seeds = Array.isArray(row.seed_policy?.seeds) ? row.seed_policy.seeds.join(", ") : "n/a";
+    return `<tr>
+      <td><strong>${row.title}</strong><br><span class="subtle">${row.id}</span></td>
+      <td>${row.problem_variant}</td>
+      <td>${instances}</td>
+      <td>${row.budget_policy?.iters ?? "n/a"} iters / ${row.budget_policy?.time_budget_ms ?? "n/a"} ms</td>
+      <td>${seeds}</td>
+      <td>${row.result_schema_version}</td>
+    </tr>`;
+  }
+
+  async function load() {
+    try {
+      const payload = await fetchJson("data/suites.json");
+      const rows = Array.isArray(payload.suites) ? payload.suites : [];
+      if (!rows.length) {
+        body.innerHTML = '<tr><td colspan="6">No suite specs exported yet.</td></tr>';
+        status.textContent = "No suite data available.";
+        return;
+      }
+
+      body.innerHTML = rows.map(rowHtml).join("\n");
+      status.textContent = `Last updated: ${formatIso(payload.generated_at)} • ${rows.length} official suites`;
+    } catch (error) {
+      body.innerHTML = '<tr><td colspan="6">No data found.</td></tr>';
+      status.classList.add("error");
+      status.textContent = "Missing /data/suites.json. Run: python -m rastion build-site-data";
+      console.error(error);
+    }
+  }
+
+  load();
+</script>

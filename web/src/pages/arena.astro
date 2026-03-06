@@ -1,0 +1,184 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Rastion • TSP Arena" description="TSPLIB live arena for the routing-first Phase 1 hub.">
+  <section class="card">
+    <p class="kicker">Phase 1 Demo Surface</p>
+    <h1>TSP Arena</h1>
+    <p>
+      The arena is the acquisition layer for Rastion's routing hub. Compare solver routes on curated TSPLIB instances,
+      inspect depot-aware geometry, and replay best-value-over-time without pretending Phase 1 already supports
+      multi-vehicle VRP semantics.
+    </p>
+  </section>
+
+  <div class="grid" style="margin-top: 1rem;">
+    <section class="card">
+      <div class="controls">
+        <label for="instance-select">Problem size:</label>
+        <select id="instance-select" aria-label="Choose TSPLIB instance"></select>
+
+        <label for="solver-focus">Route focus:</label>
+        <select id="solver-focus" aria-label="Focus solver">
+          <option value="">All solvers</option>
+        </select>
+
+        <span class="status" id="arena-meta">Loading TSPLIB arena...</span>
+      </div>
+
+      <h2>Instance Map</h2>
+      <canvas class="map" id="tsp-map" width="960" height="420"></canvas>
+    </section>
+
+    <section class="card">
+      <h2>Leaderboard</h2>
+      <p class="status" id="arena-status">Loading solver results...</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Solver</th>
+              <th>Best Distance</th>
+              <th>Runtime (ms)</th>
+              <th>Events</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="arena-leaderboard-body">
+            <tr><td colspan="5">Waiting for data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Progress Plot</h2>
+      <canvas class="chart" id="arena-chart" width="960" height="340"></canvas>
+    </section>
+  </div>
+
+  <script>
+    import { renderArenaChart } from "../components/ArenaChart";
+    import { renderTspMap } from "../components/TspMap";
+    import { fetchJson, formatIso } from "../components/dataLoader";
+
+    const instanceSelect = document.querySelector("#instance-select");
+    const solverFocus = document.querySelector("#solver-focus");
+    const meta = document.querySelector("#arena-meta");
+    const status = document.querySelector("#arena-status");
+    const body = document.querySelector("#arena-leaderboard-body");
+    const chartCanvas = document.querySelector("#arena-chart");
+    const mapCanvas = document.querySelector("#tsp-map");
+
+    let bundle = null;
+
+    function formatSize(instance) {
+      const label = String(instance.size || "custom").toLowerCase();
+      return `${label} • ${instance.name} (n=${instance.n_vars})`;
+    }
+
+    function rowHtml(row) {
+      const hasError = typeof row.error === "string" && row.error.length > 0;
+      const statusText = hasError ? "error" : "ok";
+      const distance = hasError ? "n/a" : Number(row.final?.best_value ?? 0).toFixed(2);
+      const runtime = hasError ? "-" : Number(row.final?.runtime_ms ?? 0);
+      const events = Array.isArray(row.events) ? row.events.length : 0;
+
+      return `<tr>
+        <td><strong>${row.name}</strong></td>
+        <td>${distance}</td>
+        <td>${runtime}</td>
+        <td>${events}</td>
+        <td>${statusText}</td>
+      </tr>`;
+    }
+
+    function activeInstance() {
+      const id = instanceSelect.value;
+      const instances = Array.isArray(bundle?.instances) ? bundle.instances : [];
+      return instances.find((instance) => instance.id === id) || instances[0] || null;
+    }
+
+    function renderInstance() {
+      const instance = activeInstance();
+      if (!instance) {
+        body.innerHTML = '<tr><td colspan="5">No TSPLIB instances available.</td></tr>';
+        status.textContent = "No arena data available.";
+        meta.textContent = "Run: python -m rastion build-site-data";
+        return;
+      }
+
+      const allRows = Array.isArray(instance.solvers) ? [...instance.solvers] : [];
+      allRows.sort(
+        (a, b) =>
+          Number(a.final?.best_value ?? Number.POSITIVE_INFINITY) -
+            Number(b.final?.best_value ?? Number.POSITIVE_INFINITY) ||
+          Number(a.final?.runtime_ms ?? Number.POSITIVE_INFINITY) -
+            Number(b.final?.runtime_ms ?? Number.POSITIVE_INFINITY),
+      );
+
+      body.innerHTML = allRows.map(rowHtml).join("\n");
+      status.textContent = `Suite updated: ${formatIso(bundle.generated_at)} • Instance: ${instance.name}`;
+      meta.textContent = `${instance.source || "tsplib"} • depot=${instance.depot} • nodes=${instance.n_vars}`;
+
+      const focusBefore = solverFocus.value;
+      const options = ['<option value="">All solvers</option>']
+        .concat(allRows.map((row) => `<option value="${row.name}">${row.name}</option>`))
+        .join("\n");
+      solverFocus.innerHTML = options;
+      if (allRows.some((row) => row.name === focusBefore)) {
+        solverFocus.value = focusBefore;
+      }
+
+      const focused = solverFocus.value || null;
+
+      const series = allRows
+        .filter((row) => !row.error)
+        .map((row) => ({
+          name: row.name,
+          events: Array.isArray(row.events) ? row.events : [],
+        }));
+
+      const routes = allRows
+        .filter((row) => !row.error)
+        .map((row) => ({
+          name: row.name,
+          route: Array.isArray(row.final?.route) ? row.final.route : [],
+        }));
+
+      renderArenaChart(chartCanvas, series, focused);
+      renderTspMap(mapCanvas, Array.isArray(instance.nodes) ? instance.nodes : [], Number(instance.depot ?? 0), routes, focused);
+    }
+
+    async function load() {
+      try {
+        bundle = await fetchJson("data/tsp_arena.json");
+        const instances = Array.isArray(bundle.instances) ? bundle.instances : [];
+        if (!instances.length) {
+          body.innerHTML = '<tr><td colspan="5">No TSPLIB instances found.</td></tr>';
+          status.textContent = "No TSPLIB arena data available.";
+          meta.textContent = "Run: python -m rastion build-site-data";
+          return;
+        }
+
+        instanceSelect.innerHTML = instances
+          .map((instance) => `<option value="${instance.id}">${formatSize(instance)}</option>`)
+          .join("\n");
+
+        renderInstance();
+
+        instanceSelect.addEventListener("change", renderInstance);
+        solverFocus.addEventListener("change", renderInstance);
+        window.addEventListener("resize", renderInstance);
+      } catch (error) {
+        body.innerHTML = '<tr><td colspan="5">No data found.</td></tr>';
+        status.classList.add("error");
+        status.textContent = "Missing /data/tsp_arena.json. Run: python -m rastion build-site-data";
+        meta.textContent = "TSPLIB arena unavailable.";
+        console.error(error);
+      }
+    }
+
+    load();
+  </script>
+</BaseLayout>
