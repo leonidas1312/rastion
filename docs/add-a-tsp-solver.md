@@ -1,141 +1,94 @@
-# Add a TSP Solver to Rastion
+# Add A TSP Solver
 
-This walkthrough matches the Phase 1 repository layout as shipped during the content freeze.
+This is the repo-verified path for turning a local adapter into a public Rastion listing.
 
-## Goal
-
-Produce a public TSP listing with:
-
-- a discoverable adapter
-- a validated solver card
-- a solver detail README that renders on the site
-- official bootstrap suite results
-- regenerated static site artifacts
-
-## Prerequisites
-
-Install the package in editable mode:
+## 1. Install the full local toolchain
 
 ```bash
-pip install -e .
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev,ortools]"
 ```
 
-If your adapter depends on OR-Tools:
+## 2. Add the adapter under `plugins_local/`
 
-```bash
-pip install -e '.[ortools]'
-```
+Your plugin must expose `get_solver()` and register a solver that supports `tsp`.
 
-All repo docs use the installed console entrypoint:
-
-```bash
-rastion --help
-```
-
-## 1. Add the adapter
-
-Create a package under `plugins_local/` that exposes `get_solver()`.
-
-Reference implementations already in the repo:
+Existing examples:
 
 - `plugins_local/rastion_tsp_nearest`
 - `plugins_local/rastion_tsp_two_opt`
 - `plugins_local/rastion_tsp_ortools`
 
-Phase 1 requirements:
-
-- supports `tsp`
-- runs locally from the repo
-- behaves honestly with respect to dependencies and limits
-
-## 2. Add the solver card
+## 3. Add the public card and detail page
 
 Create:
 
 - `catalog/solvers/<solver-id>/card.json`
 - `catalog/solvers/<solver-id>/README.md`
 
-The card provides structured metadata.
-The README is the narrative layer that the site renders on the solver detail page.
+Keep the card honest about:
 
-Minimum content to include in the README:
-
-- what the solver is
-- when to use it
-- what it cannot do
+- installation requirements
+- limits
+- determinism
+- optional dependencies
 - known failure modes
-- interpretation of current suite results
 
-## 3. Validate the catalog contract
+## 4. Validate the catalog
 
 ```bash
-rastion validate-cards
+python -m rastion validate-cards
 ```
 
 Validation checks:
 
-- duplicate ids
-- missing suite specs
-- missing solver detail markdown
-- missing adapter paths
-- undiscoverable runtime solver names
-- non-TSP Phase 1 cards or suites
+- card ids
+- suite ids
+- adapter path existence
+- discoverability of the runtime solver
+- presence of the detail markdown file
 
-## 4. Run the official bootstrap suites
-
-```bash
-rastion eval-suite tsplib-small-v1
-rastion eval-suite tsplib-medium-v1
-rastion eval-suite tsplib-large-v1
-```
-
-Why "bootstrap":
-
-- each official Phase 1 suite currently contains one TSPLIB instance
-- this keeps the evaluation reproducible and honest while the corpus is still small
-- do not market the resulting ranks as a universal TSP verdict
-
-## 5. Regenerate the website artifacts
+## 5. Run the official suites
 
 ```bash
-rastion build-site-data
+python -m rastion eval-suite tsplib-small-v1
+python -m rastion eval-suite tsplib-medium-v1
+python -m rastion eval-suite tsplib-large-v1
 ```
 
-This writes:
+Public evidence in `v0.1` is suite-scoped. Do not treat one suite run as proof of broad TSP superiority.
 
-- `web/public/data/catalog.json`
-- `web/public/data/suites.json`
-- `web/public/data/leaderboards.json`
-- `web/public/data/evals/*.json`
-- `web/public/data/tsp_arena.json`
+## 6. Regenerate the public artifacts
 
-## 6. Check the website locally
+```bash
+python -m rastion build-site-data --iters 800 --seed 0 --emit-every 50
+```
+
+Then build the site:
 
 ```bash
 cd web
-npm install
-npm run dev
+npm ci
+npm run build
 ```
 
-Verify:
+## 7. Check the public surfaces
 
-- your solver appears in the catalog
-- its README renders on the detail page
-- suite coverage is visible
-- failure modes and references are present
+Verify that the new solver appears in:
 
-## 7. Prepare the PR
+- the solver catalog
+- its detail page
+- suite-scoped leaderboard results
+- the TSPLIB arena export if it participates there
 
-Include:
+## 8. Run the release smoke flow
 
-- adapter package
-- solver card
-- solver README
-- regenerated JSON artifacts if the repo expects them
-- a truthful description of method class, dependency requirements, and limits
+Before publishing or opening a PR, run:
 
-Avoid:
+```bash
+./scripts/release_smoke.sh
+```
 
-- claiming VRP support
-- claiming broad routing superiority from the bootstrap suites
-- hiding dependency failures or unsupported constraints
+That is the fastest way to ensure the repo still behaves like a coherent public TSP hub.

@@ -35,7 +35,7 @@
     "tested_max_nodes": 2000,
     "unsupported_constraints": ["capacities", "time windows", "multiple vehicles"],
     "depot_assumptions": "Assumes a single depot and a closed Hamiltonian tour.",
-    "notes": "Phase 1 supports TSP only. VRP variants are roadmap items."
+    "notes": "Rastion v0.1 supports TSP only. Broader variants are future work."
   },
   "hardware": ["cpu"],
   "determinism": "Deterministic for a fixed seed; seed only breaks ties between equal-distance candidates.",

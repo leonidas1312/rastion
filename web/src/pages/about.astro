@@ -1,0 +1,178 @@
+---
+import { existsSync, readFileSync } from "node:fs";
+
+import PageIntro from "../components/PageIntro.astro";
+import SuitesTable from "../components/SuitesTable.astro";
+import TrustNote from "../components/TrustNote.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const catalogPath = new URL("../../public/data/catalog.json", import.meta.url);
+const leaderboardsPath = new URL("../../public/data/leaderboards.json", import.meta.url);
+
+const catalog = existsSync(catalogPath) ? JSON.parse(readFileSync(catalogPath, "utf-8")) : { solvers: [] };
+const leaderboards = existsSync(leaderboardsPath) ? JSON.parse(readFileSync(leaderboardsPath, "utf-8")) : { leaderboards: [] };
+
+const solverRows = Array.isArray(catalog.solvers) ? catalog.solvers : [];
+const suiteRows = Array.isArray(leaderboards.leaderboards) ? leaderboards.leaderboards : [];
+
+const summaryById = new Map();
+for (const solver of solverRows) {
+  summaryById.set(solver.id, {
+    ...solver,
+    suitesWon: 0,
+    meanRanks: [],
+  });
+}
+
+for (const suite of suiteRows) {
+  const standings = Array.isArray(suite.standings) ? suite.standings : [];
+  standings.forEach((row, index) => {
+    const solver = summaryById.get(row.solver_id);
+    if (!solver) return;
+    solver.meanRanks.push(index + 1);
+    if (index === 0) {
+      solver.suitesWon += 1;
+    }
+  });
+}
+
+const roleCopy = {
+  "tsp-nearest-neighbor": "Transparent baseline for demos, smoke tests, and orientation. It matters because its behavior is easy to explain.",
+  "tsp-two-opt": "Stronger default baseline inside the core repo. Use it when you want better tour quality without leaving the native Rastion surface.",
+  "tsp-ortools": "External backend comparison point. It helps anchor the hub against an optional solver stack beyond the built-in baselines.",
+};
+
+const solverRoles = Array.from(summaryById.values())
+  .map((row) => ({
+    ...row,
+    averageRank: row.meanRanks.length
+      ? (row.meanRanks.reduce((total, value) => total + value, 0) / row.meanRanks.length).toFixed(2)
+      : "n/a",
+    role: roleCopy[row.id] || "Published solver role pending a dedicated summary.",
+  }))
+  .sort((left, right) => {
+    if (right.suitesWon !== left.suitesWon) return right.suitesWon - left.suitesWon;
+    return String(left.name).localeCompare(String(right.name));
+  });
+---
+<BaseLayout title="Rastion • About" description="Product framing, scope, and evaluation policy for the Rastion public TSP hub." canonical="/about/">
+  <PageIntro
+    eyebrow="About"
+    title="What Rastion v0.1 actually ships"
+    lede="Rastion is a public hub for TSP solvers, with solver cards, reproducible evals, and replayable TSPLIB demos."
+  >
+    <TrustNote slot="note" href="#evaluation" linkLabel="Jump to evaluation details">
+      v0.1 is TSP-only, suite-scoped, and intentionally small enough to audit.
+    </TrustNote>
+  </PageIntro>
+
+  <section class="section-block section-panel" id="positioning">
+    <div class="section-heading">
+      <p class="kicker">What Rastion is</p>
+      <h2>A public TSP hub with one honest story</h2>
+      <p>Rastion does not try to look larger than it is. The public release is one concrete product: a TSP hub where solver cards, official evals, and replayable demos all come from the same repo and the same generated artifacts.</p>
+    </div>
+  </section>
+
+  <section class="section-block" id="phase-1">
+    <div class="section-heading">
+      <p class="kicker">What is live in Phase 1</p>
+      <h2>The current shipped surface</h2>
+    </div>
+    <div class="destination-grid">
+      <article class="destination-card">
+        <h3>Solvers</h3>
+        <p>Executable TSP solver cards with installation, limits, references, and current suite coverage.</p>
+      </article>
+      <article class="destination-card">
+        <h3>Leaderboards</h3>
+        <p>Official suite-scoped results with fixed budgets, fixed seeds, status reporting, and artifact paths.</p>
+      </article>
+      <article class="destination-card">
+        <h3>Arena</h3>
+        <p>Replayable route geometry and progress traces on exported TSPLIB runs.</p>
+      </article>
+      <article class="destination-card">
+        <h3>Contributor flow</h3>
+        <p>A reproducible workflow for turning a solver integration into a public catalog entry.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section-block section-panel" id="limits">
+    <div class="section-heading">
+      <p class="kicker">Current scope and limits</p>
+      <h2>What Rastion claims, and what it does not</h2>
+    </div>
+    <ul class="list-reset">
+      <li>Phase 1 is TSP only.</li>
+      <li>Current leaderboards are suite-scoped bootstrap-track evidence, not universal TSP verdicts.</li>
+      <li>Work beyond TSP is future scope, not part of the current public contract.</li>
+    </ul>
+  </section>
+
+  <section class="section-block section-panel" id="evaluation">
+    <div class="section-heading">
+      <p class="kicker">How evaluation works</p>
+      <h2>Official, narrow, and rerunnable</h2>
+      <p>Rastion publishes suite-scoped TSP results using fixed instances, fixed budgets, fixed seeds, and stored output artifacts. The current track is intentionally small so outside readers can audit what the results actually prove.</p>
+    </div>
+    <ul class="list-reset">
+      <li>Suites are versioned and curated.</li>
+      <li>Budgets and seeds are explicit in the exported definitions.</li>
+      <li>Published results stay tied to artifact paths and run status.</li>
+    </ul>
+  </section>
+
+  <section class="section-block" id="official-suites">
+    <div class="section-heading">
+      <p class="kicker">Official suites</p>
+      <h2>Current suite definitions</h2>
+      <p>The suite table is the trust layer behind the catalog and the leaderboards.</p>
+    </div>
+    <SuitesTable />
+  </section>
+
+  <section class="section-block" id="current-solvers">
+    <div class="section-heading">
+      <p class="kicker">Current solver roles</p>
+      <h2>Why these entries matter right now</h2>
+      <p>The current set is meant to make the hub legible, not to imitate a mature benchmark zoo on day one.</p>
+    </div>
+    <div class="destination-grid">
+      {solverRoles.map((row) => (
+        <article class="destination-card">
+          <p class="kicker">{row.method_class} • {row.listing_tier}</p>
+          <h3>{row.name}</h3>
+          <p>{row.role}</p>
+          <div class="panel-meta">
+            <span>{row.suitesWon} suite win{row.suitesWon === 1 ? "" : "s"}</span>
+            <span>Average placement: {row.averageRank}</span>
+            <span>Tested scale: {row.limits?.tested_max_nodes ?? "n/a"} nodes</span>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section-block section-panel" id="why-now">
+    <div class="section-heading">
+      <p class="kicker">Why publish now</p>
+      <h2>Small, but already useful enough to test in public</h2>
+    </div>
+    <ul class="list-reset">
+      <li>The cards are executable, not just descriptive.</li>
+      <li>The leaderboard rows are reproducible and tied to stored artifacts.</li>
+      <li>The arena replays real exported TSPLIB runs.</li>
+      <li>The current release is meant to test demand before expanding scope.</li>
+    </ul>
+  </section>
+
+  <section class="section-block section-panel" id="future-work">
+    <div class="section-heading">
+      <p class="kicker">Future work</p>
+      <h2>What comes after a credible TSP release</h2>
+      <p>If the current TSP surface proves worth continuing, later releases can expand suites, add more solver cards, and only then consider broader routing variants.</p>
+    </div>
+  </section>
+</BaseLayout>

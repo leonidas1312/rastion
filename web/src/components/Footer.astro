@@ -1,7 +1,22 @@
+---
+const base = import.meta.env.BASE_URL;
+---
 <footer class="footer">
-  <div class="container">
-    <p>Local publish flow: <code>rastion build-site-data</code> then <code>cd web && npm install && npm run dev</code>.</p>
-    <p>Phase 1 is routing-first and TSP-concrete. VRP support is intentionally roadmap work.</p>
-    <p>GitHub Pages publishes solver cards, bootstrap TSP evals, and TSPLIB arena artifacts from generated JSON.</p>
+  <div class="container footer-inner">
+    <div>
+      <p class="footer-title">Rastion</p>
+      <p class="footer-copy">A public hub for TSP solvers, with solver cards, reproducible evals, and replayable TSPLIB demos.</p>
+    </div>
+    <div class="footer-links">
+      <a href={`${base}arena/`}>Arena</a>
+      <a href={`${base}solvers/`}>Solvers</a>
+      <a href={`${base}leaderboards/`}>Leaderboards</a>
+      <a href={`${base}about/`}>About</a>
+      <a href={`${base}contribute/`}>Contribute</a>
+    </div>
+    <div class="footer-utility">
+      <p>v0.1 is TSP-only, suite-scoped, and intentionally small enough to audit.</p>
+      <button class="toggle-theme" type="button" aria-label="Toggle color theme">Theme</button>
+    </div>
   </div>
 </footer>

@@ -32,6 +32,8 @@ def export_solvers_json(out_path: str | Path) -> dict[str, object]:
     rows.sort(key=lambda item: item["name"])
     payload = {
         "generated_at": _now_utc_iso(),
+        "scope": "developer",
+        "note": "Developer export only. The public website uses catalog, suites, leaderboards, evals, and tsp_arena artifacts.",
         "count": len(rows),
         "solvers": rows,
     }
@@ -101,6 +103,8 @@ def export_benchmarks_json(
 
     normalized = {
         "generated_at": _now_utc_iso(),
+        "scope": "developer",
+        "note": "Developer export only. The public website does not use benchmark-cache artifacts.",
         "source_cache": str(cache),
         "rows": rows,
         "problems": problems,

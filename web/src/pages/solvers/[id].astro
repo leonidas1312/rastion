@@ -1,10 +1,13 @@
 ---
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 
+import PageIntro from "../../components/PageIntro.astro";
+import TrustNote from "../../components/TrustNote.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const leaderboardsPath = new URL("../../../public/data/leaderboards.json", import.meta.url);
 const detailModules = import.meta.glob("../../../../catalog/solvers/*/README.md");
+const base = import.meta.env.BASE_URL;
 
 export function getStaticPaths() {
   const cardsDir = new URL("../../../../catalog/solvers/", import.meta.url);
@@ -56,137 +59,177 @@ const detailLoader = detailModules[detailKey];
 const detailModule = detailLoader ? await detailLoader() : null;
 const DetailContent = detailModule?.Content;
 ---
-<BaseLayout title={`Rastion • ${card.name}`} description={card.summary}>
-  <section class="hero">
-    <p class="kicker">{card.routing_family} • {card.listing_tier}</p>
-    <h1>{card.name}</h1>
-    <p>{card.summary}</p>
-    <div class="hero-actions">
+<BaseLayout title={`Rastion • ${card.name}`} description={card.summary} canonical={`/solvers/${card.id}/`} wide={true}>
+  <PageIntro
+    eyebrow={`${card.routing_family} • ${card.listing_tier}`}
+    title={card.name}
+    lede={card.summary}
+  >
+    <div slot="actions" class="intro-actions">
       <a class="button-primary" href={card.repository}>Repository</a>
-      <a class="button-secondary" href={card.homepage}>Homepage</a>
-      <a class="button-secondary" href="../../leaderboards/">View official suites</a>
-      <a class="button-secondary" href="../../methodology/">Methodology</a>
+      {card.homepage && <a class="button-secondary" href={card.homepage}>Homepage</a>}
+      <a class="button-secondary" href={`${base}leaderboards/`}>Official results</a>
     </div>
-  </section>
+    <TrustNote slot="note" href={`${base}about/#evaluation`} linkLabel="How to read the results">
+      Official results are suite-scoped and reproducible.
+    </TrustNote>
+  </PageIntro>
 
-  <div class="grid cards" style="margin-top: 1rem;">
-    <article class="card">
-      <p class="kicker">Routing Support</p>
-      <h2>Variant Coverage</h2>
-      <p>{card.description}</p>
-      <p><strong>Problem variants:</strong> {(card.problem_variants || []).join(", ")}</p>
-      <p><strong>Method class:</strong> {card.method_class}</p>
-      <p><strong>Determinism:</strong> {card.determinism}</p>
-    </article>
-    <article class="card">
-      <p class="kicker">Installation</p>
-      <h2>Adapter Contract</h2>
-      <pre><code>{card.installation.command}</code></pre>
-      <p><strong>Adapter kind:</strong> {card.adapter.kind}</p>
-      <p><strong>Runtime solver name:</strong> {card.adapter.solver_name}</p>
-      <p><strong>Adapter path:</strong> <code>{card.adapter.path}</code></p>
-    </article>
-    <article class="card">
-      <p class="kicker">Current Performance</p>
-      <h2>Bootstrap Track Summary</h2>
-      <p><strong>Suite wins:</strong> {performanceSummary.suitesWon}</p>
-      <p><strong>Best placement:</strong> {performanceSummary.bestRank ?? "n/a"}</p>
-      <p><strong>Worst placement:</strong> {performanceSummary.worstRank ?? "n/a"}</p>
-      <p class="subtle">Read this as Phase 1 bootstrap evidence, not a universal routing claim.</p>
-    </article>
-  </div>
+  <div class="detail-layout section-block">
+    <div class="stack-lg">
+      <section class="section-panel prose">
+        <p class="kicker">Overview</p>
+        <h2>Solver notes</h2>
+        <p>{card.description}</p>
+        {DetailContent ? <DetailContent /> : <p class="subtle">No solver detail markdown found.</p>}
+      </section>
 
-  <section class="card prose" style="margin-top: 1rem;">
-    <p class="kicker">Narrative</p>
-    <h2>Solver Notes</h2>
-    {DetailContent ? <DetailContent /> : <p class="subtle">No solver detail markdown found.</p>}
-  </section>
-
-  <div class="grid cards" style="margin-top: 1rem;">
-    <article class="card">
-      <p class="kicker">Capabilities</p>
-      <h2>What This Solver Does</h2>
-      <ul class="list-reset">
-        <li>Streaming: {card.capabilities.streaming ? "yes" : "no"}</li>
-        <li>Deterministic mode: {card.capabilities.deterministic_mode ? "yes" : "no"}</li>
-        <li>Warm start: {card.capabilities.warm_start ? "yes" : "no"}</li>
-        <li>Local search: {card.capabilities.local_search ? "yes" : "no"}</li>
-        <li>Multi-route ready: {card.capabilities.multi_route_ready ? "yes" : "no"}</li>
-      </ul>
-      {card.capabilities.notes && <p class="subtle">{card.capabilities.notes}</p>}
-    </article>
-    <article class="card">
-      <p class="kicker">Limits</p>
-      <h2>Known Scope</h2>
-      <p><strong>Tested scale:</strong> {card.limits.tested_max_nodes} nodes</p>
-      <p><strong>Depot assumptions:</strong> {card.limits.depot_assumptions}</p>
-      <p><strong>Unsupported:</strong> {(card.limits.unsupported_constraints || []).join(", ")}</p>
-      {card.limits.notes && <p class="subtle">{card.limits.notes}</p>}
-    </article>
-  </div>
-
-  <section class="card" style="margin-top: 1rem;">
-    <p class="kicker">Official Coverage</p>
-    <h2>Suite Results</h2>
-    {
-      suiteRows.length ? (
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Suite</th>
-                <th>Rank</th>
-                <th>Method</th>
-                <th>Mean Distance</th>
-                <th>Mean Runtime (ms)</th>
-                <th>Coverage</th>
-              </tr>
-            </thead>
-            <tbody>
-              {suiteRows.map((item) => (
-                <tr>
-                  <td><strong>{item.suite.title}</strong><br /><span class="subtle">{item.suite.id}</span></td>
-                  <td>{item.rank}</td>
-                  <td>{item.row.method_class}</td>
-                  <td>{item.row.mean_score === null ? "n/a" : Number(item.row.mean_score).toFixed(2)}</td>
-                  <td>{item.row.mean_runtime_ms === null ? "n/a" : Number(item.row.mean_runtime_ms).toFixed(2)}</td>
-                  <td>{item.row.completed_instances}/{item.row.total_instances}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <section class="stack-lg">
+        <div class="section-heading">
+          <p class="kicker">Coverage and limits</p>
+          <h2>Current operating envelope</h2>
         </div>
-        <p class="subtle">These results come from the current bootstrap track. They are reproducible local evidence, not a global TSP verdict.</p>
-      ) : (
-        <p class="subtle">No generated suite artifacts found yet. Run <code>rastion build-site-data</code>.</p>
-      )
-    }
-  </section>
+        <div class="grid grid-two">
+          <article class="card">
+            <h3>Capabilities</h3>
+            <ul class="list-reset">
+              <li>Streaming: {card.capabilities.streaming ? "yes" : "no"}</li>
+              <li>Deterministic mode: {card.capabilities.deterministic_mode ? "yes" : "no"}</li>
+              <li>Warm start: {card.capabilities.warm_start ? "yes" : "no"}</li>
+              <li>Local search: {card.capabilities.local_search ? "yes" : "no"}</li>
+              <li>Multi-route ready: {card.capabilities.multi_route_ready ? "yes" : "no"}</li>
+            </ul>
+            {card.capabilities.notes && <p class="subtle">{card.capabilities.notes}</p>}
+          </article>
+          <article class="card">
+            <h3>Limits</h3>
+            <ul class="list-reset">
+              <li>Tested scale: {card.limits.tested_max_nodes} nodes</li>
+              <li>Depot assumptions: {card.limits.depot_assumptions}</li>
+              <li>Unsupported: {(card.limits.unsupported_constraints || []).join(", ") || "n/a"}</li>
+            </ul>
+            {card.limits.notes && <p class="subtle">{card.limits.notes}</p>}
+          </article>
+        </div>
+      </section>
 
-  <div class="grid cards" style="margin-top: 1rem;">
-    <article class="card">
-      <p class="kicker">References</p>
-      <h2>Links and Citations</h2>
-      <ul class="list-reset">
-        {card.references.map((item) => (
-          <li><a href={item}>{item}</a></li>
-        ))}
-      </ul>
-      <ul class="list-reset">
-        {card.citations.map((item) => (
-          <li>{item}</li>
-        ))}
-      </ul>
-    </article>
-    <article class="card">
-      <p class="kicker">Failure Modes</p>
-      <h2>What To Watch</h2>
-      <ul class="list-reset">
-        {card.known_failure_modes.map((item) => (
-          <li>{item}</li>
-        ))}
-      </ul>
-      <p class="subtle">Artifacts: <code>{card.artifact_paths.benchmark_json}</code>, <code>{card.artifact_paths.arena_json}</code></p>
-    </article>
+      <section class="stack-lg">
+        <div class="section-heading">
+          <p class="kicker">Results and references</p>
+          <h2>Official coverage and supporting detail</h2>
+        </div>
+        <article class="section-panel">
+          <h3>Suite results</h3>
+          {
+            suiteRows.length ? (
+              <>
+                <div class="table-panel">
+                  <div class="table-wrap">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Suite</th>
+                          <th>Rank</th>
+                          <th>Method</th>
+                          <th>Mean Distance</th>
+                          <th>Mean Runtime (ms)</th>
+                          <th>Coverage</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {suiteRows.map((item) => (
+                          <tr>
+                            <td><strong>{item.suite.title}</strong><br /><span class="subtle">{item.suite.id}</span></td>
+                            <td>{item.rank}</td>
+                            <td>{item.row.method_class}</td>
+                            <td>{item.row.mean_score === null ? "n/a" : Number(item.row.mean_score).toFixed(2)}</td>
+                            <td>{item.row.mean_runtime_ms === null ? "n/a" : Number(item.row.mean_runtime_ms).toFixed(2)}</td>
+                            <td>{item.row.completed_instances}/{item.row.total_instances}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <p class="subtle">These results come from the current official Phase 1 suites.</p>
+              </>
+            ) : (
+              <p class="subtle">No generated suite artifacts found yet. Run <code>rastion build-site-data</code>.</p>
+            )
+          }
+        </article>
+
+        <div class="grid grid-two">
+          <article class="card">
+            <h3>References</h3>
+            <ul class="list-reset">
+              {card.references.map((item) => (
+                <li><a href={item}>{item}</a></li>
+              ))}
+            </ul>
+            <ul class="list-reset">
+              {card.citations.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Failure modes</h3>
+            <ul class="list-reset">
+              {card.known_failure_modes.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+            <div class="panel-meta">
+              <span>Published artifacts</span>
+              <code>{card.artifact_paths.arena_json}</code>
+              <code>{card.artifact_paths.suite_results_dir}</code>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <aside class="facts-panel">
+      <p class="kicker">Facts</p>
+      <dl class="facts-list">
+        <div>
+          <dt>Method class</dt>
+          <dd>{card.method_class}</dd>
+        </div>
+        <div>
+          <dt>Problem variants</dt>
+          <dd>{(card.problem_variants || []).join(", ")}</dd>
+        </div>
+        <div>
+          <dt>Determinism</dt>
+          <dd>{card.determinism}</dd>
+        </div>
+        <div>
+          <dt>Tested scale</dt>
+          <dd>{card.limits.tested_max_nodes} nodes</dd>
+        </div>
+        <div>
+          <dt>Best official rank</dt>
+          <dd>{performanceSummary.bestRank ?? "n/a"}</dd>
+        </div>
+        <div>
+          <dt>Suite wins</dt>
+          <dd>{performanceSummary.suitesWon}</dd>
+        </div>
+        <div>
+          <dt>Adapter kind</dt>
+          <dd>{card.adapter.kind}</dd>
+        </div>
+        <div>
+          <dt>Adapter path</dt>
+          <dd><code>{card.adapter.path}</code></dd>
+        </div>
+      </dl>
+      <div class="stack">
+        <p class="kicker">Install</p>
+        <pre><code>{card.installation.command}</code></pre>
+      </div>
+    </aside>
   </div>
 </BaseLayout>

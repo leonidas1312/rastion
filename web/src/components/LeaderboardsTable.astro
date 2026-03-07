@@ -1,87 +1,85 @@
-<section class="card">
-  <p class="kicker">Official Evals</p>
-  <h2>TSP Leaderboards</h2>
-  <p class="status" id="leaderboards-status">Loading official suite results...</p>
-  <div class="stack" id="leaderboards-root">
-    <div class="card">Waiting for suite data...</div>
-  </div>
+---
+import { existsSync, readFileSync } from "node:fs";
+
+const base = import.meta.env.BASE_URL;
+const leaderboardsPath = new URL("../../public/data/leaderboards.json", import.meta.url);
+
+const payload = existsSync(leaderboardsPath) ? JSON.parse(readFileSync(leaderboardsPath, "utf-8")) : null;
+const suites = Array.isArray(payload?.leaderboards) ? payload.leaderboards : [];
+const updated = payload?.generated_at ? new Date(payload.generated_at).toLocaleString() : null;
+---
+<section class="section-panel stack-lg">
+  <p class="status">
+    {updated ? `Last updated: ${updated} • ${suites.length} official suite leaderboard${suites.length === 1 ? "" : "s"}` : "No leaderboard export found. Run `rastion build-site-data`."}
+  </p>
+  {
+    suites.length ? (
+      suites.map((suitePayload) => {
+        const suite = suitePayload.suite || {};
+        const standings = Array.isArray(suitePayload.standings) ? suitePayload.standings : [];
+        const instanceLabels = Array.isArray(suitePayload.instances)
+          ? suitePayload.instances.map((instance) => `${instance.label} (${instance.size})`).join(", ")
+          : "n/a";
+        const track = Array.isArray(suitePayload.instances) && suitePayload.instances.length <= 1 ? "bootstrap v0" : "expanded";
+        const seeds = Array.isArray(suite.seed_policy?.seeds) ? suite.seed_policy.seeds.join(", ") : "n/a";
+
+        return (
+          <article class="suite-card">
+            <div class="metric-strip">
+              <div>
+                <p class="kicker">Suite</p>
+                <h3>{suite.title || "Unknown suite"}</h3>
+              </div>
+              <span class="badge">{track}</span>
+            </div>
+            <p>{suite.description || "No suite description found."}</p>
+            <div class="panel-meta">
+              <span>{suite.problem_variant || "n/a"}</span>
+              <span>{instanceLabels}</span>
+              <span>{suite.budget_policy?.iters ?? "n/a"} iters / {suite.budget_policy?.time_budget_ms ?? "n/a"} ms</span>
+              <span>Seeds: {seeds}</span>
+            </div>
+            <div class="table-panel">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Solver</th>
+                      <th>Method</th>
+                      <th>Mean Distance</th>
+                      <th>Mean Runtime (ms)</th>
+                      <th>Coverage</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {standings.length ? (
+                      standings.map((row) => (
+                        <tr>
+                          <td><a href={`${base}solvers/${row.solver_slug}/`}><strong>{row.solver_name}</strong></a><br /><span class="subtle">{row.listing_tier}</span></td>
+                          <td>{row.method_class}</td>
+                          <td>{row.mean_score === null ? "n/a" : Number(row.mean_score).toFixed(2)}</td>
+                          <td>{row.mean_runtime_ms === null ? "n/a" : Number(row.mean_runtime_ms).toFixed(2)}</td>
+                          <td>{row.completed_instances}/{row.total_instances}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colspan="5">No results found.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="panel-meta">
+              <span>Artifact</span>
+              <code>{suitePayload.artifact_path}</code>
+            </div>
+          </article>
+        );
+      })
+    ) : (
+      <div class="card">No leaderboards exported yet.</div>
+    )
+  }
 </section>
-
-<script>
-  import { fetchJson, formatIso, siteBase } from "./dataLoader";
-
-  const status = document.querySelector("#leaderboards-status");
-  const root = document.querySelector("#leaderboards-root");
-
-  function tableHtml(suitePayload) {
-    const suite = suitePayload.suite || {};
-    const standings = Array.isArray(suitePayload.standings) ? suitePayload.standings : [];
-    const instanceLabels = Array.isArray(suitePayload.instances)
-      ? suitePayload.instances.map((instance) => `${instance.label} (${instance.size})`).join(", ")
-      : "n/a";
-    const track = Array.isArray(suitePayload.instances) && suitePayload.instances.length <= 1 ? "bootstrap v0" : "expanded";
-    const rows = standings.length
-      ? standings
-          .map(
-            (row) => `<tr>
-              <td><a href="${siteBase()}solvers/${row.solver_slug}/"><strong>${row.solver_name}</strong></a><br><span class="subtle">${row.listing_tier}</span></td>
-              <td>${row.method_class}</td>
-              <td>${row.mean_score === null ? "n/a" : Number(row.mean_score).toFixed(2)}</td>
-              <td>${row.mean_runtime_ms === null ? "n/a" : Number(row.mean_runtime_ms).toFixed(2)}</td>
-              <td>${row.completed_instances}/${row.total_instances}</td>
-            </tr>`,
-          )
-          .join("\n")
-      : '<tr><td colspan="5">No results found.</td></tr>';
-
-    return `<article class="card">
-      <div class="metric-strip">
-        <div>
-          <p class="kicker">Suite</p>
-          <h3>${suite.title || "Unknown suite"}</h3>
-        </div>
-        <div class="subtle">${suite.problem_variant || "n/a"} • ${instanceLabels} • <span class="badge">${track}</span></div>
-      </div>
-      <p>${suite.description || ""}</p>
-      <p class="subtle">Budget: ${suite.budget_policy?.iters ?? "n/a"} iterations, ${suite.budget_policy?.time_budget_ms ?? "n/a"} ms, seeds ${(suite.seed_policy?.seeds || []).join(", ") || "n/a"}.</p>
-      <p class="subtle">Interpretation: these current results are official within Rastion's Phase 1 bootstrap track, not a global TSP verdict.</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Solver</th>
-              <th>Method</th>
-              <th>Mean Distance</th>
-              <th>Mean Runtime (ms)</th>
-              <th>Coverage</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-      <p class="subtle">Artifact: <code>${suitePayload.artifact_path}</code></p>
-    </article>`;
-  }
-
-  async function load() {
-    try {
-      const payload = await fetchJson("data/leaderboards.json");
-      const rows = Array.isArray(payload.leaderboards) ? payload.leaderboards : [];
-      if (!rows.length) {
-        root.innerHTML = '<div class="card">No leaderboards exported yet.</div>';
-        status.textContent = "No leaderboard data available.";
-        return;
-      }
-
-      root.innerHTML = rows.map(tableHtml).join("\n");
-      status.textContent = `Last updated: ${formatIso(payload.generated_at)} • ${rows.length} suite leaderboards • bootstrap track`;
-    } catch (error) {
-      root.innerHTML = '<div class="card">No data found.</div>';
-      status.classList.add("error");
-      status.textContent = "Missing /data/leaderboards.json. Run: rastion build-site-data";
-      console.error(error);
-    }
-  }
-
-  load();
-</script>

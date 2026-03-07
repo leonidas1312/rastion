@@ -4,7 +4,7 @@
   "routing_family": "routing",
   "problem_variants": ["tsp"],
   "summary": "Iterative 2-opt TSP local search seeded from a nearest-neighbor tour.",
-  "description": "2-opt is the main official local-search baseline in Rastion's routing-first phase. It improves a seeded tour with repeated segment reversals, emits progress events, and represents the kind of lightweight heuristic contributors can slot into the hub today.",
+  "description": "2-opt is the main official local-search baseline in Rastion's public TSP hub. It improves a seeded tour with repeated segment reversals, emits progress events, and represents the kind of lightweight heuristic contributors can slot into the hub today.",
   "repository": "https://github.com/leonidas1312/rastion",
   "homepage": "https://github.com/leonidas1312/rastion",
   "license": "Apache-2.0",
@@ -35,7 +35,7 @@
     "tested_max_nodes": 2000,
     "unsupported_constraints": ["capacities", "time windows", "multiple vehicles"],
     "depot_assumptions": "Assumes a single depot and one closed tour.",
-    "notes": "Suitable for Phase 1 TSP leaderboards; not yet generalized to VRP."
+    "notes": "Suitable for the v0.1 TSP leaderboards and arena workflow."
   },
   "hardware": ["cpu"],
   "determinism": "Pseudo-deterministic for a fixed seed and budget.",

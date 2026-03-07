@@ -23,22 +23,27 @@ from rastion.plugins.discovery import discover_solvers
 from rastion.solvers.autosolver import AutoSolver
 from rastion.solvers.registry import get_solver, list_solvers
 from rastion.tsp.arena import write_tsp_arena_bundle
-from rastion.tsp.tsplib import load_tsplib_problem
 
-app = typer.Typer(help="Rastion routing-first solver hub CLI")
+app = typer.Typer(help="Rastion public TSP hub CLI")
 console = Console()
 
 DEFAULT_WEB_DATA_DIR = Path("web/public/data")
-DEFAULT_ARENA_OUT = DEFAULT_WEB_DATA_DIR / "arena.json"
+DEFAULT_DEV_EXPORT_DIR = Path(".rastion")
+DEFAULT_DEV_WEB_EXPORT_DIR = DEFAULT_DEV_EXPORT_DIR / "exports"
+DEFAULT_ARENA_OUT = DEFAULT_DEV_EXPORT_DIR / "arena.json"
 DEFAULT_TSP_ARENA_OUT = DEFAULT_WEB_DATA_DIR / "tsp_arena.json"
-DEFAULT_BENCHMARKS_EXPORT_OUT = DEFAULT_WEB_DATA_DIR / "benchmarks.json"
-DEFAULT_SOLVERS_EXPORT_OUT = DEFAULT_WEB_DATA_DIR / "solvers.json"
+DEFAULT_BENCHMARKS_EXPORT_OUT = DEFAULT_DEV_WEB_EXPORT_DIR / "benchmarks.json"
+DEFAULT_SOLVERS_EXPORT_OUT = DEFAULT_DEV_WEB_EXPORT_DIR / "solvers.json"
 DEFAULT_CATALOG_EXPORT_OUT = DEFAULT_WEB_DATA_DIR / "catalog.json"
 DEFAULT_SUITES_EXPORT_OUT = DEFAULT_WEB_DATA_DIR / "suites.json"
 DEFAULT_LEADERBOARDS_EXPORT_OUT = DEFAULT_WEB_DATA_DIR / "leaderboards.json"
 DEFAULT_EVALS_OUT_DIR = DEFAULT_WEB_DATA_DIR / "evals"
 DEFAULT_TSPLIB_DIR = Path("examples/tsplib")
-DEFAULT_TSP_BENCHMARK_PROBLEM = DEFAULT_TSPLIB_DIR / "berlin52.tsp"
+DEPRECATED_PUBLIC_ARTIFACTS = (
+    DEFAULT_WEB_DATA_DIR / "arena.json",
+    DEFAULT_WEB_DATA_DIR / "benchmarks.json",
+    DEFAULT_WEB_DATA_DIR / "solvers.json",
+)
 
 
 def _parse_solver_csv(raw: str | None) -> list[str] | None:
@@ -190,7 +195,7 @@ def arena_command(
 
 @app.command("export-benchmarks")
 def export_benchmarks_command(
-    out: Path = typer.Option(DEFAULT_BENCHMARKS_EXPORT_OUT, "--out", help="Output JSON path"),
+    out: Path = typer.Option(DEFAULT_BENCHMARKS_EXPORT_OUT, "--out", help="Output JSON path for developer exports"),
 ) -> None:
     payload = export_benchmarks_json(out)
     count = len(payload.get("rows", []))
@@ -199,7 +204,7 @@ def export_benchmarks_command(
 
 @app.command("export-solvers")
 def export_solvers_command(
-    out: Path = typer.Option(DEFAULT_SOLVERS_EXPORT_OUT, "--out", help="Output JSON path"),
+    out: Path = typer.Option(DEFAULT_SOLVERS_EXPORT_OUT, "--out", help="Output JSON path for developer exports"),
 ) -> None:
     discover_solvers()
     payload = export_solvers_json(out)
@@ -323,7 +328,6 @@ def tsp_arena_command(
 
 @app.command("build-site-data")
 def build_site_data_command(
-    repeat: int = typer.Option(2, "--repeat", min=1, help="Benchmark repeats for the TSP cache export"),
     iters: int = typer.Option(1_000, "--iters", min=1, help="Arena iteration budget"),
     seed: int = typer.Option(0, "--seed", help="Deterministic random seed"),
     emit_every: int = typer.Option(50, "--emit-every", min=1, help="Arena event cadence"),
@@ -333,9 +337,9 @@ def build_site_data_command(
     validate_catalog(cards_dir=cards_dir, suites_dir=suites_dir)
     discover_solvers()
 
-    benchmark_problem = load_tsplib_problem(DEFAULT_TSP_BENCHMARK_PROBLEM)
-    benchmark_rows = run_benchmark(benchmark_problem, repeat=repeat, iters=max(100, iters // 3), seed=seed)
-    save_benchmark_results(benchmark_rows, problem=benchmark_problem)
+    for stale_path in DEPRECATED_PUBLIC_ARTIFACTS:
+        if stale_path.exists():
+            stale_path.unlink()
 
     suite_payloads = evaluate_all_suites(
         out_dir=DEFAULT_EVALS_OUT_DIR,
@@ -358,24 +362,12 @@ def build_site_data_command(
         seed=seed,
         emit_every=emit_every,
     )
-    write_arena_json(
-        benchmark_problem,
-        DEFAULT_ARENA_OUT,
-        solver_names=["tsp_nearest_neighbor", "tsp_two_opt"],
-        iters=iters,
-        seed=seed,
-        emit_every=emit_every,
-    )
-    export_benchmarks_json(DEFAULT_BENCHMARKS_EXPORT_OUT)
-    export_solvers_json(DEFAULT_SOLVERS_EXPORT_OUT)
 
-    console.print("Routing hub data generated for website:")
+    console.print("Public TSP hub data generated for website:")
     console.print(f"  - {DEFAULT_CATALOG_EXPORT_OUT}")
     console.print(f"  - {DEFAULT_SUITES_EXPORT_OUT}")
     console.print(f"  - {DEFAULT_LEADERBOARDS_EXPORT_OUT}")
-    console.print(f"  - {DEFAULT_SOLVERS_EXPORT_OUT}")
-    console.print(f"  - {DEFAULT_BENCHMARKS_EXPORT_OUT}")
-    console.print(f"  - {DEFAULT_ARENA_OUT}")
+    console.print(f"  - {DEFAULT_EVALS_OUT_DIR}")
     console.print(f"  - {DEFAULT_TSP_ARENA_OUT}")
     console.print("Run locally:")
     console.print("  cd web && npm install && npm run dev")
@@ -383,23 +375,21 @@ def build_site_data_command(
 
 @app.command("demo-site")
 def demo_site_command(
-    repeat: int = typer.Option(2, "--repeat", min=1, help="Benchmark repeats for the TSP cache export"),
     iters: int = typer.Option(1_000, "--iters", min=1, help="Arena iteration budget"),
     seed: int = typer.Option(0, "--seed", help="Deterministic random seed"),
     emit_every: int = typer.Option(50, "--emit-every", min=1, help="Arena event cadence"),
 ) -> None:
-    console.print("[yellow]demo-site is retained as an alias. Use build-site-data for the routing hub flow.[/yellow]")
-    build_site_data_command(repeat=repeat, iters=iters, seed=seed, emit_every=emit_every)
+    console.print("[yellow]demo-site is retained as an alias. Use build-site-data for the public TSP hub flow.[/yellow]")
+    build_site_data_command(iters=iters, seed=seed, emit_every=emit_every)
 
 
 @app.command("demo")
 def demo_command(
-    repeat: int = typer.Option(2, "--repeat", min=1, help="Benchmark repeats for the TSP cache export"),
     iters: int = typer.Option(1_000, "--iters", min=1, help="Arena iteration budget"),
     seed: int = typer.Option(0, "--seed", help="Deterministic random seed"),
     emit_every: int = typer.Option(50, "--emit-every", min=1, help="Arena event cadence"),
 ) -> None:
-    build_site_data_command(repeat=repeat, iters=iters, seed=seed, emit_every=emit_every)
+    build_site_data_command(iters=iters, seed=seed, emit_every=emit_every)
 
 
 if __name__ == "__main__":

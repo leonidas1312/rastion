@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-03-06T16:27:50.691359+00:00",
+  "generated_at": "2026-03-07T18:27:03.724210+00:00",
   "count": 3,
   "leaderboards": [
     {
       "suite": {
         "id": "tsplib-large-v1",
         "title": "TSPLIB Large v1",
-        "description": "Official large-instance TSP suite for the routing-first Phase 1 hub.",
+        "description": "Official large-instance TSP suite for the public Rastion v0.1 hub.",
         "problem_variant": "tsp",
         "instances": [
           {
@@ -40,7 +40,7 @@
           "experimental"
         ]
       },
-      "generated_at": "2026-03-06T16:27:49.901436+00:00",
+      "generated_at": "2026-03-07T18:27:04.218047+00:00",
       "standings": [
         {
           "solver_id": "tsp-two-opt",
@@ -52,7 +52,7 @@
             "ok": 1
           },
           "mean_score": 3193.0,
-          "mean_runtime_ms": 66.2456950003616,
+          "mean_runtime_ms": 193.0424710008083,
           "completed_instances": 1,
           "total_instances": 1
         },
@@ -66,7 +66,7 @@
             "ok": 1
           },
           "mean_score": 3265.0,
-          "mean_runtime_ms": 11.541063999175094,
+          "mean_runtime_ms": 13.079629999992903,
           "completed_instances": 1,
           "total_instances": 1
         },
@@ -77,7 +77,7 @@
           "method_class": "hybrid",
           "listing_tier": "experimental",
           "status_counts": {
-            "dependency-missing": 1
+            "error": 1
           },
           "mean_score": null,
           "mean_runtime_ms": null,
@@ -101,7 +101,7 @@
               "method_class": "metaheuristic",
               "listing_tier": "official",
               "score": 3193.0,
-              "avg_runtime_ms": 66.2456950003616,
+              "avg_runtime_ms": 193.0424710008083,
               "status": "ok",
               "error": null,
               "run_record": {
@@ -111,7 +111,7 @@
                 "problem_variant": "tsp",
                 "instance_id": "a280",
                 "score": 3193.0,
-                "runtime": 66.2456950003616,
+                "runtime": 193.0424710008083,
                 "status": "ok",
                 "seed_policy": {
                   "seeds": [
@@ -123,7 +123,7 @@
                   "time_budget_ms": 2000,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-06T16:27:49.901436+00:00",
+                "generated_at": "2026-03-07T18:27:04.218047+00:00",
                 "artifact_path": "data/evals/tsplib-large-v1.json",
                 "environment": {
                   "python": "3.12.3",
@@ -139,7 +139,7 @@
               "method_class": "heuristic",
               "listing_tier": "official",
               "score": 3265.0,
-              "avg_runtime_ms": 11.541063999175094,
+              "avg_runtime_ms": 13.079629999992903,
               "status": "ok",
               "error": null,
               "run_record": {
@@ -149,7 +149,7 @@
                 "problem_variant": "tsp",
                 "instance_id": "a280",
                 "score": 3265.0,
-                "runtime": 11.541063999175094,
+                "runtime": 13.079629999992903,
                 "status": "ok",
                 "seed_policy": {
                   "seeds": [
@@ -161,7 +161,7 @@
                   "time_budget_ms": 2000,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-06T16:27:49.901436+00:00",
+                "generated_at": "2026-03-07T18:27:04.218047+00:00",
                 "artifact_path": "data/evals/tsplib-large-v1.json",
                 "environment": {
                   "python": "3.12.3",
@@ -178,8 +178,8 @@
               "listing_tier": "experimental",
               "score": null,
               "avg_runtime_ms": null,
-              "status": "dependency-missing",
-              "error": "ortools is not installed. Install with: pip install -e '.[ortools]' (No module named 'ortools')",
+              "status": "error",
+              "error": "Protocol message RoutingSearchParameters has no \"random_seed\" field.",
               "run_record": {
                 "suite_id": "tsplib-large-v1",
                 "solver_id": "tsp-ortools",
@@ -188,7 +188,7 @@
                 "instance_id": "a280",
                 "score": null,
                 "runtime": null,
-                "status": "dependency-missing",
+                "status": "error",
                 "seed_policy": {
                   "seeds": [
                     0
@@ -199,7 +199,7 @@
                   "time_budget_ms": 2000,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-06T16:27:49.901436+00:00",
+                "generated_at": "2026-03-07T18:27:04.218047+00:00",
                 "artifact_path": "data/evals/tsplib-large-v1.json",
                 "environment": {
                   "python": "3.12.3",
@@ -216,7 +216,7 @@
       "suite": {
         "id": "tsplib-medium-v1",
         "title": "TSPLIB Medium v1",
-        "description": "Official medium-instance TSP suite for the routing-first Phase 1 hub.",
+        "description": "Official medium-instance TSP suite for the public Rastion v0.1 hub.",
         "problem_variant": "tsp",
         "instances": [
           {
@@ -250,7 +250,7 @@
           "experimental"
         ]
       },
-      "generated_at": "2026-03-06T16:27:50.249306+00:00",
+      "generated_at": "2026-03-07T18:27:03.134095+00:00",
       "standings": [
         {
           "solver_id": "tsp-two-opt",
@@ -262,7 +262,7 @@
             "ok": 1
           },
           "mean_score": 7996.0,
-          "mean_runtime_ms": 29.526663000069675,
+          "mean_runtime_ms": 24.449776999972528,
           "completed_instances": 1,
           "total_instances": 1
         },
@@ -276,7 +276,7 @@
             "ok": 1
           },
           "mean_score": 8197.0,
-          "mean_runtime_ms": 3.694458000609302,
+          "mean_runtime_ms": 3.8016550006432226,
           "completed_instances": 1,
           "total_instances": 1
         },
@@ -287,7 +287,7 @@
           "method_class": "hybrid",
           "listing_tier": "experimental",
           "status_counts": {
-            "dependency-missing": 1
+            "error": 1
           },
           "mean_score": null,
           "mean_runtime_ms": null,
@@ -311,7 +311,7 @@
               "method_class": "metaheuristic",
               "listing_tier": "official",
               "score": 7996.0,
-              "avg_runtime_ms": 29.526663000069675,
+              "avg_runtime_ms": 24.449776999972528,
               "status": "ok",
               "error": null,
               "run_record": {
@@ -321,7 +321,7 @@
                 "problem_variant": "tsp",
                 "instance_id": "ch150",
                 "score": 7996.0,
-                "runtime": 29.526663000069675,
+                "runtime": 24.449776999972528,
                 "status": "ok",
                 "seed_policy": {
                   "seeds": [
@@ -333,7 +333,7 @@
                   "time_budget_ms": 1500,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-06T16:27:50.249306+00:00",
+                "generated_at": "2026-03-07T18:27:03.134095+00:00",
                 "artifact_path": "data/evals/tsplib-medium-v1.json",
                 "environment": {
                   "python": "3.12.3",
@@ -349,7 +349,7 @@
               "method_class": "heuristic",
               "listing_tier": "official",
               "score": 8197.0,
-              "avg_runtime_ms": 3.694458000609302,
+              "avg_runtime_ms": 3.8016550006432226,
               "status": "ok",
               "error": null,
               "run_record": {
@@ -359,7 +359,7 @@
                 "problem_variant": "tsp",
                 "instance_id": "ch150",
                 "score": 8197.0,
-                "runtime": 3.694458000609302,
+                "runtime": 3.8016550006432226,
                 "status": "ok",
                 "seed_policy": {
                   "seeds": [
@@ -371,7 +371,7 @@
                   "time_budget_ms": 1500,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-06T16:27:50.249306+00:00",
+                "generated_at": "2026-03-07T18:27:03.134095+00:00",
                 "artifact_path": "data/evals/tsplib-medium-v1.json",
                 "environment": {
                   "python": "3.12.3",
@@ -388,8 +388,8 @@
               "listing_tier": "experimental",
               "score": null,
               "avg_runtime_ms": null,
-              "status": "dependency-missing",
-              "error": "ortools is not installed. Install with: pip install -e '.[ortools]' (No module named 'ortools')",
+              "status": "error",
+              "error": "Protocol message RoutingSearchParameters has no \"random_seed\" field.",
               "run_record": {
                 "suite_id": "tsplib-medium-v1",
                 "solver_id": "tsp-ortools",
@@ -398,7 +398,7 @@
                 "instance_id": "ch150",
                 "score": null,
                 "runtime": null,
-                "status": "dependency-missing",
+                "status": "error",
                 "seed_policy": {
                   "seeds": [
                     0
@@ -409,7 +409,7 @@
                   "time_budget_ms": 1500,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-06T16:27:50.249306+00:00",
+                "generated_at": "2026-03-07T18:27:03.134095+00:00",
                 "artifact_path": "data/evals/tsplib-medium-v1.json",
                 "environment": {
                   "python": "3.12.3",
@@ -426,7 +426,7 @@
       "suite": {
         "id": "tsplib-small-v1",
         "title": "TSPLIB Small v1",
-        "description": "Official small-instance TSP suite for the routing-first Phase 1 hub.",
+        "description": "Official small-instance TSP suite for the public Rastion v0.1 hub.",
         "problem_variant": "tsp",
         "instances": [
           {
@@ -460,7 +460,7 @@
           "experimental"
         ]
       },
-      "generated_at": "2026-03-06T16:27:50.489833+00:00",
+      "generated_at": "2026-03-07T18:27:03.409129+00:00",
       "standings": [
         {
           "solver_id": "tsp-two-opt",
@@ -472,7 +472,7 @@
             "ok": 1
           },
           "mean_score": 8448.0,
-          "mean_runtime_ms": 4.978486000254634,
+          "mean_runtime_ms": 5.01799499943445,
           "completed_instances": 1,
           "total_instances": 1
         },
@@ -486,7 +486,7 @@
             "ok": 1
           },
           "mean_score": 8980.0,
-          "mean_runtime_ms": 0.7629729998370749,
+          "mean_runtime_ms": 0.6185649999679299,
           "completed_instances": 1,
           "total_instances": 1
         },
@@ -497,7 +497,7 @@
           "method_class": "hybrid",
           "listing_tier": "experimental",
           "status_counts": {
-            "dependency-missing": 1
+            "error": 1
           },
           "mean_score": null,
           "mean_runtime_ms": null,
@@ -521,7 +521,7 @@
               "method_class": "metaheuristic",
               "listing_tier": "official",
               "score": 8448.0,
-              "avg_runtime_ms": 4.978486000254634,
+              "avg_runtime_ms": 5.01799499943445,
               "status": "ok",
               "error": null,
               "run_record": {
@@ -531,7 +531,7 @@
                 "problem_variant": "tsp",
                 "instance_id": "berlin52",
                 "score": 8448.0,
-                "runtime": 4.978486000254634,
+                "runtime": 5.01799499943445,
                 "status": "ok",
                 "seed_policy": {
                   "seeds": [
@@ -543,7 +543,7 @@
                   "time_budget_ms": 1000,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-06T16:27:50.489833+00:00",
+                "generated_at": "2026-03-07T18:27:03.409129+00:00",
                 "artifact_path": "data/evals/tsplib-small-v1.json",
                 "environment": {
                   "python": "3.12.3",
@@ -559,7 +559,7 @@
               "method_class": "heuristic",
               "listing_tier": "official",
               "score": 8980.0,
-              "avg_runtime_ms": 0.7629729998370749,
+              "avg_runtime_ms": 0.6185649999679299,
               "status": "ok",
               "error": null,
               "run_record": {
@@ -569,7 +569,7 @@
                 "problem_variant": "tsp",
                 "instance_id": "berlin52",
                 "score": 8980.0,
-                "runtime": 0.7629729998370749,
+                "runtime": 0.6185649999679299,
                 "status": "ok",
                 "seed_policy": {
                   "seeds": [
@@ -581,7 +581,7 @@
                   "time_budget_ms": 1000,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-06T16:27:50.489833+00:00",
+                "generated_at": "2026-03-07T18:27:03.409129+00:00",
                 "artifact_path": "data/evals/tsplib-small-v1.json",
                 "environment": {
                   "python": "3.12.3",
@@ -598,8 +598,8 @@
               "listing_tier": "experimental",
               "score": null,
               "avg_runtime_ms": null,
-              "status": "dependency-missing",
-              "error": "ortools is not installed. Install with: pip install -e '.[ortools]' (No module named 'ortools')",
+              "status": "error",
+              "error": "Protocol message RoutingSearchParameters has no \"random_seed\" field.",
               "run_record": {
                 "suite_id": "tsplib-small-v1",
                 "solver_id": "tsp-ortools",
@@ -608,7 +608,7 @@
                 "instance_id": "berlin52",
                 "score": null,
                 "runtime": null,
-                "status": "dependency-missing",
+                "status": "error",
                 "seed_policy": {
                   "seeds": [
                     0
@@ -619,7 +619,7 @@
                   "time_budget_ms": 1000,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-06T16:27:50.489833+00:00",
+                "generated_at": "2026-03-07T18:27:03.409129+00:00",
                 "artifact_path": "data/evals/tsplib-small-v1.json",
                 "environment": {
                   "python": "3.12.3",

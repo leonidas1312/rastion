@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-03-06T16:27:50.684853+00:00",
+  "generated_at": "2026-03-07T18:27:03.713507+00:00",
   "count": 3,
   "suites": [
     {
       "id": "tsplib-large-v1",
       "title": "TSPLIB Large v1",
-      "description": "Official large-instance TSP suite for the routing-first Phase 1 hub.",
+      "description": "Official large-instance TSP suite for the public Rastion v0.1 hub.",
       "problem_variant": "tsp",
       "instances": [
         {
@@ -42,7 +42,7 @@
     {
       "id": "tsplib-medium-v1",
       "title": "TSPLIB Medium v1",
-      "description": "Official medium-instance TSP suite for the routing-first Phase 1 hub.",
+      "description": "Official medium-instance TSP suite for the public Rastion v0.1 hub.",
       "problem_variant": "tsp",
       "instances": [
         {
@@ -79,7 +79,7 @@
     {
       "id": "tsplib-small-v1",
       "title": "TSPLIB Small v1",
-      "description": "Official small-instance TSP suite for the routing-first Phase 1 hub.",
+      "description": "Official small-instance TSP suite for the public Rastion v0.1 hub.",
       "problem_variant": "tsp",
       "instances": [
         {

@@ -1,7 +1,7 @@
 {
   "id": "tsplib-medium-v1",
   "title": "TSPLIB Medium v1",
-  "description": "Official medium-instance TSP suite for the routing-first Phase 1 hub.",
+  "description": "Official medium-instance TSP suite for the public Rastion v0.1 hub.",
   "problem_variant": "tsp",
   "instances": [
     {

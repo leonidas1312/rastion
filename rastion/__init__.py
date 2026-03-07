@@ -1,4 +1,4 @@
-"""Rastion routing-first solver hub package."""
+"""Rastion public TSP hub package."""
 
 from importlib.metadata import PackageNotFoundError, version
 

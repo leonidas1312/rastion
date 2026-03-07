@@ -1,0 +1,17 @@
+---
+interface Props {
+  href?: string;
+  linkLabel?: string;
+}
+
+const { href, linkLabel = "Learn more" } = Astro.props;
+---
+<p class="trust-note">
+  <slot />
+  {href && (
+    <>
+      {" "}
+      <a class="inline-link" href={href}>{linkLabel}</a>
+    </>
+  )}
+</p>

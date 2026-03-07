@@ -1,18 +1,20 @@
 ---
+import PageIntro from "../components/PageIntro.astro";
+import TrustNote from "../components/TrustNote.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
-<BaseLayout title="Rastion • TSP Arena" description="TSPLIB live arena for the routing-first Phase 1 hub.">
-  <section class="card">
-    <p class="kicker">Phase 1 Demo Surface</p>
-    <h1>TSP Arena</h1>
-    <p>
-      The arena is the acquisition layer for Rastion's routing hub. Compare solver routes on curated TSPLIB instances,
-      inspect depot-aware geometry, and replay best-value-over-time without pretending Phase 1 already supports
-      multi-vehicle VRP semantics.
-    </p>
-  </section>
+<BaseLayout title="Rastion • TSP Arena" description="Replay TSPLIB route geometry and solver progress in Rastion's arena." canonical="/arena/" wide={true}>
+  <PageIntro
+    eyebrow="Arena"
+    title="TSP Arena"
+    lede="Compare replayed TSPLIB routes, inspect route geometry, and watch how each solver improves over time."
+  >
+    <TrustNote slot="note" href="../about/#evaluation" linkLabel="Official eval context">
+      Replayed exported events. TSP only. Official evaluation framing lives in About.
+    </TrustNote>
+  </PageIntro>
 
-  <div class="grid" style="margin-top: 1rem;">
+  <div class="grid grid-main-aside section-block">
     <section class="card">
       <div class="controls">
         <label for="instance-select">Problem size:</label>

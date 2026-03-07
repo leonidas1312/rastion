@@ -1,20 +1,21 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
 import LeaderboardsTable from "../components/LeaderboardsTable.astro";
+import PageIntro from "../components/PageIntro.astro";
+import TrustNote from "../components/TrustNote.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
-<BaseLayout title="Rastion • Leaderboards" description="Official suite-scoped TSP leaderboards for the routing-first hub.">
-  <section class="card">
-    <p class="kicker">Official Evals</p>
-    <h1>Leaderboards</h1>
-    <p>
-      Rankings are suite-scoped, TSP-only, and generated from curated TSPLIB instances with fixed budgets and seeds.
-      The current published track is a bootstrap track: official within Rastion, intentionally narrow, and explicit
-      about what the current suite corpus does and does not prove. Phase 1 does not publish a fake "best routing
-      solver" global ranking.
-    </p>
-    <p><a href="../methodology/">Read the methodology and caveats</a></p>
-  </section>
-  <div class="grid" style="margin-top: 1rem;">
+<BaseLayout title="Rastion • Leaderboards" description="Official suite-scoped TSP leaderboards for the Rastion public TSP hub." canonical="/leaderboards/" wide={true}>
+  <PageIntro
+    eyebrow="Leaderboards"
+    title="Official suite results"
+    lede="Compare published TSP results from curated suites with fixed budgets, fixed seeds, and stored artifacts."
+  >
+    <TrustNote slot="note" href="../about/#evaluation" linkLabel="How evaluation works">
+      Phase 1 results are suite-scoped. The current track is intentionally narrow and auditable.
+    </TrustNote>
+  </PageIntro>
+
+  <section class="section-block">
     <LeaderboardsTable />
-  </div>
+  </section>
 </BaseLayout>

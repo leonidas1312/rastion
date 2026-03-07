@@ -1,53 +1,83 @@
 ---
+import PageIntro from "../components/PageIntro.astro";
+import TrustNote from "../components/TrustNote.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
----
-<BaseLayout title="Rastion • Contribute" description="How to add an executable TSP solver to the Rastion routing hub.">
-  <section class="card">
-    <p class="kicker">Contribution Contract</p>
-    <h1>Add A TSP Solver</h1>
-    <p>
-      Phase 1 listings require more than a claim. A solver must have a valid card, a working adapter, and official TSP
-      suite outputs so the catalog stays reproducible and useful to the routing community.
-    </p>
-  </section>
 
-  <div class="grid cards" style="margin-top: 1rem;">
-    <article class="card">
-      <h2>1. Add the adapter</h2>
-      <p>Create a local plugin under <code>plugins_local/</code> that exposes <code>get_solver()</code> and supports <code>tsp</code>.</p>
-    </article>
-    <article class="card">
-      <h2>2. Add the solver card</h2>
-      <p>Create <code>catalog/solvers/&lt;solver-id&gt;/card.json</code> plus a short <code>README.md</code> detail file.</p>
-    </article>
-    <article class="card">
-      <h2>3. Validate the catalog</h2>
-      <pre><code>rastion validate-cards</code></pre>
-    </article>
-    <article class="card">
-      <h2>4. Run the official suites</h2>
-      <pre><code>rastion eval-suite tsplib-small-v1
+const base = import.meta.env.BASE_URL;
+---
+<BaseLayout title="Rastion • Contribute" description="Contributor workflow for adding a TSP solver to Rastion." canonical="/contribute/">
+  <PageIntro
+    eyebrow="Contribute"
+    title="Add a TSP solver to Rastion"
+    lede="Public solver listings require more than a claim. Each entry needs a working adapter, a valid card, official suite output, and regenerated site artifacts."
+  >
+    <TrustNote slot="note" href={`${base}about/#limits`} linkLabel="Current scope">
+      v0.1 public listings are TSP-only and suite-scoped.
+    </TrustNote>
+  </PageIntro>
+
+  <section class="section-block">
+    <div class="section-heading">
+      <p class="kicker">Workflow</p>
+      <h2>Current repo-verified path</h2>
+    </div>
+    <div class="destination-grid">
+      <article class="destination-card">
+        <h3>1. Install locally</h3>
+        <pre><code>pip install -e ".[dev,ortools]"
+rastion --help</code></pre>
+        <p>The full local verification setup matches the publish flow and the CI workflows.</p>
+      </article>
+      <article class="destination-card">
+        <h3>2. Add the adapter</h3>
+        <p>Create a local plugin under <code>plugins_local/</code> that exposes <code>get_solver()</code> and supports <code>tsp</code>.</p>
+      </article>
+      <article class="destination-card">
+        <h3>3. Add the card and README</h3>
+        <p>Create <code>catalog/solvers/&lt;solver-id&gt;/card.json</code> and <code>catalog/solvers/&lt;solver-id&gt;/README.md</code>.</p>
+      </article>
+      <article class="destination-card">
+        <h3>4. Validate</h3>
+        <pre><code>rastion validate-cards</code></pre>
+        <p>Validation checks ids, adapter paths, discoverability, and required detail markdown.</p>
+      </article>
+      <article class="destination-card">
+        <h3>5. Run the official suites</h3>
+        <pre><code>rastion eval-suite tsplib-small-v1
 rastion eval-suite tsplib-medium-v1
 rastion eval-suite tsplib-large-v1</code></pre>
-    </article>
-    <article class="card">
-      <h2>5. Build site artifacts</h2>
-      <pre><code>rastion build-site-data</code></pre>
-    </article>
-    <article class="card">
-      <h2>6. Submit the PR</h2>
-      <p>Include the adapter, solver card, and generated artifacts. Explain the method class, limits, and failure modes honestly.</p>
-    </article>
-  </div>
+      </article>
+      <article class="destination-card">
+        <h3>6. Regenerate site data</h3>
+        <pre><code>./scripts/release_smoke.sh
+cd web && npm run build</code></pre>
+        <p>Verify that the solver appears in the catalog, detail page, suite output, and TSPLIB arena export.</p>
+      </article>
+    </div>
+  </section>
 
-  <section class="card" style="margin-top: 1rem;">
-    <h2>Listing Rules</h2>
-    <ul class="list-reset">
-      <li>Phase 1 public listings are TSP only.</li>
-      <li>Routing is the umbrella story, but VRP support is roadmap work until the interfaces expand.</li>
-      <li>Official suites are curated and suite-scoped. There is no single global routing leaderboard.</li>
-      <li>Experimental listings are allowed, but dependency and coverage gaps must remain visible.</li>
-    </ul>
-    <p><a href="../add-a-tsp-solver/">Open the repo-verified walkthrough</a></p>
+  <section class="section-block grid grid-two">
+    <article class="section-panel">
+      <div class="section-heading">
+        <p class="kicker">PR expectations</p>
+        <h2>What a public listing needs</h2>
+      </div>
+      <ul class="list-reset">
+        <li>Include the adapter, solver card, README, and generated artifacts.</li>
+        <li>Keep method class, dependency requirements, limits, and failure modes visible.</li>
+        <li>Interpret official suite output as suite-scoped evidence, not a universal TSP verdict.</li>
+      </ul>
+    </article>
+    <article class="section-panel">
+      <div class="section-heading">
+        <p class="kicker">Phase 1 scope</p>
+        <h2>Current public contract</h2>
+      </div>
+      <ul class="list-reset">
+        <li>v0.1 public listings are TSP only.</li>
+        <li>Future work beyond TSP is intentionally outside the current release.</li>
+        <li>Official leaderboards stay curated and suite-scoped.</li>
+      </ul>
+    </article>
   </section>
 </BaseLayout>

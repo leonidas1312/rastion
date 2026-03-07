@@ -1,17 +1,18 @@
 ---
+import RedirectNotice from "../components/RedirectNotice.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import BenchmarkTable from "../components/BenchmarkTable.astro";
+const base = import.meta.env.BASE_URL;
 ---
-<BaseLayout title="Rastion • Benchmarks" description="Benchmark cache exported for website rendering.">
-  <section class="card">
-    <p class="kicker">Benchmark Cache</p>
-    <h1>Benchmarks</h1>
-    <p>
-      Rows are normalized from <code>.rastion/benchmarks.json</code> using
-      <code>rastion export-benchmarks</code>.
-    </p>
-  </section>
-  <div class="grid" style="margin-top: 1rem;">
-    <BenchmarkTable />
-  </div>
+<BaseLayout
+  title="Rastion • Benchmarks"
+  description="This page has moved to the public evaluation surfaces."
+  canonical="/leaderboards/"
+  redirectTo="/leaderboards/"
+  noIndex={true}
+>
+  <RedirectNotice
+    target={`${base}leaderboards/`}
+    description="Raw benchmark-cache exports are developer-only. The public evaluation surface now lives on the Leaderboards page."
+    ctaLabel="Open Leaderboards"
+  />
 </BaseLayout>

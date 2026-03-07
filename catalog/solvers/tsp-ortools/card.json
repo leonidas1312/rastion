@@ -4,7 +4,7 @@
   "routing_family": "routing",
   "problem_variants": ["tsp"],
   "summary": "OR-Tools-backed TSP adapter using the routing solver with guided local search.",
-  "description": "This adapter wraps Google OR-Tools for Phase 1 TSP evaluation. It is listed as experimental because it depends on an optional extra and introduces a larger external dependency surface than the built-in reference solvers.",
+  "description": "This adapter wraps Google OR-Tools for Rastion's public TSP hub. It is listed as experimental because it depends on an optional extra and introduces a larger external dependency surface than the built-in reference solvers.",
   "repository": "https://github.com/leonidas1312/rastion",
   "homepage": "https://developers.google.com/optimization",
   "license": "Apache-2.0",
@@ -29,11 +29,11 @@
     "warm_start": false,
     "local_search": true,
     "multi_route_ready": false,
-    "notes": "Uses OR-Tools routing primitives for single-vehicle TSP only in Phase 1."
+    "notes": "Uses OR-Tools routing primitives for single-vehicle TSP only in Rastion v0.1."
   },
   "limits": {
     "tested_max_nodes": 5000,
-    "unsupported_constraints": ["capacities", "time windows", "multiple vehicles in Rastion Phase 1"],
+    "unsupported_constraints": ["capacities", "time windows", "multiple vehicles in Rastion v0.1"],
     "depot_assumptions": "Assumes one depot and a single route manager.",
     "notes": "Optional dependency. Build and eval flows must surface dependency-missing states clearly."
   },
@@ -49,7 +49,7 @@
   ],
   "known_failure_modes": [
     "Unavailable unless the ortools extra is installed.",
-    "Phase 1 adapter exposes only TSP, not broader VRP capabilities."
+    "The v0.1 adapter exposes TSP only, not broader routing variants."
   ],
   "artifact_paths": {
     "benchmark_json": "data/benchmarks.json",

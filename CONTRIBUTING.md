@@ -1,7 +1,7 @@
 # Contributing
 
-Rastion Phase 1 is a routing-first hub with real TSP support. Contributions should preserve that contract: executable
-adapters, explicit metadata, and reproducible suite outputs.
+Rastion `v0.1` is a public TSP hub. Contributions should preserve that contract: executable adapters, explicit
+metadata, and reproducible suite outputs.
 
 ## Add A Solver
 
@@ -33,15 +33,14 @@ For a repo-verified walkthrough, use [docs/add-a-tsp-solver.md](docs/add-a-tsp-s
 ## Listing Rules
 
 - Phase 1 public listings are `tsp` only.
-- `routing` is the umbrella taxonomy.
-- `vrp` and richer routing variants are roadmap work.
 - Public listings require executable adapters plus solver cards.
 - Official leaderboards are suite-scoped and curated.
 - The current official suites are a bootstrap track, not a claim of broad TSP supremacy.
+- Work beyond TSP is future scope, not current product surface.
 
 ## Engineering Rules
 
 - Keep solver cards honest about limits, optional dependencies, and failure modes.
-- Do not claim support for VRP variants that the adapter cannot actually run.
+- Do not claim support beyond the TSP surface the adapter actually runs today.
 - Keep the TSP arena TSP-specific until multi-route semantics are added.
 - Preserve non-breaking CLI behavior when extending the publication flow.

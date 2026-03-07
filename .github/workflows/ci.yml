@@ -1,4 +1,4 @@
-name: Validate Routing Hub
+name: Validate TSP Hub
 
 on:
   pull_request:
@@ -34,7 +34,7 @@ jobs:
       - name: Run smoke suite
         run: python -m rastion eval-suite tsplib-small-v1
 
-      - name: Build routing hub data
+      - name: Build public TSP hub data
         run: python -m rastion build-site-data --iters 800 --seed 0 --emit-every 50
 
       - name: Build Astro site

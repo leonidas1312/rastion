@@ -1,60 +1,18 @@
 ---
+import RedirectNotice from "../components/RedirectNotice.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+const base = import.meta.env.BASE_URL;
 ---
-<BaseLayout title="Rastion • Add a TSP Solver" description="Repo-verified walkthrough for adding a TSP solver to Rastion Phase 1.">
-  <section class="hero">
-    <p class="kicker">Contributor Walkthrough</p>
-    <h1>Add a TSP Solver to Rastion</h1>
-    <p>
-      This walkthrough matches the current Phase 1 repository layout. The goal is a public TSP listing with a working
-      adapter, a validated solver card, a rendered solver README, and official bootstrap suite artifacts.
-    </p>
-  </section>
-
-  <div class="grid cards" style="margin-top: 1rem;">
-    <article class="card">
-      <h2>1. Install locally</h2>
-      <pre><code>pip install -e .
-rastion --help</code></pre>
-      <p class="subtle">Use `pip install -e '.[ortools]'` if your adapter needs the OR-Tools extra.</p>
-    </article>
-    <article class="card">
-      <h2>2. Add the adapter</h2>
-      <p>Create a package under <code>plugins_local/</code> that exposes <code>get_solver()</code> and supports <code>tsp</code>.</p>
-      <p class="subtle">Reference implementations live in the nearest-neighbor, 2-opt, and OR-Tools plugins.</p>
-    </article>
-    <article class="card">
-      <h2>3. Add the card and README</h2>
-      <p>Create <code>catalog/solvers/&lt;solver-id&gt;/card.json</code> and <code>catalog/solvers/&lt;solver-id&gt;/README.md</code>.</p>
-      <p class="subtle">The card is structured metadata. The README is the narrative content rendered on the site.</p>
-    </article>
-    <article class="card">
-      <h2>4. Validate</h2>
-      <pre><code>rastion validate-cards</code></pre>
-      <p class="subtle">Validation checks ids, adapter paths, discoverability, and required solver detail markdown.</p>
-    </article>
-    <article class="card">
-      <h2>5. Run the bootstrap suites</h2>
-      <pre><code>rastion eval-suite tsplib-small-v1
-rastion eval-suite tsplib-medium-v1
-rastion eval-suite tsplib-large-v1</code></pre>
-      <p class="subtle">Current official suites are bootstrap suites: reproducible and honest, but intentionally narrow.</p>
-    </article>
-    <article class="card">
-      <h2>6. Regenerate site data</h2>
-      <pre><code>rastion build-site-data
-cd web && npm install && npm run dev</code></pre>
-      <p class="subtle">Verify the solver appears in the catalog, detail page, and official suite results.</p>
-    </article>
-  </div>
-
-  <section class="card" style="margin-top: 1rem;">
-    <h2>PR Expectations</h2>
-    <ul class="list-reset">
-      <li>Do not claim VRP support.</li>
-      <li>Keep dependency requirements and failure modes visible.</li>
-      <li>Interpret the current leaderboards as bootstrap-track evidence, not a universal TSP verdict.</li>
-      <li>Include both the adapter contract and the solver narrative so the listing is useful to outside readers.</li>
-    </ul>
-  </section>
+<BaseLayout
+  title="Rastion • Add a TSP Solver"
+  description="This page has moved to the contributor guide."
+  canonical="/contribute/"
+  redirectTo="/contribute/"
+  noIndex={true}
+>
+  <RedirectNotice
+    target={`${base}contribute/`}
+    description="The repo-verified contributor walkthrough now lives on the unified Contribute page."
+    ctaLabel="Open Contribute"
+  />
 </BaseLayout>

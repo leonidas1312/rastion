@@ -1,7 +1,7 @@
 {
   "id": "tsplib-small-v1",
   "title": "TSPLIB Small v1",
-  "description": "Official small-instance TSP suite for the routing-first Phase 1 hub.",
+  "description": "Official small-instance TSP suite for the public Rastion v0.1 hub.",
   "problem_variant": "tsp",
   "instances": [
     {

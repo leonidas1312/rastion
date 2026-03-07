@@ -1,68 +1,52 @@
 # Rastion
 
-Rastion is a routing solver hub for Python: executable solver cards, official TSP evals, and replayable TSPLIB demos.
+Rastion is a public hub for TSP solvers, with solver cards, reproducible evals, and replayable TSPLIB demos.
 
-The current wedge is deliberate:
+`v0.1` is intentionally narrow:
 
-- `routing` is the product story
-- `TSP` is the fully supported vertical today
-- `VRP` is roadmap work, not implied current capability
+- TSP only
+- suite-scoped results
+- small, auditable bootstrap suites
+- no fake global "best solver" trophy page
 
-## Live Demo
+## What You Can Do Today
 
-GitHub Pages publishes the static hub from generated JSON artifacts:
+- browse solver cards under `catalog/solvers/*`
+- run official TSPLIB suites from `catalog/suites/*.json`
+- publish suite-scoped leaderboards
+- replay exported TSPLIB routes in the arena
+- use the same generated artifacts locally and on GitHub Pages
 
-- solver catalog
-- official TSP leaderboards
-- TSPLIB arena
-- suite definitions
+## 5-Minute Setup
 
-## Why Routing First?
+Create a local virtual environment:
 
-Routing is narrow enough to be scientifically coherent and broad enough to grow into a real ecosystem. Rastion starts
-with TSP because the repo already has executable TSPLIB support, route visualization, and baseline heuristics. The
-public schemas are VRP-ready so CVRP and richer routing variants can land without redesigning the catalog contract.
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
-## TSP Today, VRP Next
-
-Phase 1 supports:
-
-- executable TSP solver adapters
-- solver cards in `catalog/solvers/*/card.json`
-- official TSPLIB suites in `catalog/suites/*.json`
-- suite-scoped leaderboards
-- replayable TSP arena artifacts
-
-Phase 1 does not support:
-
-- CVRP or VRPTW execution
-- multi-vehicle route rendering
-- global cross-family routing rankings
-
-## 5-Minute Quickstart
-
-Install the package:
+Minimal install:
 
 ```bash
 pip install -e .
 ```
 
-With the optional OR-Tools adapter enabled:
+Full local verification setup:
 
 ```bash
-pip install -e '.[ortools]'
+pip install -e ".[dev,ortools]"
 ```
 
-Generate all static site artifacts:
+Run the published local verification flow:
 
 ```bash
-rastion build-site-data
+./scripts/release_smoke.sh
 ```
 
-The installed `rastion` console script is the recommended entrypoint for docs and contributor workflows.
-`python -m rastion ...` remains compatible if you prefer module execution.
+That script creates and reuses `.venv/` automatically.
 
-Run the Astro site:
+Start the site locally:
 
 ```bash
 cd web
@@ -70,7 +54,7 @@ npm install
 npm run dev
 ```
 
-## Core Commands
+## Run The Official Flow
 
 Validate solver cards and suite specs:
 
@@ -78,95 +62,102 @@ Validate solver cards and suite specs:
 rastion validate-cards
 ```
 
-Export the public catalog and suite metadata:
-
-```bash
-rastion export-catalog --out web/public/data/catalog.json
-rastion export-suites --out web/public/data/suites.json
-```
-
-Run an official suite and export the suite artifact:
+Run an official suite and export its artifact:
 
 ```bash
 rastion eval-suite tsplib-small-v1
 ```
 
-Export all leaderboards:
+Generate the public website artifacts:
 
 ```bash
-rastion export-leaderboards --out web/public/data/leaderboards.json
+rastion build-site-data --iters 800 --seed 0 --emit-every 50
 ```
 
-Generate the TSP arena artifact:
+Build the Astro site:
 
 ```bash
-rastion tsp-arena --out web/public/data/tsp_arena.json --iters 2000 --seed 0 --emit-every 50
+cd web
+npm ci
+npm run build
 ```
 
-Compatibility alias:
+The public website contract for `v0.1` is:
 
-```bash
-rastion demo
-rastion demo-site
-```
+- `web/public/data/catalog.json`
+- `web/public/data/suites.json`
+- `web/public/data/leaderboards.json`
+- `web/public/data/evals/*.json`
+- `web/public/data/tsp_arena.json`
 
-## Add A TSP Solver
+## Use Rastion Yourself
 
-Phase 1 public listings require:
+The shortest repo-verified path from clone to visible output is documented in:
+
+- [docs/use-rastion-yourself.md](docs/use-rastion-yourself.md)
+- [docs/publish-checklist.md](docs/publish-checklist.md)
+
+## Current Solver Track
+
+The current public track is intentionally small:
+
+- `Nearest Neighbor` is the transparent baseline
+- `2-Opt Local Search` is the stronger built-in baseline
+- `OR-Tools Routing` is the optional external comparison point
+
+The current official suites are also intentionally small:
+
+- `tsplib-small-v1`
+- `tsplib-medium-v1`
+- `tsplib-large-v1`
+
+Each suite currently contains one TSPLIB instance. That is enough to make the methodology honest, reproducible, and easy to audit. It is not enough to claim broad TSP dominance.
+
+## Limits And Non-Goals
+
+`v0.1` does not support:
+
+- CVRP or VRPTW execution
+- multi-vehicle route rendering
+- global rankings across problem families
+
+Future work can expand beyond TSP after there is real public interest and the current contracts prove worth keeping.
+
+## Why Publish Now
+
+Rastion is at the right stage to publish because the core loop is real:
+
+- cards are executable, not just marketing copy
+- results are reproducible and artifact-backed
+- route demos are replayable from exported TSPLIB runs
+
+Publishing now is meant to answer one question: is this useful enough to keep investing in?
+
+## Contributing A Solver
+
+Public TSP listings require:
 
 1. a working adapter under `plugins_local/`
 2. a valid solver card under `catalog/solvers/<solver-id>/card.json`
 3. a solver detail markdown file
 4. successful validation with `rastion validate-cards`
 5. official suite output from the TSP suite set
+6. regenerated public site artifacts
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the exact flow and [docs/add-a-tsp-solver.md](docs/add-a-tsp-solver.md)
-for the full walkthrough.
+Use:
 
-## Official Suite Policy
-
-Leaderboards are:
-
-- `TSP` only in Phase 1
-- versioned
-- curated
-- suite-scoped
-- generated from fixed seeds and budgets
-
-Rastion intentionally does not publish a fake global "best routing solver" ranking.
-
-Current suite scope is intentionally labeled as a bootstrap track:
-
-- there are three official Phase 1 suites
-- each suite currently contains one TSPLIB instance
-- this makes the methodology honest, reproducible, and easy to audit
-- it does not justify broad claims about general TSP dominance
-
-Read the public framing in:
-
-- [docs/launch-announcement.md](docs/launch-announcement.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
 - [docs/add-a-tsp-solver.md](docs/add-a-tsp-solver.md)
 
 ## Repo Layout
 
-- `catalog/solvers/`: solver cards and detail markdown
+- `catalog/solvers/`: public solver cards and detail markdown
 - `catalog/suites/`: official suite definitions
-- `docs/`: launch and contributor content for the freeze window
+- `docs/`: local usage, publish, and contributor guides
 - `plugins_local/`: executable solver adapters
-- `rastion/catalog/`: catalog loading, validation, exports, and evals
-- `rastion/tsp/`: TSPLIB ingestion and TSP arena utilities
+- `rastion/catalog/`: validation, exports, and suite evals
+- `rastion/tsp/`: TSPLIB ingestion and arena utilities
 - `web/`: Astro site
-
-## Roadmap
-
-Phase 2 targets basic CVRP support:
-
-- `CVRPProblem`
-- multi-route result schema
-- CVRP suite definitions
-- multi-vehicle visualizations
-
-Phase 3 can expand into broader routing variants once the contracts are stable.
 
 ## GitHub Pages
 
@@ -181,5 +172,5 @@ Project Pages:
 ## Tests
 
 ```bash
-pytest -q
+python3 -m pytest -q -s
 ```

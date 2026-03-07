@@ -1,7 +1,7 @@
 <section class="card">
-  <p class="kicker">Registry</p>
-  <h2>Available Solvers</h2>
-  <p class="status" id="solvers-status">Loading solver registry...</p>
+  <p class="kicker">Developer Export</p>
+  <h2>Runtime Solver Registry</h2>
+  <p class="status" id="solvers-status">Loading developer solver export...</p>
   <div class="table-wrap">
     <table>
       <thead>
@@ -44,7 +44,7 @@
       const rows = Array.isArray(payload.solvers) ? payload.solvers : [];
       if (!rows.length) {
         body.innerHTML = '<tr><td colspan="6">No solvers exported yet.</td></tr>';
-        status.textContent = "No solver data available.";
+        status.textContent = "No developer solver export available.";
         return;
       }
 
@@ -53,7 +53,7 @@
     } catch (error) {
       body.innerHTML = '<tr><td colspan="6">No data found.</td></tr>';
       status.classList.add("error");
-      status.textContent = "Missing /data/solvers.json. Run: rastion build-site-data";
+      status.textContent = "Missing developer export. Run: rastion export-solvers";
       console.error(error);
     }
   }

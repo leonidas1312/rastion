@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T16:27:50.918909+00:00",
+  "generated_at": "2026-03-07T18:27:03.969598+00:00",
   "suite": "tsplib",
   "instances": [
     {
@@ -380,7 +380,7 @@
             "best_value": null,
             "runtime_ms": 0
           },
-          "error": "ortools is not installed. Install with: pip install -e '.[ortools]' (No module named 'ortools')"
+          "error": "Protocol message RoutingSearchParameters has no \"random_seed\" field."
         },
         {
           "name": "tsp_two_opt",
@@ -404,89 +404,89 @@
               "best_value": 8980.0
             },
             {
-              "t_ms": 0,
+              "t_ms": 1,
               "iter": 50,
               "best_value": 8967.0
             },
             {
-              "t_ms": 1,
+              "t_ms": 2,
               "iter": 100,
               "best_value": 8749.0
             },
             {
-              "t_ms": 1,
+              "t_ms": 3,
               "iter": 150,
               "best_value": 8670.0
             },
             {
-              "t_ms": 1,
+              "t_ms": 3,
               "iter": 200,
               "best_value": 8463.0
             },
             {
-              "t_ms": 2,
+              "t_ms": 4,
               "iter": 250,
               "best_value": 8463.0
             },
             {
-              "t_ms": 2,
+              "t_ms": 4,
               "iter": 300,
               "best_value": 8463.0
             },
             {
-              "t_ms": 3,
+              "t_ms": 5,
               "iter": 350,
               "best_value": 8326.0
             },
             {
-              "t_ms": 3,
+              "t_ms": 5,
               "iter": 400,
               "best_value": 8215.0
             },
             {
-              "t_ms": 3,
+              "t_ms": 6,
               "iter": 450,
               "best_value": 8215.0
             },
             {
-              "t_ms": 4,
+              "t_ms": 6,
               "iter": 500,
               "best_value": 8215.0
             },
             {
-              "t_ms": 4,
+              "t_ms": 6,
               "iter": 550,
               "best_value": 8215.0
             },
             {
-              "t_ms": 4,
+              "t_ms": 7,
               "iter": 600,
               "best_value": 8154.0
             },
             {
-              "t_ms": 5,
+              "t_ms": 7,
               "iter": 650,
               "best_value": 8154.0
             },
             {
-              "t_ms": 5,
+              "t_ms": 8,
               "iter": 700,
               "best_value": 8154.0
             },
             {
-              "t_ms": 6,
+              "t_ms": 8,
               "iter": 750,
               "best_value": 8154.0
             },
             {
-              "t_ms": 6,
+              "t_ms": 9,
               "iter": 800,
               "best_value": 8154.0
             }
           ],
           "final": {
             "best_value": 8154.0,
-            "runtime_ms": 6,
+            "runtime_ms": 7,
             "route": [
               0,
               21,
@@ -545,7 +545,7 @@
           }
         }
       ],
-      "generated_at": "2026-03-06T16:27:50.719815+00:00"
+      "generated_at": "2026-03-07T18:27:03.762905+00:00"
     },
     {
       "id": "ch150",
@@ -1325,12 +1325,12 @@
           },
           "events": [
             {
-              "t_ms": 2,
+              "t_ms": 3,
               "iter": 50,
               "best_value": 2358.0
             },
             {
-              "t_ms": 2,
+              "t_ms": 3,
               "iter": 100,
               "best_value": 4821.0
             },
@@ -1518,7 +1518,7 @@
             "best_value": null,
             "runtime_ms": 0
           },
-          "error": "ortools is not installed. Install with: pip install -e '.[ortools]' (No module named 'ortools')"
+          "error": "Protocol message RoutingSearchParameters has no \"random_seed\" field."
         },
         {
           "name": "tsp_two_opt",
@@ -1552,12 +1552,12 @@
               "best_value": 8191.0
             },
             {
-              "t_ms": 4,
+              "t_ms": 5,
               "iter": 150,
               "best_value": 8109.0
             },
             {
-              "t_ms": 5,
+              "t_ms": 6,
               "iter": 200,
               "best_value": 8109.0
             },
@@ -1577,22 +1577,22 @@
               "best_value": 8090.0
             },
             {
-              "t_ms": 8,
+              "t_ms": 9,
               "iter": 400,
               "best_value": 8090.0
             },
             {
-              "t_ms": 9,
+              "t_ms": 10,
               "iter": 450,
               "best_value": 8090.0
             },
             {
-              "t_ms": 10,
+              "t_ms": 11,
               "iter": 500,
               "best_value": 8030.0
             },
             {
-              "t_ms": 11,
+              "t_ms": 12,
               "iter": 550,
               "best_value": 8030.0
             },
@@ -1607,24 +1607,24 @@
               "best_value": 8016.0
             },
             {
-              "t_ms": 13,
+              "t_ms": 14,
               "iter": 700,
               "best_value": 7980.0
             },
             {
-              "t_ms": 14,
+              "t_ms": 15,
               "iter": 750,
               "best_value": 7980.0
             },
             {
-              "t_ms": 15,
+              "t_ms": 16,
               "iter": 800,
               "best_value": 7980.0
             }
           ],
           "final": {
             "best_value": 7980.0,
-            "runtime_ms": 15,
+            "runtime_ms": 16,
             "route": [
               0,
               97,
@@ -1781,7 +1781,7 @@
           }
         }
       ],
-      "generated_at": "2026-03-06T16:27:50.776002+00:00"
+      "generated_at": "2026-03-07T18:27:03.824568+00:00"
     },
     {
       "id": "a280",
@@ -3549,7 +3549,7 @@
             "best_value": null,
             "runtime_ms": 0
           },
-          "error": "ortools is not installed. Install with: pip install -e '.[ortools]' (No module named 'ortools')"
+          "error": "Protocol message RoutingSearchParameters has no \"random_seed\" field."
         },
         {
           "name": "tsp_two_opt",
@@ -3573,7 +3573,7 @@
               "best_value": 3507.0
             },
             {
-              "t_ms": 9,
+              "t_ms": 8,
               "iter": 50,
               "best_value": 3507.0
             },
@@ -3583,7 +3583,7 @@
               "best_value": 3507.0
             },
             {
-              "t_ms": 12,
+              "t_ms": 11,
               "iter": 150,
               "best_value": 3503.0
             },
@@ -3593,7 +3593,7 @@
               "best_value": 3503.0
             },
             {
-              "t_ms": 15,
+              "t_ms": 14,
               "iter": 250,
               "best_value": 3503.0
             },
@@ -3603,7 +3603,7 @@
               "best_value": 3492.0
             },
             {
-              "t_ms": 18,
+              "t_ms": 17,
               "iter": 350,
               "best_value": 3492.0
             },
@@ -3613,7 +3613,7 @@
               "best_value": 3479.0
             },
             {
-              "t_ms": 21,
+              "t_ms": 20,
               "iter": 450,
               "best_value": 3479.0
             },
@@ -3623,7 +3623,7 @@
               "best_value": 3478.0
             },
             {
-              "t_ms": 24,
+              "t_ms": 23,
               "iter": 550,
               "best_value": 3478.0
             },
@@ -3633,7 +3633,7 @@
               "best_value": 3465.0
             },
             {
-              "t_ms": 27,
+              "t_ms": 26,
               "iter": 650,
               "best_value": 3465.0
             },
@@ -3643,7 +3643,7 @@
               "best_value": 3465.0
             },
             {
-              "t_ms": 30,
+              "t_ms": 29,
               "iter": 750,
               "best_value": 3465.0
             },
@@ -3942,7 +3942,7 @@
           }
         }
       ],
-      "generated_at": "2026-03-06T16:27:50.918788+00:00"
+      "generated_at": "2026-03-07T18:27:03.969465+00:00"
     }
   ]
 }

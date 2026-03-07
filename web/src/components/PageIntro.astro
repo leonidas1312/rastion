@@ -1,0 +1,22 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lede?: string;
+  split?: boolean;
+}
+
+const { eyebrow, title, lede, split = false } = Astro.props;
+---
+<section class:list={["page-intro", split && "page-intro-split"]}>
+  <div class="page-intro-copy">
+    {eyebrow && <p class="kicker">{eyebrow}</p>}
+    <h1>{title}</h1>
+    {lede && <p class="lede">{lede}</p>}
+    <slot name="actions" />
+    <slot name="note" />
+  </div>
+  <div class="page-intro-aside">
+    <slot name="aside" />
+  </div>
+</section>

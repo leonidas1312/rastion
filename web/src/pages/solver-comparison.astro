@@ -1,98 +1,18 @@
 ---
-import { readFileSync } from "node:fs";
-
+import RedirectNotice from "../components/RedirectNotice.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
-
-const leaderboardsPath = new URL("../../public/data/leaderboards.json", import.meta.url);
-const catalogPath = new URL("../../public/data/catalog.json", import.meta.url);
-
-const leaderboards = JSON.parse(readFileSync(leaderboardsPath, "utf-8"));
-const catalog = JSON.parse(readFileSync(catalogPath, "utf-8"));
-
-const suiteRows = Array.isArray(leaderboards.leaderboards) ? leaderboards.leaderboards : [];
-const solverRows = Array.isArray(catalog.solvers) ? catalog.solvers : [];
-
-const summaryById = new Map();
-for (const solver of solverRows) {
-  summaryById.set(solver.id, {
-    id: solver.id,
-    name: solver.name,
-    summary: solver.summary,
-    methodClass: solver.method_class,
-    tier: solver.listing_tier,
-    limits: solver.limits,
-    failureModes: solver.known_failure_modes || [],
-    suitesWon: 0,
-    meanRanks: [],
-  });
-}
-
-for (const suite of suiteRows) {
-  const standings = Array.isArray(suite.standings) ? suite.standings : [];
-  standings.forEach((row, index) => {
-    const summary = summaryById.get(row.solver_id);
-    if (!summary) return;
-    summary.meanRanks.push(index + 1);
-    if (index === 0) {
-      summary.suitesWon += 1;
-    }
-  });
-}
-
-const rows = Array.from(summaryById.values()).map((row) => ({
-  ...row,
-  averageRank: row.meanRanks.length
-    ? (row.meanRanks.reduce((total, value) => total + value, 0) / row.meanRanks.length).toFixed(2)
-    : "n/a",
-}));
-
-rows.sort((left, right) => {
-  if (right.suitesWon !== left.suitesWon) return right.suitesWon - left.suitesWon;
-  return String(left.name).localeCompare(String(right.name));
-});
+const base = import.meta.env.BASE_URL;
 ---
-<BaseLayout title="Rastion • Solver Comparison" description="What the current three Phase 1 TSP solvers do differently, and how to interpret their bootstrap results.">
-  <section class="hero">
-    <p class="kicker">Comparison</p>
-    <h1>What The Current Three Solvers Actually Tell You</h1>
-    <p>
-      Phase 1 has three published TSP entries for a reason: they establish a floor, a stronger default baseline, and
-      an optional external backend. Together they make the catalog credible enough to publish without pretending the
-      comparison set is already mature.
-    </p>
-  </section>
-
-  <div class="grid cards" style="margin-top: 1rem;">
-    {rows.map((row) => (
-      <article class="card">
-        <p class="kicker">{row.methodClass} • {row.tier}</p>
-        <h2>{row.name}</h2>
-        <p>{row.summary}</p>
-        <p><strong>Bootstrap suite wins:</strong> {row.suitesWon}</p>
-        <p><strong>Average placement:</strong> {row.averageRank}</p>
-        <p><strong>Tested scale:</strong> {row.limits?.tested_max_nodes ?? "n/a"} nodes</p>
-        <p><strong>When to use it:</strong> {
-          row.id === "tsp-two-opt"
-            ? "Use it as the current default baseline when you want stronger tour quality without leaving the core repo."
-            : row.id === "tsp-nearest-neighbor"
-              ? "Use it as the transparent floor for demos, smoke tests, and contributor orientation."
-              : "Use it when you want to compare the core baselines against an optional OR-Tools-backed adapter."
-        }</p>
-        <ul class="list-reset">
-          {row.failureModes.map((item) => <li>{item}</li>)}
-        </ul>
-      </article>
-    ))}
-  </div>
-
-  <section class="card" style="margin-top: 1rem;">
-    <p class="kicker">Interpretation</p>
-    <h2>Read The Table Honestly</h2>
-    <ul class="list-reset">
-      <li>`tsp-two-opt` is the strongest current default on the published bootstrap suites.</li>
-      <li>`tsp-nearest-neighbor` is useful because it is simple, legible, and cheap, not because it wins large-instance quality.</li>
-      <li>`tsp-ortools` matters as an integration example and optional backend, even when the core baselines remain easier to audit.</li>
-      <li>The point of this page is not to crown a universal winner. It is to explain what these exemplars contribute to the hub.</li>
-    </ul>
-  </section>
+<BaseLayout
+  title="Rastion • Solver Comparison"
+  description="This page has moved to the new About page."
+  canonical="/about/"
+  redirectTo="/about/#current-solvers"
+  noIndex={true}
+>
+  <RedirectNotice
+    target={`${base}about/#current-solvers`}
+    description="Current solver roles now live on the consolidated About page."
+    ctaLabel="Open About"
+  />
 </BaseLayout>

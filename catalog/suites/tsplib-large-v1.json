@@ -1,7 +1,7 @@
 {
   "id": "tsplib-large-v1",
   "title": "TSPLIB Large v1",
-  "description": "Official large-instance TSP suite for the routing-first Phase 1 hub.",
+  "description": "Official large-instance TSP suite for the public Rastion v0.1 hub.",
   "problem_variant": "tsp",
   "instances": [
     {

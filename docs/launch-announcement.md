@@ -1,25 +1,25 @@
-# Rastion Phase 1 Launch Draft
+# Rastion v0.1 Launch Draft
 
-Rastion is now a routing-first solver hub for Python.
+Rastion is now a public hub for TSP solvers.
 
 What is live today:
 
 - executable solver cards
-- official TSP bootstrap evals
-- replayable TSPLIB arena artifacts
+- reproducible TSP bootstrap evals
+- replayable TSPLIB demos
 - contributor workflow for adding TSP solvers
 
-Why the wedge is narrow:
+Why the release is narrow:
 
-- routing is more coherent than "all optimization"
 - TSP is already executable and visual in the repo
-- the public contracts are designed so CVRP can follow without a product rewrite
+- the public cards, evals, and demos come from one auditable workflow
+- the current scope is small enough to publish honestly
 
 What we are not claiming:
 
-- VRP support today
+- support beyond TSP today
 - multi-route visualization today
-- a universal "best routing solver" ranking
+- a universal "best solver" ranking
 
 Why the current evals are called bootstrap suites:
 
@@ -30,8 +30,8 @@ Why the current evals are called bootstrap suites:
 
 Recommended one-paragraph launch copy:
 
-> Rastion is a GitHub-native routing solver hub for Python: executable solver cards, official TSP bootstrap evals, and replayable TSPLIB demos. Phase 1 is intentionally narrow and honest. TSP is fully supported today, VRP is next, and every published solver entry includes an adapter, metadata, and reproducible artifacts instead of marketing claims.
+> Rastion is a public hub for TSP solvers, with solver cards, reproducible evals, and replayable TSPLIB demos. The v0.1 release is intentionally narrow and honest: TSP only, suite-scoped results, and artifact-backed output instead of marketing claims.
 
 Suggested short social post:
 
-> Shipping Rastion Phase 1: a routing-first solver hub for Python. Live now: executable TSP solver cards, bootstrap TSPLIB leaderboards, and replayable route demos. Narrow on purpose. Honest about limits. Built so CVRP can land next without redesign.
+> Shipping Rastion v0.1: a public hub for TSP solvers. Live now: executable solver cards, reproducible TSPLIB leaderboards, and replayable demos. Narrow on purpose. Honest about limits. Publishing now to see if people actually want more.

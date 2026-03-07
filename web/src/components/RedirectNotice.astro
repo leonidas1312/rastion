@@ -1,0 +1,21 @@
+---
+interface Props {
+  target: string;
+  title?: string;
+  description?: string;
+  ctaLabel?: string;
+}
+
+const {
+  target,
+  title = "This page has moved",
+  description = "The content now lives in the simplified Rastion site structure.",
+  ctaLabel = "Continue",
+} = Astro.props;
+---
+<section class="redirect-shell">
+  <p class="kicker">Moved</p>
+  <h1>{title}</h1>
+  <p class="lede">{description}</p>
+  <a class="button-primary" href={target}>{ctaLabel}</a>
+</section>

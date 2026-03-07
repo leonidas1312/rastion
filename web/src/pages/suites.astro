@@ -1,43 +1,18 @@
 ---
+import RedirectNotice from "../components/RedirectNotice.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import SuitesTable from "../components/SuitesTable.astro";
+const base = import.meta.env.BASE_URL;
 ---
-<BaseLayout title="Rastion • Suites" description="Official TSP suite definitions for Rastion's routing-first phase.">
-  <section class="card">
-    <p class="kicker">Evaluation Policy</p>
-    <h1>Official Suites</h1>
-    <p>
-      Suites are versioned, curated, and intentionally narrow. They are the trust layer behind the catalog and
-      leaderboards: fixed instances, fixed budgets, fixed seeds, and explicit artifact paths. The current three suites
-      are marked as a bootstrap track because each one presently contains a single TSPLIB instance from the shipped
-      repo corpus.
-    </p>
-    <p><a href="../methodology/">Why the current track is labeled bootstrap</a></p>
-  </section>
-  <div class="grid cards" style="margin-top: 1rem;">
-    <article class="card">
-      <h2>Why TSP First?</h2>
-      <p>
-        TSP is already executable in Rastion, scientifically recognizable, and visually legible in a static demo. That
-        makes it the right first routing vertical while the public interfaces stay VRP-ready.
-      </p>
-    </article>
-    <article class="card">
-      <h2>What Comes Next?</h2>
-      <p>
-        CVRP, VRPTW, and other routing variants should land only after the problem schema, result schema, and
-        visualization contract can represent multiple vehicles and richer constraints honestly.
-      </p>
-    </article>
-    <article class="card">
-      <h2>Why Bootstrap?</h2>
-      <p>
-        The current suite set is intentionally small and auditable. It is enough to compare adapters honestly, but not
-        enough to justify broad performance claims beyond the shipped corpus.
-      </p>
-    </article>
-  </div>
-  <div class="grid" style="margin-top: 1rem;">
-    <SuitesTable />
-  </div>
+<BaseLayout
+  title="Rastion • Suites"
+  description="This page has moved to the new About page."
+  canonical="/about/"
+  redirectTo="/about/#official-suites"
+  noIndex={true}
+>
+  <RedirectNotice
+    target={`${base}about/#official-suites`}
+    description="Official suite definitions now live on the consolidated About page."
+    ctaLabel="Open About"
+  />
 </BaseLayout>
