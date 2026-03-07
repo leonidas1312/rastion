@@ -8,6 +8,7 @@ from pathlib import Path
 
 from rastion.plugins.discovery import discover_solvers
 from rastion.solvers.registry import get_solver
+from rastion.tsp.references import gap_to_reference, get_tsplib_reference
 from rastion.tsp.tsplib import load_tsplib_problem
 
 from .loaders import DEFAULT_CARDS_DIR, DEFAULT_SUITES_DIR, REPO_ROOT, load_solver_cards, load_suite_specs
@@ -66,6 +67,7 @@ def evaluate_suite(
     for instance in suite.instances:
         problem = _load_problem(suite.problem_variant, instance.path)
         instance_results: list[dict[str, object]] = []
+        reference = get_tsplib_reference(instance.id) if suite.problem_variant == "tsp" else None
 
         for card in selected:
             solver = get_solver(card.adapter.solver_name)
@@ -94,6 +96,7 @@ def evaluate_suite(
 
             score = min(scores) if scores else None
             avg_runtime_ms = (sum(runtimes) / len(runtimes)) if runtimes else None
+            gap_pct = gap_to_reference(score, None if reference is None else reference.best_known_distance)
             run_record = EvalRunRecord(
                 suite_id=suite.id,
                 solver_id=card.id,
@@ -122,6 +125,7 @@ def evaluate_suite(
                 "listing_tier": card.listing_tier,
                 "score": score,
                 "avg_runtime_ms": avg_runtime_ms,
+                "gap_to_reference_pct": gap_pct,
                 "status": record_status,
                 "error": error_message,
                 "run_record": run_record.model_dump(),
@@ -138,6 +142,7 @@ def evaluate_suite(
                     "listing_tier": card.listing_tier,
                     "scores": [],
                     "runtimes": [],
+                    "gaps": [],
                     "status_counts": {},
                 },
             )
@@ -146,6 +151,8 @@ def evaluate_suite(
                 standing["scores"].append(score)
             if avg_runtime_ms is not None:
                 standing["runtimes"].append(avg_runtime_ms)
+            if gap_pct is not None:
+                standing["gaps"].append(gap_pct)
 
         instance_results.sort(
             key=lambda row: (
@@ -161,6 +168,7 @@ def evaluate_suite(
                 "size": instance.size,
                 "path": instance.path,
                 "n_vars": int(problem.n_vars),
+                "reference": None if reference is None else reference.payload(),
                 "results": instance_results,
             }
         )
@@ -169,11 +177,13 @@ def evaluate_suite(
     for standing in standings.values():
         scores = standing.pop("scores")
         runtimes = standing.pop("runtimes")
+        gaps = standing.pop("gaps")
         standings_rows.append(
             {
                 **standing,
                 "mean_score": (sum(scores) / len(scores)) if scores else None,
                 "mean_runtime_ms": (sum(runtimes) / len(runtimes)) if runtimes else None,
+                "mean_gap_to_reference_pct": (sum(gaps) / len(gaps)) if gaps else None,
                 "completed_instances": len(scores),
                 "total_instances": len(suite.instances),
             }

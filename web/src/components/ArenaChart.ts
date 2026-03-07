@@ -9,6 +9,12 @@ export type ArenaSeries = {
   events: ArenaEvent[];
 };
 
+export type ArenaReference = {
+  label: string;
+  distance: number;
+  url?: string;
+} | null;
+
 const PALETTE = ["#0d7f73", "#c4472d", "#255cb8", "#8e5eb8", "#1b8a4a", "#bd8b13"];
 
 function range(values: number[]): [number, number] {
@@ -29,6 +35,7 @@ export function renderArenaChart(
   canvas: HTMLCanvasElement,
   series: ArenaSeries[],
   focusedSolverName: string | null = null,
+  reference: ArenaReference = null,
 ): void {
   const dpr = window.devicePixelRatio || 1;
   const width = canvas.clientWidth || 900;
@@ -50,7 +57,11 @@ export function renderArenaChart(
 
   const allEvents = series.flatMap((row) => row.events);
   const [minX, maxX] = range(allEvents.map((event) => Number(event.t_ms || 0)));
-  const [minY, maxY] = range(allEvents.map((event) => Number(event.best_value || 0)));
+  const yValues = allEvents.map((event) => Number(event.best_value || 0));
+  if (reference) {
+    yValues.push(Number(reference.distance));
+  }
+  const [minY, maxY] = range(yValues);
 
   const mapX = (value: number) => margin.left + ((value - minX) / (maxX - minX || 1)) * chartW;
   const mapY = (value: number) => margin.top + chartH - ((value - minY) / (maxY - minY || 1)) * chartH;
@@ -69,6 +80,22 @@ export function renderArenaChart(
   ctx.fillText(`${maxY.toFixed(2)}`, 8, margin.top + 12);
   ctx.fillText(`${minX.toFixed(0)}ms`, margin.left, height - 14);
   ctx.fillText(`${maxX.toFixed(0)}ms`, margin.left + chartW - 60, height - 14);
+
+  if (reference) {
+    const y = mapY(Number(reference.distance));
+    ctx.save();
+    ctx.setLineDash([8, 5]);
+    ctx.strokeStyle = "rgba(139, 95, 32, 0.9)";
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(margin.left, y);
+    ctx.lineTo(margin.left + chartW, y);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle = "rgba(139, 95, 32, 0.95)";
+    ctx.fillText(`${reference.label} ${Number(reference.distance).toFixed(2)}`, margin.left + 8, Math.max(y - 8, 14));
+  }
 
   series.forEach((row, idx) => {
     if (!row.events.length) return;

@@ -71,7 +71,6 @@ class ORToolsTSPSolver(Solver):
         params.first_solution_strategy = routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
         params.local_search_metaheuristic = routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
         params.time_limit.FromMilliseconds(max(time_budget_ms, 1))
-        params.random_seed = seed
 
         assignment = routing.SolveWithParameters(params)
         if assignment is None:
@@ -102,14 +101,20 @@ class ORToolsTSPSolver(Solver):
             },
         )
 
-    def solve_stream(self, problem_ir: TSPProblem, **kwargs: Any) -> Iterator[ProgressEvent]:
+    def solve_trace(self, problem_ir: TSPProblem, **kwargs: Any) -> tuple[Solution, list[ProgressEvent]]:
         started = time.perf_counter()
         solution = self.solve(problem_ir, **kwargs)
-        yield ProgressEvent(
-            t_ms=max(int((time.perf_counter() - started) * 1000.0), 0),
-            iter=1,
+        runtime_ms = max(int(solution.metadata.get("runtime_ms", (time.perf_counter() - started) * 1000.0)), 0)
+        event = ProgressEvent(
+            t_ms=runtime_ms,
+            iter=max(int(kwargs.get("iters", 1)), 1),
             best_value=solution.best_value,
         )
+        return solution, [event]
+
+    def solve_stream(self, problem_ir: TSPProblem, **kwargs: Any) -> Iterator[ProgressEvent]:
+        _, events = self.solve_trace(problem_ir, **kwargs)
+        yield from events
 
 
 def get_solver() -> Solver:

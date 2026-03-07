@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T18:27:03.677187+00:00",
+  "generated_at": "2026-03-07T19:04:54.447394+00:00",
   "family": "routing",
   "problem_variants": [
     "tsp",
@@ -66,7 +66,7 @@
       "hardware": [
         "cpu"
       ],
-      "determinism": "Deterministic for a fixed seed and time budget, subject to OR-Tools behavior.",
+      "determinism": "Rastion records concrete exported outputs for each run. Route selection can vary across OR-Tools versions and search settings.",
       "method_class": "hybrid",
       "version": "0.1.0",
       "citations": [

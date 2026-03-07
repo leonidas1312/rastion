@@ -584,6 +584,10 @@ canvas.map {
   color: var(--muted);
 }
 
+.arena-summary {
+  margin-bottom: 0.2rem;
+}
+
 select {
   border: 1px solid var(--line);
   border-radius: 999px;

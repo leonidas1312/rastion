@@ -1,13 +1,13 @@
 # Rastion
 
-Rastion is a public hub for TSP solvers, with solver cards, reproducible evals, and replayable TSPLIB demos.
+Rastion publishes executable TSP solver cards, reproducible suite results, and replayable TSPLIB arena exports.
 
 `v0.1` is intentionally narrow:
 
 - TSP only
 - suite-scoped results
 - small, auditable bootstrap suites
-- no fake global "best solver" trophy page
+- no global ranking across unrelated problem families
 
 ## What You Can Do Today
 
@@ -121,7 +121,7 @@ Each suite currently contains one TSPLIB instance. That is enough to make the me
 - multi-vehicle route rendering
 - global rankings across problem families
 
-Future work can expand beyond TSP after there is real public interest and the current contracts prove worth keeping.
+Future work can expand beyond TSP after the current contracts have enough usage and test coverage to justify it.
 
 ## Why Publish Now
 

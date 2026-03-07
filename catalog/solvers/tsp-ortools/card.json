@@ -38,7 +38,7 @@
     "notes": "Optional dependency. Build and eval flows must surface dependency-missing states clearly."
   },
   "hardware": ["cpu"],
-  "determinism": "Deterministic for a fixed seed and time budget, subject to OR-Tools behavior.",
+  "determinism": "Rastion records concrete exported outputs for each run. Route selection can vary across OR-Tools versions and search settings.",
   "method_class": "hybrid",
   "version": "0.1.0",
   "citations": [

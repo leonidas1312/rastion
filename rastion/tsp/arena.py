@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from rastion.arena import run_arena
+from rastion.tsp.references import gap_to_reference, get_tsplib_reference
 from rastion.tsp.tsplib import default_tsplib_paths, load_tsplib_problem
 
 
@@ -25,6 +26,7 @@ def build_tsp_arena_bundle(
 
     for offset, (size_label, path) in enumerate(default_tsplib_paths(tsplib_dir)):
         problem = load_tsplib_problem(path)
+        reference = get_tsplib_reference(problem.name)
         arena_payload = run_arena(
             problem,
             solver_names=solver_names,
@@ -33,6 +35,19 @@ def build_tsp_arena_bundle(
             seed=seed + offset * 100,
             emit_every=emit_every,
         )
+        solver_rows = []
+        for row in arena_payload.get("solvers", []):
+            final = row.get("final", {})
+            best_value = final.get("best_value")
+            solver_rows.append(
+                {
+                    **row,
+                    "gap_to_reference_pct": gap_to_reference(
+                        float(best_value) if best_value is not None else None,
+                        None if reference is None else reference.best_known_distance,
+                    ),
+                }
+            )
 
         nodes = [
             {
@@ -53,7 +68,8 @@ def build_tsp_arena_bundle(
                 "depot": problem.depot,
                 "source": str(path),
                 "nodes": nodes,
-                "solvers": arena_payload.get("solvers", []),
+                "reference": None if reference is None else reference.payload(),
+                "solvers": solver_rows,
                 "generated_at": arena_payload.get("generated_at"),
             }
         )

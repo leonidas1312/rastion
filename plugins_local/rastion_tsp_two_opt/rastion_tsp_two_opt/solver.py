@@ -94,8 +94,11 @@ class TSPTwoOptSolver(Solver):
         solution, _ = self._run(problem_ir, **kwargs)
         return solution
 
+    def solve_trace(self, problem_ir: TSPProblem, **kwargs: Any) -> tuple[Solution, list[ProgressEvent]]:
+        return self._run(problem_ir, **kwargs)
+
     def solve_stream(self, problem_ir: TSPProblem, **kwargs: Any) -> Iterator[ProgressEvent]:
-        _, events = self._run(problem_ir, **kwargs)
+        _, events = self.solve_trace(problem_ir, **kwargs)
         yield from events
 
 

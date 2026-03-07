@@ -45,9 +45,19 @@ class Solver(ABC):
     def solve(self, problem_ir: ProblemIR, **kwargs: Any) -> Solution:
         raise NotImplementedError
 
-    def solve_stream(self, problem_ir: ProblemIR, **kwargs: Any) -> Iterator[ProgressEvent]:
+    def solve_trace(self, problem_ir: ProblemIR, **kwargs: Any) -> tuple[Solution, list[ProgressEvent]]:
         solution = self.solve(problem_ir, **kwargs)
-        yield ProgressEvent(t_ms=0, iter=int(kwargs.get("iters", 1)), best_value=solution.best_value)
+        runtime_ms = solution.metadata.get("runtime_ms", 0)
+        final_event = ProgressEvent(
+            t_ms=max(int(runtime_ms), 0),
+            iter=int(kwargs.get("iters", 1)),
+            best_value=solution.best_value,
+        )
+        return solution, [final_event]
+
+    def solve_stream(self, problem_ir: ProblemIR, **kwargs: Any) -> Iterator[ProgressEvent]:
+        _, events = self.solve_trace(problem_ir, **kwargs)
+        yield from events
 
 
 def evaluate_qubo(problem_ir: ProblemIR, x: np.ndarray) -> float:

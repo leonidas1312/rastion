@@ -151,4 +151,10 @@ def test_evaluate_suite_and_export_leaderboards_emit_tsp_results(tmp_path: Path)
 
     by_id = {row["solver_id"]: row for row in standings}
     assert by_id["tsp-nearest-neighbor"]["mean_score"] is not None
+    assert by_id["tsp-nearest-neighbor"]["mean_gap_to_reference_pct"] is not None
     assert by_id["tsp-two-opt"]["mean_score"] is not None
+
+    suite_instances = suite_payload["instances"]
+    assert suite_instances[0]["reference"]["label"] == "Best known"
+    result_rows = suite_instances[0]["results"]
+    assert all("gap_to_reference_pct" in row for row in result_rows)

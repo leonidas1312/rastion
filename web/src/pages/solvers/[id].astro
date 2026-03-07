@@ -25,11 +25,6 @@ export function getStaticPaths() {
 
 const { card } = Astro.props;
 let suiteRows = [];
-let performanceSummary = {
-  suitesWon: 0,
-  bestRank: null,
-  worstRank: null,
-};
 if (existsSync(leaderboardsPath)) {
   const payload = JSON.parse(readFileSync(leaderboardsPath, "utf-8"));
   const leaderboards = Array.isArray(payload.leaderboards) ? payload.leaderboards : [];
@@ -45,13 +40,6 @@ if (existsSync(leaderboardsPath)) {
       };
     })
     .filter(Boolean);
-
-  const ranks = suiteRows.map((item) => item.rank).filter((value) => value > 0);
-  performanceSummary = {
-    suitesWon: ranks.filter((value) => value === 1).length,
-    bestRank: ranks.length ? Math.min(...ranks) : null,
-    worstRank: ranks.length ? Math.max(...ranks) : null,
-  };
 }
 
 const detailKey = `../../../../catalog/solvers/${card.id}/README.md`;
@@ -71,7 +59,7 @@ const DetailContent = detailModule?.Content;
       <a class="button-secondary" href={`${base}leaderboards/`}>Official results</a>
     </div>
     <TrustNote slot="note" href={`${base}about/#evaluation`} linkLabel="How to read the results">
-      Official results are suite-scoped and reproducible.
+      Published results on this page come from the generated suite exports in `web/public/data`.
     </TrustNote>
   </PageIntro>
 
@@ -132,6 +120,7 @@ const DetailContent = detailModule?.Content;
                           <th>Rank</th>
                           <th>Method</th>
                           <th>Mean Distance</th>
+                          <th>Gap to BKS</th>
                           <th>Mean Runtime (ms)</th>
                           <th>Coverage</th>
                         </tr>
@@ -143,6 +132,7 @@ const DetailContent = detailModule?.Content;
                             <td>{item.rank}</td>
                             <td>{item.row.method_class}</td>
                             <td>{item.row.mean_score === null ? "n/a" : Number(item.row.mean_score).toFixed(2)}</td>
+                            <td>{item.row.mean_gap_to_reference_pct === null ? "n/a" : `${Number(item.row.mean_gap_to_reference_pct).toFixed(2)}%`}</td>
                             <td>{item.row.mean_runtime_ms === null ? "n/a" : Number(item.row.mean_runtime_ms).toFixed(2)}</td>
                             <td>{item.row.completed_instances}/{item.row.total_instances}</td>
                           </tr>
@@ -198,8 +188,16 @@ const DetailContent = detailModule?.Content;
           <dd>{card.method_class}</dd>
         </div>
         <div>
+          <dt>Listing tier</dt>
+          <dd>{card.listing_tier}</dd>
+        </div>
+        <div>
           <dt>Problem variants</dt>
           <dd>{(card.problem_variants || []).join(", ")}</dd>
+        </div>
+        <div>
+          <dt>License</dt>
+          <dd>{card.license}</dd>
         </div>
         <div>
           <dt>Determinism</dt>
@@ -210,12 +208,8 @@ const DetailContent = detailModule?.Content;
           <dd>{card.limits.tested_max_nodes} nodes</dd>
         </div>
         <div>
-          <dt>Best official rank</dt>
-          <dd>{performanceSummary.bestRank ?? "n/a"}</dd>
-        </div>
-        <div>
-          <dt>Suite wins</dt>
-          <dd>{performanceSummary.suitesWon}</dd>
+          <dt>Official suites</dt>
+          <dd>{suiteRows.length}</dd>
         </div>
         <div>
           <dt>Adapter kind</dt>

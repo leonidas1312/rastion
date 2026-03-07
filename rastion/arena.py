@@ -53,44 +53,36 @@ def run_arena(
             run_kwargs["time_budget_ms"] = int(time_budget_ms)
 
         try:
-            events: list[dict[str, float | int]] = []
-            best_value = float("inf")
+            started_trace = time.perf_counter()
+            solution, progress_events = solver.solve_trace(problem, **run_kwargs)
+            trace_runtime_ms = max(int((time.perf_counter() - started_trace) * 1000.0), 0)
 
-            started_stream = time.perf_counter()
-            for event in solver.solve_stream(problem, **run_kwargs):
-                event_row = {
+            events = [
+                {
                     "t_ms": int(event.t_ms),
                     "iter": int(event.iter),
                     "best_value": float(event.best_value),
                 }
-                events.append(event_row)
-                best_value = min(best_value, float(event.best_value))
-            stream_runtime_ms = max(int((time.perf_counter() - started_stream) * 1000.0), 0)
-
-            solution = None
+                for event in progress_events
+            ]
+            best_value = float(solution.best_value)
             route: list[int] | None = None
             if str(getattr(problem, "problem_type", "")) == "tsp":
-                started_solve = time.perf_counter()
-                solution = solver.solve(problem, **run_kwargs)
-                solve_runtime_ms = max(int((time.perf_counter() - started_solve) * 1000.0), 0)
-                stream_runtime_ms = solve_runtime_ms
-                best_value = float(solution.best_value)
                 route_meta = solution.metadata.get("route")
                 if isinstance(route_meta, list):
                     route = [int(node) for node in route_meta]
                 else:
                     route = [int(node) for node in solution.best_x.tolist()]
-            elif best_value == float("inf"):
-                solution = solver.solve(problem, **run_kwargs)
-                best_value = float(solution.best_value)
-                events = [{"t_ms": stream_runtime_ms, "iter": int(iters), "best_value": best_value}]
+
+            runtime_ms = solution.metadata.get("runtime_ms", trace_runtime_ms)
+            runtime_ms = max(int(runtime_ms), 0)
 
             if not events:
-                events = [{"t_ms": int(stream_runtime_ms), "iter": int(iters), "best_value": float(best_value)}]
+                events = [{"t_ms": runtime_ms, "iter": int(iters), "best_value": float(best_value)}]
 
             final_payload: dict[str, float | int | list[int]] = {
                 "best_value": float(best_value),
-                "runtime_ms": int(stream_runtime_ms),
+                "runtime_ms": runtime_ms,
             }
             if route is not None:
                 final_payload["route"] = route

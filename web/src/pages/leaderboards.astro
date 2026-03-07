@@ -4,14 +4,14 @@ import PageIntro from "../components/PageIntro.astro";
 import TrustNote from "../components/TrustNote.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
-<BaseLayout title="Rastion • Leaderboards" description="Official suite-scoped TSP leaderboards for the Rastion public TSP hub." canonical="/leaderboards/" wide={true}>
+<BaseLayout title="Rastion • Leaderboards" description="Official TSP suite results with distance, gap-to-BKS, runtime, and coverage." canonical="/leaderboards/" wide={true}>
   <PageIntro
     eyebrow="Leaderboards"
     title="Official suite results"
-    lede="Compare published TSP results from curated suites with fixed budgets, fixed seeds, and stored artifacts."
+    lede="These tables come from versioned suite definitions with fixed instances, budgets, seeds, and generated artifacts checked into the public site data."
   >
     <TrustNote slot="note" href="../about/#evaluation" linkLabel="How evaluation works">
-      Phase 1 results are suite-scoped. The current track is intentionally narrow and auditable.
+      Distances stay suite-scoped. Gap-to-BKS is computed from the TSPLIB reference for the shipped instance.
     </TrustNote>
   </PageIntro>
 

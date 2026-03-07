@@ -3,14 +3,14 @@ import PageIntro from "../components/PageIntro.astro";
 import TrustNote from "../components/TrustNote.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
-<BaseLayout title="Rastion • TSP Arena" description="Replay TSPLIB route geometry and solver progress in Rastion's arena." canonical="/arena/" wide={true}>
+<BaseLayout title="Rastion • TSP Arena" description="Replay TSPLIB tours, compare them with best-known distances, and inspect exported solver traces." canonical="/arena/" wide={true}>
   <PageIntro
     eyebrow="Arena"
     title="TSP Arena"
-    lede="Compare replayed TSPLIB routes, inspect route geometry, and watch how each solver improves over time."
+    lede="The arena replays one exported TSPLIB run at a time. The map shows the full closed tour, the table shows the final score, and the plot shows best full-tour distance over elapsed time."
   >
     <TrustNote slot="note" href="../about/#evaluation" linkLabel="Official eval context">
-      Replayed exported events. TSP only. Official evaluation framing lives in About.
+      Best-known distances come from the TSPLIB reference. Arena rows use the same generated exports as the public leaderboards.
     </TrustNote>
   </PageIntro>
 
@@ -22,13 +22,27 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
         <label for="solver-focus">Route focus:</label>
         <select id="solver-focus" aria-label="Focus solver">
-          <option value="">All solvers</option>
+          <option value="__all__">Overlay all solvers</option>
         </select>
 
         <span class="status" id="arena-meta">Loading TSPLIB arena...</span>
       </div>
 
+      <div class="grid grid-two arena-summary">
+        <article class="section-panel">
+          <p class="kicker">Selected solver</p>
+          <h3 id="arena-selected-solver">Awaiting data</h3>
+          <p class="subtle" id="arena-selected-summary">The default view picks the best successful solver for the current instance.</p>
+        </article>
+        <article class="section-panel">
+          <p class="kicker">Reference</p>
+          <h3 id="arena-reference-distance">Awaiting data</h3>
+          <p class="subtle" id="arena-reference-summary">Best-known distance is shown when the instance is covered by the TSPLIB reference set.</p>
+        </article>
+      </div>
+
       <h2>Instance Map</h2>
+      <p class="subtle">Full closed tour over TSPLIB coordinates. The depot/start node is marked in red.</p>
       <canvas class="map" id="tsp-map" width="960" height="420"></canvas>
     </section>
 
@@ -41,13 +55,14 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             <tr>
               <th>Solver</th>
               <th>Best Distance</th>
+              <th>Gap to BKS</th>
               <th>Runtime (ms)</th>
               <th>Events</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody id="arena-leaderboard-body">
-            <tr><td colspan="5">Waiting for data...</td></tr>
+            <tr><td colspan="6">Waiting for data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -55,6 +70,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
     <section class="card">
       <h2>Progress Plot</h2>
+      <p class="subtle">Best full-tour distance over elapsed time. The dashed guide marks the TSPLIB best-known distance when available.</p>
       <canvas class="chart" id="arena-chart" width="960" height="340"></canvas>
     </section>
   </div>
@@ -71,24 +87,44 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     const body = document.querySelector("#arena-leaderboard-body");
     const chartCanvas = document.querySelector("#arena-chart");
     const mapCanvas = document.querySelector("#tsp-map");
+    const selectedSolver = document.querySelector("#arena-selected-solver");
+    const selectedSummary = document.querySelector("#arena-selected-summary");
+    const referenceDistance = document.querySelector("#arena-reference-distance");
+    const referenceSummary = document.querySelector("#arena-reference-summary");
 
     let bundle = null;
+    let activeInstanceId = null;
+    const OVERLAY_ALL = "__all__";
 
     function formatSize(instance) {
       const label = String(instance.size || "custom").toLowerCase();
       return `${label} • ${instance.name} (n=${instance.n_vars})`;
     }
 
+    function formatDistance(value) {
+      return value === null || value === undefined ? "n/a" : Number(value).toFixed(2);
+    }
+
+    function formatGap(value) {
+      return value === null || value === undefined ? "n/a" : `${Number(value).toFixed(2)}%`;
+    }
+
+    function bestSuccessfulRow(rows) {
+      return rows.find((row) => !row.error) || null;
+    }
+
     function rowHtml(row) {
       const hasError = typeof row.error === "string" && row.error.length > 0;
       const statusText = hasError ? "error" : "ok";
-      const distance = hasError ? "n/a" : Number(row.final?.best_value ?? 0).toFixed(2);
+      const distance = hasError ? "n/a" : formatDistance(row.final?.best_value);
+      const gap = hasError ? "n/a" : formatGap(row.gap_to_reference_pct);
       const runtime = hasError ? "-" : Number(row.final?.runtime_ms ?? 0);
       const events = Array.isArray(row.events) ? row.events.length : 0;
 
       return `<tr>
         <td><strong>${row.name}</strong></td>
         <td>${distance}</td>
+        <td>${gap}</td>
         <td>${runtime}</td>
         <td>${events}</td>
         <td>${statusText}</td>
@@ -104,9 +140,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     function renderInstance() {
       const instance = activeInstance();
       if (!instance) {
-        body.innerHTML = '<tr><td colspan="5">No TSPLIB instances available.</td></tr>';
+        body.innerHTML = '<tr><td colspan="6">No TSPLIB instances available.</td></tr>';
         status.textContent = "No arena data available.";
         meta.textContent = "Run: rastion build-site-data";
+        selectedSolver.textContent = "No solver selected";
+        selectedSummary.textContent = "No arena data available.";
+        referenceDistance.textContent = "No reference";
+        referenceSummary.textContent = "No TSPLIB reference data available.";
         return;
       }
 
@@ -118,21 +158,47 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           Number(a.final?.runtime_ms ?? Number.POSITIVE_INFINITY) -
             Number(b.final?.runtime_ms ?? Number.POSITIVE_INFINITY),
       );
+      const bestRow = bestSuccessfulRow(allRows);
 
       body.innerHTML = allRows.map(rowHtml).join("\n");
       status.textContent = `Suite updated: ${formatIso(bundle.generated_at)} • Instance: ${instance.name}`;
-      meta.textContent = `${instance.source || "tsplib"} • depot=${instance.depot} • nodes=${instance.n_vars}`;
+      meta.textContent = `${instance.source || "tsplib"} • depot=${instance.depot} • nodes=${instance.n_vars}${instance.reference ? ` • ${instance.reference.label}: ${formatDistance(instance.reference.distance)}` : ""}`;
 
       const focusBefore = solverFocus.value;
-      const options = ['<option value="">All solvers</option>']
+      const options = [`<option value="${OVERLAY_ALL}">Overlay all solvers</option>`]
         .concat(allRows.map((row) => `<option value="${row.name}">${row.name}</option>`))
         .join("\n");
       solverFocus.innerHTML = options;
-      if (allRows.some((row) => row.name === focusBefore)) {
+      if (instance.id !== activeInstanceId) {
+        solverFocus.value = bestRow?.name || OVERLAY_ALL;
+        activeInstanceId = instance.id;
+      } else if (allRows.some((row) => row.name === focusBefore) || focusBefore === OVERLAY_ALL) {
         solverFocus.value = focusBefore;
+      } else {
+        solverFocus.value = bestRow?.name || OVERLAY_ALL;
       }
 
-      const focused = solverFocus.value || null;
+      const focused = solverFocus.value === OVERLAY_ALL ? null : solverFocus.value || null;
+      const selectedRow = focused ? allRows.find((row) => row.name === focused) || bestRow : bestRow;
+
+      selectedSolver.textContent = solverFocus.value === OVERLAY_ALL ? "Overlay all solvers" : focused || bestRow?.name || "No solver";
+      if (selectedRow?.error) {
+        selectedSummary.textContent = selectedRow.error;
+      } else if (selectedRow) {
+        selectedSummary.textContent = `Best distance ${formatDistance(selectedRow.final?.best_value)} • gap ${formatGap(selectedRow.gap_to_reference_pct)} • runtime ${Number(selectedRow.final?.runtime_ms ?? 0)} ms`;
+      } else {
+        selectedSummary.textContent = "No successful solver export for this instance.";
+      }
+
+      if (instance.reference) {
+        referenceDistance.textContent = `${instance.reference.label}: ${formatDistance(instance.reference.distance)}`;
+        referenceSummary.innerHTML = instance.reference.url
+          ? `Reference value used for gap-to-BKS. <a href="${instance.reference.url}">Source</a>`
+          : "Reference value used for gap-to-BKS.";
+      } else {
+        referenceDistance.textContent = "No reference";
+        referenceSummary.textContent = "No TSPLIB reference data available for this instance.";
+      }
 
       const series = allRows
         .filter((row) => !row.error)
@@ -148,7 +214,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           route: Array.isArray(row.final?.route) ? row.final.route : [],
         }));
 
-      renderArenaChart(chartCanvas, series, focused);
+      renderArenaChart(chartCanvas, series, focused, instance.reference || null);
       renderTspMap(mapCanvas, Array.isArray(instance.nodes) ? instance.nodes : [], Number(instance.depot ?? 0), routes, focused);
     }
 
@@ -157,7 +223,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         bundle = await fetchJson("data/tsp_arena.json");
         const instances = Array.isArray(bundle.instances) ? bundle.instances : [];
         if (!instances.length) {
-          body.innerHTML = '<tr><td colspan="5">No TSPLIB instances found.</td></tr>';
+          body.innerHTML = '<tr><td colspan="6">No TSPLIB instances found.</td></tr>';
           status.textContent = "No TSPLIB arena data available.";
           meta.textContent = "Run: rastion build-site-data";
           return;
@@ -173,7 +239,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         solverFocus.addEventListener("change", renderInstance);
         window.addEventListener("resize", renderInstance);
       } catch (error) {
-        body.innerHTML = '<tr><td colspan="5">No data found.</td></tr>';
+        body.innerHTML = '<tr><td colspan="6">No data found.</td></tr>';
         status.classList.add("error");
         status.textContent = "Missing /data/tsp_arena.json. Run: rastion build-site-data";
         meta.textContent = "TSPLIB arena unavailable.";

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T18:27:03.724210+00:00",
+  "generated_at": "2026-03-07T19:04:54.517289+00:00",
   "count": 3,
   "leaderboards": [
     {
@@ -40,8 +40,23 @@
           "experimental"
         ]
       },
-      "generated_at": "2026-03-07T18:27:04.218047+00:00",
+      "generated_at": "2026-03-07T19:04:48.381132+00:00",
       "standings": [
+        {
+          "solver_id": "tsp-ortools",
+          "solver_name": "OR-Tools Routing",
+          "solver_slug": "tsp-ortools",
+          "method_class": "hybrid",
+          "listing_tier": "experimental",
+          "status_counts": {
+            "ok": 1
+          },
+          "mean_score": 2666.0,
+          "mean_runtime_ms": 2159.0872689994285,
+          "mean_gap_to_reference_pct": 3.3734005428460647,
+          "completed_instances": 1,
+          "total_instances": 1
+        },
         {
           "solver_id": "tsp-two-opt",
           "solver_name": "2-Opt Local Search",
@@ -52,7 +67,8 @@
             "ok": 1
           },
           "mean_score": 3193.0,
-          "mean_runtime_ms": 193.0424710008083,
+          "mean_runtime_ms": 244.07453200183227,
+          "mean_gap_to_reference_pct": 23.807677394338892,
           "completed_instances": 1,
           "total_instances": 1
         },
@@ -66,22 +82,9 @@
             "ok": 1
           },
           "mean_score": 3265.0,
-          "mean_runtime_ms": 13.079629999992903,
+          "mean_runtime_ms": 7.615454000188038,
+          "mean_gap_to_reference_pct": 26.599457153935635,
           "completed_instances": 1,
-          "total_instances": 1
-        },
-        {
-          "solver_id": "tsp-ortools",
-          "solver_name": "OR-Tools Routing",
-          "solver_slug": "tsp-ortools",
-          "method_class": "hybrid",
-          "listing_tier": "experimental",
-          "status_counts": {
-            "error": 1
-          },
-          "mean_score": null,
-          "mean_runtime_ms": null,
-          "completed_instances": 0,
           "total_instances": 1
         }
       ],
@@ -92,26 +95,34 @@
           "size": "large",
           "path": "examples/tsplib/a280.tsp",
           "n_vars": 280,
+          "reference": {
+            "instance_id": "a280",
+            "display_name": "a280",
+            "label": "Best known",
+            "distance": 2579.0,
+            "url": "http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/tsp95.pdf"
+          },
           "results": [
             {
-              "solver_id": "tsp-two-opt",
-              "solver_name": "2-Opt Local Search",
-              "solver_slug": "tsp-two-opt",
+              "solver_id": "tsp-ortools",
+              "solver_name": "OR-Tools Routing",
+              "solver_slug": "tsp-ortools",
               "solver_version": "0.1.0",
-              "method_class": "metaheuristic",
-              "listing_tier": "official",
-              "score": 3193.0,
-              "avg_runtime_ms": 193.0424710008083,
+              "method_class": "hybrid",
+              "listing_tier": "experimental",
+              "score": 2666.0,
+              "avg_runtime_ms": 2159.0872689994285,
+              "gap_to_reference_pct": 3.3734005428460647,
               "status": "ok",
               "error": null,
               "run_record": {
                 "suite_id": "tsplib-large-v1",
-                "solver_id": "tsp-two-opt",
+                "solver_id": "tsp-ortools",
                 "solver_version": "0.1.0",
                 "problem_variant": "tsp",
                 "instance_id": "a280",
-                "score": 3193.0,
-                "runtime": 193.0424710008083,
+                "score": 2666.0,
+                "runtime": 2159.0872689994285,
                 "status": "ok",
                 "seed_policy": {
                   "seeds": [
@@ -123,7 +134,46 @@
                   "time_budget_ms": 2000,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-07T18:27:04.218047+00:00",
+                "generated_at": "2026-03-07T19:04:48.381132+00:00",
+                "artifact_path": "data/evals/tsplib-large-v1.json",
+                "environment": {
+                  "python": "3.12.3",
+                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+                }
+              }
+            },
+            {
+              "solver_id": "tsp-two-opt",
+              "solver_name": "2-Opt Local Search",
+              "solver_slug": "tsp-two-opt",
+              "solver_version": "0.1.0",
+              "method_class": "metaheuristic",
+              "listing_tier": "official",
+              "score": 3193.0,
+              "avg_runtime_ms": 244.07453200183227,
+              "gap_to_reference_pct": 23.807677394338892,
+              "status": "ok",
+              "error": null,
+              "run_record": {
+                "suite_id": "tsplib-large-v1",
+                "solver_id": "tsp-two-opt",
+                "solver_version": "0.1.0",
+                "problem_variant": "tsp",
+                "instance_id": "a280",
+                "score": 3193.0,
+                "runtime": 244.07453200183227,
+                "status": "ok",
+                "seed_policy": {
+                  "seeds": [
+                    0
+                  ]
+                },
+                "budget_policy": {
+                  "iters": 2000,
+                  "time_budget_ms": 2000,
+                  "repeat": 1
+                },
+                "generated_at": "2026-03-07T19:04:48.381132+00:00",
                 "artifact_path": "data/evals/tsplib-large-v1.json",
                 "environment": {
                   "python": "3.12.3",
@@ -139,7 +189,8 @@
               "method_class": "heuristic",
               "listing_tier": "official",
               "score": 3265.0,
-              "avg_runtime_ms": 13.079629999992903,
+              "avg_runtime_ms": 7.615454000188038,
+              "gap_to_reference_pct": 26.599457153935635,
               "status": "ok",
               "error": null,
               "run_record": {
@@ -149,7 +200,7 @@
                 "problem_variant": "tsp",
                 "instance_id": "a280",
                 "score": 3265.0,
-                "runtime": 13.079629999992903,
+                "runtime": 7.615454000188038,
                 "status": "ok",
                 "seed_policy": {
                   "seeds": [
@@ -161,45 +212,7 @@
                   "time_budget_ms": 2000,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-07T18:27:04.218047+00:00",
-                "artifact_path": "data/evals/tsplib-large-v1.json",
-                "environment": {
-                  "python": "3.12.3",
-                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
-                }
-              }
-            },
-            {
-              "solver_id": "tsp-ortools",
-              "solver_name": "OR-Tools Routing",
-              "solver_slug": "tsp-ortools",
-              "solver_version": "0.1.0",
-              "method_class": "hybrid",
-              "listing_tier": "experimental",
-              "score": null,
-              "avg_runtime_ms": null,
-              "status": "error",
-              "error": "Protocol message RoutingSearchParameters has no \"random_seed\" field.",
-              "run_record": {
-                "suite_id": "tsplib-large-v1",
-                "solver_id": "tsp-ortools",
-                "solver_version": "0.1.0",
-                "problem_variant": "tsp",
-                "instance_id": "a280",
-                "score": null,
-                "runtime": null,
-                "status": "error",
-                "seed_policy": {
-                  "seeds": [
-                    0
-                  ]
-                },
-                "budget_policy": {
-                  "iters": 2000,
-                  "time_budget_ms": 2000,
-                  "repeat": 1
-                },
-                "generated_at": "2026-03-07T18:27:04.218047+00:00",
+                "generated_at": "2026-03-07T19:04:48.381132+00:00",
                 "artifact_path": "data/evals/tsplib-large-v1.json",
                 "environment": {
                   "python": "3.12.3",
@@ -250,8 +263,23 @@
           "experimental"
         ]
       },
-      "generated_at": "2026-03-07T18:27:03.134095+00:00",
+      "generated_at": "2026-03-07T19:04:51.208082+00:00",
       "standings": [
+        {
+          "solver_id": "tsp-ortools",
+          "solver_name": "OR-Tools Routing",
+          "solver_slug": "tsp-ortools",
+          "method_class": "hybrid",
+          "listing_tier": "experimental",
+          "status_counts": {
+            "ok": 1
+          },
+          "mean_score": 6694.0,
+          "mean_runtime_ms": 1502.0083210001758,
+          "mean_gap_to_reference_pct": 2.542892156862745,
+          "completed_instances": 1,
+          "total_instances": 1
+        },
         {
           "solver_id": "tsp-two-opt",
           "solver_name": "2-Opt Local Search",
@@ -262,7 +290,8 @@
             "ok": 1
           },
           "mean_score": 7996.0,
-          "mean_runtime_ms": 24.449776999972528,
+          "mean_runtime_ms": 22.862668996822322,
+          "mean_gap_to_reference_pct": 22.487745098039216,
           "completed_instances": 1,
           "total_instances": 1
         },
@@ -276,22 +305,9 @@
             "ok": 1
           },
           "mean_score": 8197.0,
-          "mean_runtime_ms": 3.8016550006432226,
+          "mean_runtime_ms": 2.4442689973511733,
+          "mean_gap_to_reference_pct": 25.566789215686274,
           "completed_instances": 1,
-          "total_instances": 1
-        },
-        {
-          "solver_id": "tsp-ortools",
-          "solver_name": "OR-Tools Routing",
-          "solver_slug": "tsp-ortools",
-          "method_class": "hybrid",
-          "listing_tier": "experimental",
-          "status_counts": {
-            "error": 1
-          },
-          "mean_score": null,
-          "mean_runtime_ms": null,
-          "completed_instances": 0,
           "total_instances": 1
         }
       ],
@@ -302,26 +318,34 @@
           "size": "medium",
           "path": "examples/tsplib/ch150.tsp",
           "n_vars": 150,
+          "reference": {
+            "instance_id": "ch150",
+            "display_name": "ch150",
+            "label": "Best known",
+            "distance": 6528.0,
+            "url": "http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/tsp95.pdf"
+          },
           "results": [
             {
-              "solver_id": "tsp-two-opt",
-              "solver_name": "2-Opt Local Search",
-              "solver_slug": "tsp-two-opt",
+              "solver_id": "tsp-ortools",
+              "solver_name": "OR-Tools Routing",
+              "solver_slug": "tsp-ortools",
               "solver_version": "0.1.0",
-              "method_class": "metaheuristic",
-              "listing_tier": "official",
-              "score": 7996.0,
-              "avg_runtime_ms": 24.449776999972528,
+              "method_class": "hybrid",
+              "listing_tier": "experimental",
+              "score": 6694.0,
+              "avg_runtime_ms": 1502.0083210001758,
+              "gap_to_reference_pct": 2.542892156862745,
               "status": "ok",
               "error": null,
               "run_record": {
                 "suite_id": "tsplib-medium-v1",
-                "solver_id": "tsp-two-opt",
+                "solver_id": "tsp-ortools",
                 "solver_version": "0.1.0",
                 "problem_variant": "tsp",
                 "instance_id": "ch150",
-                "score": 7996.0,
-                "runtime": 24.449776999972528,
+                "score": 6694.0,
+                "runtime": 1502.0083210001758,
                 "status": "ok",
                 "seed_policy": {
                   "seeds": [
@@ -333,7 +357,46 @@
                   "time_budget_ms": 1500,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-07T18:27:03.134095+00:00",
+                "generated_at": "2026-03-07T19:04:51.208082+00:00",
+                "artifact_path": "data/evals/tsplib-medium-v1.json",
+                "environment": {
+                  "python": "3.12.3",
+                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+                }
+              }
+            },
+            {
+              "solver_id": "tsp-two-opt",
+              "solver_name": "2-Opt Local Search",
+              "solver_slug": "tsp-two-opt",
+              "solver_version": "0.1.0",
+              "method_class": "metaheuristic",
+              "listing_tier": "official",
+              "score": 7996.0,
+              "avg_runtime_ms": 22.862668996822322,
+              "gap_to_reference_pct": 22.487745098039216,
+              "status": "ok",
+              "error": null,
+              "run_record": {
+                "suite_id": "tsplib-medium-v1",
+                "solver_id": "tsp-two-opt",
+                "solver_version": "0.1.0",
+                "problem_variant": "tsp",
+                "instance_id": "ch150",
+                "score": 7996.0,
+                "runtime": 22.862668996822322,
+                "status": "ok",
+                "seed_policy": {
+                  "seeds": [
+                    0
+                  ]
+                },
+                "budget_policy": {
+                  "iters": 1200,
+                  "time_budget_ms": 1500,
+                  "repeat": 1
+                },
+                "generated_at": "2026-03-07T19:04:51.208082+00:00",
                 "artifact_path": "data/evals/tsplib-medium-v1.json",
                 "environment": {
                   "python": "3.12.3",
@@ -349,7 +412,8 @@
               "method_class": "heuristic",
               "listing_tier": "official",
               "score": 8197.0,
-              "avg_runtime_ms": 3.8016550006432226,
+              "avg_runtime_ms": 2.4442689973511733,
+              "gap_to_reference_pct": 25.566789215686274,
               "status": "ok",
               "error": null,
               "run_record": {
@@ -359,7 +423,7 @@
                 "problem_variant": "tsp",
                 "instance_id": "ch150",
                 "score": 8197.0,
-                "runtime": 3.8016550006432226,
+                "runtime": 2.4442689973511733,
                 "status": "ok",
                 "seed_policy": {
                   "seeds": [
@@ -371,45 +435,7 @@
                   "time_budget_ms": 1500,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-07T18:27:03.134095+00:00",
-                "artifact_path": "data/evals/tsplib-medium-v1.json",
-                "environment": {
-                  "python": "3.12.3",
-                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
-                }
-              }
-            },
-            {
-              "solver_id": "tsp-ortools",
-              "solver_name": "OR-Tools Routing",
-              "solver_slug": "tsp-ortools",
-              "solver_version": "0.1.0",
-              "method_class": "hybrid",
-              "listing_tier": "experimental",
-              "score": null,
-              "avg_runtime_ms": null,
-              "status": "error",
-              "error": "Protocol message RoutingSearchParameters has no \"random_seed\" field.",
-              "run_record": {
-                "suite_id": "tsplib-medium-v1",
-                "solver_id": "tsp-ortools",
-                "solver_version": "0.1.0",
-                "problem_variant": "tsp",
-                "instance_id": "ch150",
-                "score": null,
-                "runtime": null,
-                "status": "error",
-                "seed_policy": {
-                  "seeds": [
-                    0
-                  ]
-                },
-                "budget_policy": {
-                  "iters": 1200,
-                  "time_budget_ms": 1500,
-                  "repeat": 1
-                },
-                "generated_at": "2026-03-07T18:27:03.134095+00:00",
+                "generated_at": "2026-03-07T19:04:51.208082+00:00",
                 "artifact_path": "data/evals/tsplib-medium-v1.json",
                 "environment": {
                   "python": "3.12.3",
@@ -460,8 +486,23 @@
           "experimental"
         ]
       },
-      "generated_at": "2026-03-07T18:27:03.409129+00:00",
+      "generated_at": "2026-03-07T19:04:53.074519+00:00",
       "standings": [
+        {
+          "solver_id": "tsp-ortools",
+          "solver_name": "OR-Tools Routing",
+          "solver_slug": "tsp-ortools",
+          "method_class": "hybrid",
+          "listing_tier": "experimental",
+          "status_counts": {
+            "ok": 1
+          },
+          "mean_score": 7902.0,
+          "mean_runtime_ms": 1001.7473199986853,
+          "mean_gap_to_reference_pct": 4.77326968973747,
+          "completed_instances": 1,
+          "total_instances": 1
+        },
         {
           "solver_id": "tsp-two-opt",
           "solver_name": "2-Opt Local Search",
@@ -472,7 +513,8 @@
             "ok": 1
           },
           "mean_score": 8448.0,
-          "mean_runtime_ms": 5.01799499943445,
+          "mean_runtime_ms": 5.142795998835936,
+          "mean_gap_to_reference_pct": 12.012728719172634,
           "completed_instances": 1,
           "total_instances": 1
         },
@@ -486,22 +528,9 @@
             "ok": 1
           },
           "mean_score": 8980.0,
-          "mean_runtime_ms": 0.6185649999679299,
+          "mean_runtime_ms": 0.40595199970994145,
+          "mean_gap_to_reference_pct": 19.066560594006894,
           "completed_instances": 1,
-          "total_instances": 1
-        },
-        {
-          "solver_id": "tsp-ortools",
-          "solver_name": "OR-Tools Routing",
-          "solver_slug": "tsp-ortools",
-          "method_class": "hybrid",
-          "listing_tier": "experimental",
-          "status_counts": {
-            "error": 1
-          },
-          "mean_score": null,
-          "mean_runtime_ms": null,
-          "completed_instances": 0,
           "total_instances": 1
         }
       ],
@@ -512,26 +541,34 @@
           "size": "small",
           "path": "examples/tsplib/berlin52.tsp",
           "n_vars": 52,
+          "reference": {
+            "instance_id": "berlin52",
+            "display_name": "Berlin52",
+            "label": "Best known",
+            "distance": 7542.0,
+            "url": "http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/tsp95.pdf"
+          },
           "results": [
             {
-              "solver_id": "tsp-two-opt",
-              "solver_name": "2-Opt Local Search",
-              "solver_slug": "tsp-two-opt",
+              "solver_id": "tsp-ortools",
+              "solver_name": "OR-Tools Routing",
+              "solver_slug": "tsp-ortools",
               "solver_version": "0.1.0",
-              "method_class": "metaheuristic",
-              "listing_tier": "official",
-              "score": 8448.0,
-              "avg_runtime_ms": 5.01799499943445,
+              "method_class": "hybrid",
+              "listing_tier": "experimental",
+              "score": 7902.0,
+              "avg_runtime_ms": 1001.7473199986853,
+              "gap_to_reference_pct": 4.77326968973747,
               "status": "ok",
               "error": null,
               "run_record": {
                 "suite_id": "tsplib-small-v1",
-                "solver_id": "tsp-two-opt",
+                "solver_id": "tsp-ortools",
                 "solver_version": "0.1.0",
                 "problem_variant": "tsp",
                 "instance_id": "berlin52",
-                "score": 8448.0,
-                "runtime": 5.01799499943445,
+                "score": 7902.0,
+                "runtime": 1001.7473199986853,
                 "status": "ok",
                 "seed_policy": {
                   "seeds": [
@@ -543,7 +580,46 @@
                   "time_budget_ms": 1000,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-07T18:27:03.409129+00:00",
+                "generated_at": "2026-03-07T19:04:53.074519+00:00",
+                "artifact_path": "data/evals/tsplib-small-v1.json",
+                "environment": {
+                  "python": "3.12.3",
+                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+                }
+              }
+            },
+            {
+              "solver_id": "tsp-two-opt",
+              "solver_name": "2-Opt Local Search",
+              "solver_slug": "tsp-two-opt",
+              "solver_version": "0.1.0",
+              "method_class": "metaheuristic",
+              "listing_tier": "official",
+              "score": 8448.0,
+              "avg_runtime_ms": 5.142795998835936,
+              "gap_to_reference_pct": 12.012728719172634,
+              "status": "ok",
+              "error": null,
+              "run_record": {
+                "suite_id": "tsplib-small-v1",
+                "solver_id": "tsp-two-opt",
+                "solver_version": "0.1.0",
+                "problem_variant": "tsp",
+                "instance_id": "berlin52",
+                "score": 8448.0,
+                "runtime": 5.142795998835936,
+                "status": "ok",
+                "seed_policy": {
+                  "seeds": [
+                    0
+                  ]
+                },
+                "budget_policy": {
+                  "iters": 600,
+                  "time_budget_ms": 1000,
+                  "repeat": 1
+                },
+                "generated_at": "2026-03-07T19:04:53.074519+00:00",
                 "artifact_path": "data/evals/tsplib-small-v1.json",
                 "environment": {
                   "python": "3.12.3",
@@ -559,7 +635,8 @@
               "method_class": "heuristic",
               "listing_tier": "official",
               "score": 8980.0,
-              "avg_runtime_ms": 0.6185649999679299,
+              "avg_runtime_ms": 0.40595199970994145,
+              "gap_to_reference_pct": 19.066560594006894,
               "status": "ok",
               "error": null,
               "run_record": {
@@ -569,7 +646,7 @@
                 "problem_variant": "tsp",
                 "instance_id": "berlin52",
                 "score": 8980.0,
-                "runtime": 0.6185649999679299,
+                "runtime": 0.40595199970994145,
                 "status": "ok",
                 "seed_policy": {
                   "seeds": [
@@ -581,45 +658,7 @@
                   "time_budget_ms": 1000,
                   "repeat": 1
                 },
-                "generated_at": "2026-03-07T18:27:03.409129+00:00",
-                "artifact_path": "data/evals/tsplib-small-v1.json",
-                "environment": {
-                  "python": "3.12.3",
-                  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
-                }
-              }
-            },
-            {
-              "solver_id": "tsp-ortools",
-              "solver_name": "OR-Tools Routing",
-              "solver_slug": "tsp-ortools",
-              "solver_version": "0.1.0",
-              "method_class": "hybrid",
-              "listing_tier": "experimental",
-              "score": null,
-              "avg_runtime_ms": null,
-              "status": "error",
-              "error": "Protocol message RoutingSearchParameters has no \"random_seed\" field.",
-              "run_record": {
-                "suite_id": "tsplib-small-v1",
-                "solver_id": "tsp-ortools",
-                "solver_version": "0.1.0",
-                "problem_variant": "tsp",
-                "instance_id": "berlin52",
-                "score": null,
-                "runtime": null,
-                "status": "error",
-                "seed_policy": {
-                  "seeds": [
-                    0
-                  ]
-                },
-                "budget_policy": {
-                  "iters": 600,
-                  "time_budget_ms": 1000,
-                  "repeat": 1
-                },
-                "generated_at": "2026-03-07T18:27:03.409129+00:00",
+                "generated_at": "2026-03-07T19:04:53.074519+00:00",
                 "artifact_path": "data/evals/tsplib-small-v1.json",
                 "environment": {
                   "python": "3.12.3",

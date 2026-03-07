@@ -1,15 +1,15 @@
 # OR-Tools Routing
 
-This adapter exposes OR-Tools as an experimental TSP listing inside Rastion's public hub.
+This adapter exposes Google OR-Tools as an experimental TSP solver inside Rastion.
 
-## Why it exists
+## Why it is included
 
-- provides a familiar external optimization backend
-- shows how optional dependencies surface in solver cards and eval runs
-- gives contributors an example of a non-core adapter with a stronger search backend
+- Provides an external comparison point alongside the built-in heuristics.
+- Exercises the optional-dependency path used by the local eval and export flow.
+- Shows how a third-party routing backend can be wrapped in the same solver card and suite interfaces.
 
 ## Current limits
 
-- requires the `ortools` extra
-- still represented as TSP only in the v0.1 catalog
-- broader routing capabilities are intentionally outside the current public release
+- Requires the `ortools` extra.
+- The current adapter covers single-route TSP only.
+- Broader vehicle-routing features are outside the v0.1 public surface.

@@ -4,14 +4,14 @@ import PageIntro from "../components/PageIntro.astro";
 import TrustNote from "../components/TrustNote.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
-<BaseLayout title="Rastion • Solver Catalog" description="Executable TSP solver cards for the Rastion public TSP hub." canonical="/solvers/" wide={true}>
+<BaseLayout title="Rastion • Solver Catalog" description="Executable TSP solver cards with install details, limits, and official suite coverage." canonical="/solvers/" wide={true}>
   <PageIntro
     eyebrow="Solvers"
-    title="Executable solver cards"
-    lede="Browse the current Phase 1 catalog by method, tested scale, evaluation coverage, and solver detail page."
+    title="Executable TSP solver cards"
+    lede="Each card points to a real adapter in the repo and lists the install path, method, limits, references, and official suite coverage."
   >
-    <TrustNote slot="note" href="../about/#phase-1" linkLabel="What Phase 1 includes">
-      Executable TSP solvers in Phase 1.
+    <TrustNote slot="note" href="../about/#evaluation" linkLabel="How official coverage is generated">
+      Coverage counts are taken from the current suite exports in `web/public/data`.
     </TrustNote>
   </PageIntro>
 
