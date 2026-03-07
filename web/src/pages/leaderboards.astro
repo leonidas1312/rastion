@@ -1,21 +1,19 @@
 ---
-import LeaderboardsTable from "../components/LeaderboardsTable.astro";
-import PageIntro from "../components/PageIntro.astro";
-import TrustNote from "../components/TrustNote.astro";
+import RedirectNotice from "../components/RedirectNotice.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+const base = import.meta.env.BASE_URL;
 ---
-<BaseLayout title="Rastion • Leaderboards" description="Official TSP suite results with distance, gap-to-BKS, runtime, and coverage." canonical="/leaderboards/" wide={true}>
-  <PageIntro
-    eyebrow="Leaderboards"
-    title="Official suite results"
-    lede="These tables come from versioned suite definitions with fixed instances, budgets, seeds, and generated artifacts checked into the public site data."
-  >
-    <TrustNote slot="note" href="../about/#evaluation" linkLabel="How evaluation works">
-      Distances stay suite-scoped. Gap-to-BKS is computed from the TSPLIB reference for the shipped instance.
-    </TrustNote>
-  </PageIntro>
-
-  <section class="section-block">
-    <LeaderboardsTable />
-  </section>
+<BaseLayout
+  title="Rastion • Official Results"
+  description="Official TSP suite results now live inside the Arena page."
+  canonical="/arena/"
+  redirectTo="/arena/#official-results"
+  noIndex={true}
+>
+  <RedirectNotice
+    target={`${base}arena/#official-results`}
+    title="Official results moved into Arena"
+    description="The standalone Leaderboards page has been folded into Arena. Official suite results now live below the replay and trace views."
+    ctaLabel="Open Arena results"
+  />
 </BaseLayout>

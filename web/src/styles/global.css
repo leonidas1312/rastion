@@ -297,6 +297,13 @@ main {
   font-size: 0.9rem;
 }
 
+.note-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
 .inline-link {
   color: var(--primary-strong);
   font-weight: 500;

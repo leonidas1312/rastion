@@ -10,7 +10,7 @@ const updated = payload?.generated_at ? new Date(payload.generated_at).toLocaleS
 ---
 <section class="section-panel stack-lg">
   <p class="status">
-    {updated ? `Last updated: ${updated} • ${suites.length} official suite leaderboard${suites.length === 1 ? "" : "s"}` : "No leaderboard export found. Run `rastion build-site-data`."}
+    {updated ? `Last updated: ${updated} • ${suites.length} official suite result set${suites.length === 1 ? "" : "s"}` : "No official results export found. Run `rastion build-site-data`."}
   </p>
   {
     suites.length ? (

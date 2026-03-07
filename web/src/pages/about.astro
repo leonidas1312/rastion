@@ -21,7 +21,7 @@ const suiteCount = suiteRows.length;
   <PageIntro
     eyebrow="About"
     title="How the public TSP site is put together"
-    lede="Rastion publishes one small TSP dataset across three views: solver cards, suite results, and arena replays generated from the same repo."
+    lede="Rastion publishes one small TSP dataset across two public surfaces: solver cards and an Arena page that combines official results with replayable TSPLIB runs."
   >
     <TrustNote slot="note" href="#evaluation" linkLabel="Jump to evaluation details">
       The current public dataset contains {solverCount} solver cards and {suiteCount} official suite exports.
@@ -31,8 +31,8 @@ const suiteCount = suiteRows.length;
   <section class="section-block section-panel" id="positioning">
     <div class="section-heading">
       <p class="kicker">What ships</p>
-      <h2>One dataset, three public views</h2>
-      <p>The site reads generated JSON from `web/public/data` and renders it as catalog pages, suite tables, and an arena view. The point is not to cover every routing problem; it is to make one TSP workflow legible end to end.</p>
+      <h2>One dataset, two public surfaces</h2>
+      <p>The site reads generated JSON from `web/public/data` and renders it as solver pages plus one Arena surface for replay and official results. The point is not to cover every routing problem; it is to make one TSP workflow legible end to end.</p>
     </div>
   </section>
 
@@ -47,12 +47,8 @@ const suiteCount = suiteRows.length;
         <p>Executable TSP solver cards with installation, limits, references, and current suite coverage.</p>
       </article>
       <article class="destination-card">
-        <h3>Leaderboards</h3>
-        <p>Official suite results with distance, gap-to-BKS, runtime, status, and artifact paths.</p>
-      </article>
-      <article class="destination-card">
         <h3>Arena</h3>
-        <p>Replayable route geometry and best-distance-over-time traces for the exported TSPLIB runs.</p>
+        <p>Replayable route geometry, best-distance-over-time traces, and official suite results for the exported TSPLIB runs.</p>
       </article>
       <article class="destination-card">
         <h3>Contributor flow</h3>
@@ -90,7 +86,7 @@ const suiteCount = suiteRows.length;
     <div class="section-heading">
       <p class="kicker">Official suites</p>
       <h2>Current suite definitions</h2>
-      <p>The suite table is the source for the public leaderboards and the arena instance set.</p>
+      <p>The suite table is the source for the official Arena results section and the arena instance set.</p>
     </div>
     <SuitesTable />
   </section>

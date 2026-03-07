@@ -1,4 +1,5 @@
 ---
+import LeaderboardsTable from "../components/LeaderboardsTable.astro";
 import PageIntro from "../components/PageIntro.astro";
 import TrustNote from "../components/TrustNote.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
@@ -7,10 +8,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   <PageIntro
     eyebrow="Arena"
     title="TSP Arena"
-    lede="The arena replays one exported TSPLIB run at a time. The map shows the full closed tour, the table shows the final score, and the plot shows best full-tour distance over elapsed time."
+    lede="Arena is the public results surface for Rastion's TSP release. Replay one exported TSPLIB run at a time, inspect the recorded trace, and read the official suite results from the same generated data."
   >
     <TrustNote slot="note" href="../about/#evaluation" linkLabel="Official eval context">
-      Best-known distances come from the TSPLIB reference. Arena rows use the same generated exports as the public leaderboards.
+      Best-known distances come from the TSPLIB reference. Arena instance results and official suite results use the same generated exports.
     </TrustNote>
   </PageIntro>
 
@@ -47,7 +48,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     </section>
 
     <section class="card">
-      <h2>Leaderboard</h2>
+      <h2>Instance Results</h2>
+      <p class="subtle">These rows cover the currently selected exported TSPLIB run only. Official suite standings appear below.</p>
       <p class="status" id="arena-status">Loading solver results...</p>
       <div class="table-wrap">
         <table>
@@ -74,6 +76,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       <canvas class="chart" id="arena-chart" width="960" height="340"></canvas>
     </section>
   </div>
+
+  <section class="section-block" id="official-results">
+    <div class="section-heading">
+      <p class="kicker">Official suite results</p>
+      <h2>Versioned evaluation tables</h2>
+      <p>These tables come from the generated suite exports checked into `web/public/data`. They keep suite definitions, budgets, seeds, and standings visible alongside the replay surface.</p>
+    </div>
+    <LeaderboardsTable />
+  </section>
 
   <script>
     import { renderArenaChart } from "../components/ArenaChart";

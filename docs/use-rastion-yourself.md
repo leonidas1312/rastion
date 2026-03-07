@@ -55,4 +55,4 @@ npm run build
 - `web/public/data/tsp_arena.json`
 - `web/dist/index.html`
 
-The public release should read consistently as a TSP-only product with three visible surfaces: solver cards, reproducible evals, and replayable TSPLIB demos.
+The public release should read consistently as a TSP-only product with two visible surfaces: solver cards and an Arena page that combines reproducible evals with replayable TSPLIB demos.
