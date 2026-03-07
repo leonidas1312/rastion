@@ -53,7 +53,7 @@
     } catch (error) {
       body.innerHTML = '<tr><td colspan="6">No data found.</td></tr>';
       status.classList.add("error");
-      status.textContent = "Missing /data/solvers.json. Run: python -m rastion demo-site";
+      status.textContent = "Missing /data/solvers.json. Run: rastion build-site-data";
       console.error(error);
     }
   }

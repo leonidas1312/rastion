@@ -55,7 +55,7 @@
     } catch (error) {
       body.innerHTML = '<tr><td colspan="7">No data found.</td></tr>';
       status.classList.add("error");
-      status.textContent = "Missing /data/benchmarks.json. Run: python -m rastion demo-site";
+      status.textContent = "Missing /data/benchmarks.json. Run: rastion build-site-data";
       console.error(error);
     }
   }

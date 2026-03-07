@@ -8,8 +8,11 @@ import SuitesTable from "../components/SuitesTable.astro";
     <h1>Official Suites</h1>
     <p>
       Suites are versioned, curated, and intentionally narrow. They are the trust layer behind the catalog and
-      leaderboards: fixed instances, fixed budgets, fixed seeds, and explicit artifact paths.
+      leaderboards: fixed instances, fixed budgets, fixed seeds, and explicit artifact paths. The current three suites
+      are marked as a bootstrap track because each one presently contains a single TSPLIB instance from the shipped
+      repo corpus.
     </p>
+    <p><a href="../methodology/">Why the current track is labeled bootstrap</a></p>
   </section>
   <div class="grid cards" style="margin-top: 1rem;">
     <article class="card">
@@ -24,6 +27,13 @@ import SuitesTable from "../components/SuitesTable.astro";
       <p>
         CVRP, VRPTW, and other routing variants should land only after the problem schema, result schema, and
         visualization contract can represent multiple vehicles and richer constraints honestly.
+      </p>
+    </article>
+    <article class="card">
+      <h2>Why Bootstrap?</h2>
+      <p>
+        The current suite set is intentionally small and auditable. It is enough to compare adapters honestly, but not
+        enough to justify broad performance claims beyond the shipped corpus.
       </p>
     </article>
   </div>

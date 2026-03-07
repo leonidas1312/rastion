@@ -288,6 +288,19 @@ tbody tr:last-child td {
   font-size: 0.9rem;
 }
 
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--primary-soft);
+  color: var(--text);
+}
+
 .list-reset {
   margin: 0;
   padding-left: 1.1rem;
@@ -348,6 +361,41 @@ pre {
 
 code {
   font-family: "Cascadia Code", "IBM Plex Mono", "JetBrains Mono", Consolas, monospace;
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+  margin-top: 1.2rem;
+}
+
+.prose p,
+.prose ul,
+.prose ol {
+  max-width: 70ch;
+}
+
+.prose code {
+  padding: 0.08rem 0.32rem;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--surface-strong), var(--primary-soft) 16%);
+}
+
+.prose pre {
+  overflow-x: auto;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface-strong), var(--primary-soft) 10%);
+}
+
+.prose pre code {
+  padding: 0;
+  background: transparent;
 }
 
 .footer {

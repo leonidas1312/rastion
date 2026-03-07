@@ -1,0 +1,49 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+const base = import.meta.env.BASE_URL;
+---
+<BaseLayout title="Rastion • Launch" description="Phase 1 launch framing for the routing-first Rastion hub.">
+  <section class="hero">
+    <p class="kicker">Launch</p>
+    <h1>Rastion Phase 1: Routing First, TSP Concrete</h1>
+    <p>
+      Rastion now ships as a routing-first solver hub for Python. The public claim is intentionally narrow: executable
+      TSP solver cards, bootstrap TSPLIB evals, replayable route demos, and a contributor workflow that produces
+      artifacts instead of hand-wavy benchmark claims.
+    </p>
+    <div class="hero-actions">
+      <a class="button-primary" href={`${base}why-routing/`}>Why this wedge</a>
+      <a class="button-secondary" href={`${base}methodology/`}>Methodology</a>
+      <a class="button-secondary" href={`${base}solver-comparison/`}>Current solver comparison</a>
+    </div>
+  </section>
+
+  <div class="grid cards" style="margin-top: 1rem;">
+    <article class="card">
+      <h2>What is live</h2>
+      <ul class="list-reset">
+        <li>Three executable TSP solver cards.</li>
+        <li>Three official bootstrap suites built from the current TSPLIB corpus.</li>
+        <li>Suite-scoped leaderboards with artifact paths and status recording.</li>
+        <li>Replayable TSP arena exports for route geometry and progress traces.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h2>What we are not claiming</h2>
+      <ul class="list-reset">
+        <li>VRP support today.</li>
+        <li>Multi-route visuals today.</li>
+        <li>A universal best-routing-solver ranking.</li>
+        <li>Benchmark evidence broader than the current corpus supports.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h2>What comes after the freeze</h2>
+      <ul class="list-reset">
+        <li>Deeper suite coverage.</li>
+        <li>More solver entries.</li>
+        <li>Then CVRP and richer routing contracts when the result model can represent them honestly.</li>
+      </ul>
+    </article>
+  </div>
+</BaseLayout>

@@ -22,17 +22,17 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     </article>
     <article class="card">
       <h2>3. Validate the catalog</h2>
-      <pre><code>python -m rastion validate-cards</code></pre>
+      <pre><code>rastion validate-cards</code></pre>
     </article>
     <article class="card">
       <h2>4. Run the official suites</h2>
-      <pre><code>python -m rastion eval-suite tsplib-small-v1
-python -m rastion eval-suite tsplib-medium-v1
-python -m rastion eval-suite tsplib-large-v1</code></pre>
+      <pre><code>rastion eval-suite tsplib-small-v1
+rastion eval-suite tsplib-medium-v1
+rastion eval-suite tsplib-large-v1</code></pre>
     </article>
     <article class="card">
       <h2>5. Build site artifacts</h2>
-      <pre><code>python -m rastion build-site-data</code></pre>
+      <pre><code>rastion build-site-data</code></pre>
     </article>
     <article class="card">
       <h2>6. Submit the PR</h2>
@@ -48,5 +48,6 @@ python -m rastion eval-suite tsplib-large-v1</code></pre>
       <li>Official suites are curated and suite-scoped. There is no single global routing leaderboard.</li>
       <li>Experimental listings are allowed, but dependency and coverage gaps must remain visible.</li>
     </ul>
+    <p><a href="../add-a-tsp-solver/">Open the repo-verified walkthrough</a></p>
   </section>
 </BaseLayout>

@@ -4,6 +4,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const leaderboardsPath = new URL("../../../public/data/leaderboards.json", import.meta.url);
+const detailModules = import.meta.glob("../../../../catalog/solvers/*/README.md");
 
 export function getStaticPaths() {
   const cardsDir = new URL("../../../../catalog/solvers/", import.meta.url);
@@ -21,20 +22,39 @@ export function getStaticPaths() {
 
 const { card } = Astro.props;
 let suiteRows = [];
+let performanceSummary = {
+  suitesWon: 0,
+  bestRank: null,
+  worstRank: null,
+};
 if (existsSync(leaderboardsPath)) {
   const payload = JSON.parse(readFileSync(leaderboardsPath, "utf-8"));
   const leaderboards = Array.isArray(payload.leaderboards) ? payload.leaderboards : [];
   suiteRows = leaderboards
     .map((item) => {
-      const row = Array.isArray(item.standings) ? item.standings.find((candidate) => candidate.solver_id === card.id) : null;
+      const standings = Array.isArray(item.standings) ? item.standings : [];
+      const row = standings.find((candidate) => candidate.solver_id === card.id);
       if (!row) return null;
       return {
         suite: item.suite,
         row,
+        rank: standings.findIndex((candidate) => candidate.solver_id === card.id) + 1,
       };
     })
     .filter(Boolean);
+
+  const ranks = suiteRows.map((item) => item.rank).filter((value) => value > 0);
+  performanceSummary = {
+    suitesWon: ranks.filter((value) => value === 1).length,
+    bestRank: ranks.length ? Math.min(...ranks) : null,
+    worstRank: ranks.length ? Math.max(...ranks) : null,
+  };
 }
+
+const detailKey = `../../../../catalog/solvers/${card.id}/README.md`;
+const detailLoader = detailModules[detailKey];
+const detailModule = detailLoader ? await detailLoader() : null;
+const DetailContent = detailModule?.Content;
 ---
 <BaseLayout title={`Rastion • ${card.name}`} description={card.summary}>
   <section class="hero">
@@ -45,6 +65,7 @@ if (existsSync(leaderboardsPath)) {
       <a class="button-primary" href={card.repository}>Repository</a>
       <a class="button-secondary" href={card.homepage}>Homepage</a>
       <a class="button-secondary" href="../../leaderboards/">View official suites</a>
+      <a class="button-secondary" href="../../methodology/">Methodology</a>
     </div>
   </section>
 
@@ -65,7 +86,21 @@ if (existsSync(leaderboardsPath)) {
       <p><strong>Runtime solver name:</strong> {card.adapter.solver_name}</p>
       <p><strong>Adapter path:</strong> <code>{card.adapter.path}</code></p>
     </article>
+    <article class="card">
+      <p class="kicker">Current Performance</p>
+      <h2>Bootstrap Track Summary</h2>
+      <p><strong>Suite wins:</strong> {performanceSummary.suitesWon}</p>
+      <p><strong>Best placement:</strong> {performanceSummary.bestRank ?? "n/a"}</p>
+      <p><strong>Worst placement:</strong> {performanceSummary.worstRank ?? "n/a"}</p>
+      <p class="subtle">Read this as Phase 1 bootstrap evidence, not a universal routing claim.</p>
+    </article>
   </div>
+
+  <section class="card prose" style="margin-top: 1rem;">
+    <p class="kicker">Narrative</p>
+    <h2>Solver Notes</h2>
+    {DetailContent ? <DetailContent /> : <p class="subtle">No solver detail markdown found.</p>}
+  </section>
 
   <div class="grid cards" style="margin-top: 1rem;">
     <article class="card">
@@ -100,6 +135,7 @@ if (existsSync(leaderboardsPath)) {
             <thead>
               <tr>
                 <th>Suite</th>
+                <th>Rank</th>
                 <th>Method</th>
                 <th>Mean Distance</th>
                 <th>Mean Runtime (ms)</th>
@@ -110,6 +146,7 @@ if (existsSync(leaderboardsPath)) {
               {suiteRows.map((item) => (
                 <tr>
                   <td><strong>{item.suite.title}</strong><br /><span class="subtle">{item.suite.id}</span></td>
+                  <td>{item.rank}</td>
                   <td>{item.row.method_class}</td>
                   <td>{item.row.mean_score === null ? "n/a" : Number(item.row.mean_score).toFixed(2)}</td>
                   <td>{item.row.mean_runtime_ms === null ? "n/a" : Number(item.row.mean_runtime_ms).toFixed(2)}</td>
@@ -119,8 +156,9 @@ if (existsSync(leaderboardsPath)) {
             </tbody>
           </table>
         </div>
+        <p class="subtle">These results come from the current bootstrap track. They are reproducible local evidence, not a global TSP verdict.</p>
       ) : (
-        <p class="subtle">No generated suite artifacts found yet. Run <code>python -m rastion build-site-data</code>.</p>
+        <p class="subtle">No generated suite artifacts found yet. Run <code>rastion build-site-data</code>.</p>
       )
     }
   </section>

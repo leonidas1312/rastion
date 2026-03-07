@@ -45,12 +45,13 @@ const base = import.meta.env.BASE_URL;
         keeps the public schemas VRP-ready so CVRP and other variants can slot in without redoing the catalog contract.
       </p>
       <p class="subtle">TSP is supported today. VRP is roadmap work, not implied current capability.</p>
+      <a href={`${base}why-routing/`}>Read the positioning note</a>
     </article>
     <article class="card">
       <p class="kicker">5-Minute Quickstart</p>
       <h2>Build The Static Hub Locally</h2>
       <pre><code>pip install -e .
-python -m rastion build-site-data
+rastion build-site-data
 cd web && npm install && npm run dev</code></pre>
       <p class="status" id="home-updated">Loading latest routing export timestamps...</p>
     </article>
@@ -63,6 +64,36 @@ cd web && npm install && npm run dev</code></pre>
         unstructured claims.
       </p>
       <a href={`${base}contribute/`}>Open contribution path</a>
+    </article>
+  </section>
+
+  <section class="grid cards" style="margin-top: 1rem;">
+    <article class="card">
+      <p class="kicker">Methodology</p>
+      <h2>Bootstrap, Not Hype</h2>
+      <p>
+        The current official suites are intentionally labeled as a bootstrap track. Fixed seeds, fixed budgets, and a
+        small TSPLIB corpus make the published rankings auditable without pretending they answer every TSP question.
+      </p>
+      <a href={`${base}methodology/`}>Read methodology</a>
+    </article>
+    <article class="card">
+      <p class="kicker">Comparison</p>
+      <h2>Why These Three Solvers</h2>
+      <p>
+        The current set establishes a floor, a stronger default baseline, and an optional external backend. The point
+        is to make the hub legible, not to imitate a mature benchmark zoo on day one.
+      </p>
+      <a href={`${base}solver-comparison/`}>Read comparison</a>
+    </article>
+    <article class="card">
+      <p class="kicker">Launch</p>
+      <h2>Phase 1 Framing</h2>
+      <p>
+        The launch note spells out exactly what is live, what is not, and why the freeze is focused on trust and
+        content before Phase 2 expansion.
+      </p>
+      <a href={`${base}launch/`}>Read launch note</a>
     </article>
   </section>
 
@@ -82,7 +113,7 @@ cd web && npm install && npm run dev</code></pre>
           .filter((value) => typeof value === "string" && value.length > 0);
 
         if (!resolved.length) {
-          status.textContent = "No exports found yet. Run: python -m rastion build-site-data";
+          status.textContent = "No exports found yet. Run: rastion build-site-data";
           return;
         }
 

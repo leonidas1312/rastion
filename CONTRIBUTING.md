@@ -11,22 +11,24 @@ adapters, explicit metadata, and reproducible suite outputs.
 4. Validate the catalog:
 
 ```bash
-python -m rastion validate-cards
+rastion validate-cards
 ```
 
 5. Run the official TSP suites:
 
 ```bash
-python -m rastion eval-suite tsplib-small-v1
-python -m rastion eval-suite tsplib-medium-v1
-python -m rastion eval-suite tsplib-large-v1
+rastion eval-suite tsplib-small-v1
+rastion eval-suite tsplib-medium-v1
+rastion eval-suite tsplib-large-v1
 ```
 
 6. Regenerate site artifacts:
 
 ```bash
-python -m rastion build-site-data
+rastion build-site-data
 ```
+
+For a repo-verified walkthrough, use [docs/add-a-tsp-solver.md](docs/add-a-tsp-solver.md).
 
 ## Listing Rules
 
@@ -35,6 +37,7 @@ python -m rastion build-site-data
 - `vrp` and richer routing variants are roadmap work.
 - Public listings require executable adapters plus solver cards.
 - Official leaderboards are suite-scoped and curated.
+- The current official suites are a bootstrap track, not a claim of broad TSP supremacy.
 
 ## Engineering Rules
 

@@ -1,0 +1,70 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+const base = import.meta.env.BASE_URL;
+---
+<BaseLayout title="Rastion • Why Routing First" description="Why Rastion starts with routing, and why TSP is the first fully supported vertical.">
+  <section class="hero">
+    <p class="kicker">Positioning</p>
+    <h1>Why Routing First, and Why TSP First</h1>
+    <p>
+      Rastion is deliberately not trying to be a generic optimization showcase. Routing is the narrower wedge that can
+      become a real solver hub: recognizable benchmarks, visual route geometry, reproducible artifacts, and a clean
+      path from TSP into richer vehicle-routing variants.
+    </p>
+    <div class="hero-actions">
+      <a class="button-primary" href={`${base}solvers/`}>Browse solver cards</a>
+      <a class="button-secondary" href={`${base}methodology/`}>Read the methodology</a>
+    </div>
+  </section>
+
+  <div class="grid cards" style="margin-top: 1rem;">
+    <article class="card">
+      <p class="kicker">Why not "all OR"?</p>
+      <h2>Coherence Beats Breadth</h2>
+      <p>
+        A broad optimization catalog becomes vague quickly. Routing gives Rastion a single language for instances,
+        routes, solver behavior, and evaluation artifacts. That makes the current product legible to routing builders
+        and honest to outside readers.
+      </p>
+    </article>
+    <article class="card">
+      <p class="kicker">Why TSP first?</p>
+      <h2>Executable and Visual Today</h2>
+      <p>
+        TSP already exists end to end in this repo: TSPLIB loading, executable adapters, replayable route traces, and
+        static exports. That makes it the right first vertical while multi-vehicle semantics are still out of scope.
+      </p>
+    </article>
+    <article class="card">
+      <p class="kicker">Why mention VRP at all?</p>
+      <h2>Roadmap, Not Pretend Support</h2>
+      <p>
+        The catalog and website speak the routing language now so CVRP and richer variants can land without a product
+        rewrite. That is roadmap positioning, not a claim that Phase 1 already executes VRP workloads.
+      </p>
+    </article>
+  </div>
+
+  <section class="card" style="margin-top: 1rem;">
+    <p class="kicker">Current Product Contract</p>
+    <h2>What Phase 1 Actually Ships</h2>
+    <ul class="list-reset">
+      <li>Executable TSP solver cards with installation, method class, limits, and references.</li>
+      <li>Official bootstrap TSPLIB suites with fixed budgets and seeds.</li>
+      <li>Suite-scoped leaderboards instead of a fake global routing ranking.</li>
+      <li>Replayable TSP arena artifacts with route geometry and progress traces.</li>
+      <li>A contributor workflow for adding new TSP solver entries end to end.</li>
+    </ul>
+  </section>
+
+  <section class="card" style="margin-top: 1rem;">
+    <p class="kicker">What This Is Not</p>
+    <h2>Claims Rastion Refuses to Make</h2>
+    <ul class="list-reset">
+      <li>VRP support today.</li>
+      <li>Multi-route visualization today.</li>
+      <li>A universal ranking of "the best routing solver".</li>
+      <li>Benchmark claims broader than the current published suite corpus justifies.</li>
+    </ul>
+  </section>
+</BaseLayout>

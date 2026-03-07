@@ -104,7 +104,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       if (!instance) {
         body.innerHTML = '<tr><td colspan="5">No TSPLIB instances available.</td></tr>';
         status.textContent = "No arena data available.";
-        meta.textContent = "Run: python -m rastion build-site-data";
+        meta.textContent = "Run: rastion build-site-data";
         return;
       }
 
@@ -157,7 +157,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         if (!instances.length) {
           body.innerHTML = '<tr><td colspan="5">No TSPLIB instances found.</td></tr>';
           status.textContent = "No TSPLIB arena data available.";
-          meta.textContent = "Run: python -m rastion build-site-data";
+          meta.textContent = "Run: rastion build-site-data";
           return;
         }
 
@@ -173,7 +173,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       } catch (error) {
         body.innerHTML = '<tr><td colspan="5">No data found.</td></tr>';
         status.classList.add("error");
-        status.textContent = "Missing /data/tsp_arena.json. Run: python -m rastion build-site-data";
+        status.textContent = "Missing /data/tsp_arena.json. Run: rastion build-site-data";
         meta.textContent = "TSPLIB arena unavailable.";
         console.error(error);
       }

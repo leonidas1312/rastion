@@ -19,6 +19,7 @@
     const instanceLabels = Array.isArray(suitePayload.instances)
       ? suitePayload.instances.map((instance) => `${instance.label} (${instance.size})`).join(", ")
       : "n/a";
+    const track = Array.isArray(suitePayload.instances) && suitePayload.instances.length <= 1 ? "bootstrap v0" : "expanded";
     const rows = standings.length
       ? standings
           .map(
@@ -39,10 +40,11 @@
           <p class="kicker">Suite</p>
           <h3>${suite.title || "Unknown suite"}</h3>
         </div>
-        <div class="subtle">${suite.problem_variant || "n/a"} • ${instanceLabels}</div>
+        <div class="subtle">${suite.problem_variant || "n/a"} • ${instanceLabels} • <span class="badge">${track}</span></div>
       </div>
       <p>${suite.description || ""}</p>
       <p class="subtle">Budget: ${suite.budget_policy?.iters ?? "n/a"} iterations, ${suite.budget_policy?.time_budget_ms ?? "n/a"} ms, seeds ${(suite.seed_policy?.seeds || []).join(", ") || "n/a"}.</p>
+      <p class="subtle">Interpretation: these current results are official within Rastion's Phase 1 bootstrap track, not a global TSP verdict.</p>
       <div class="table-wrap">
         <table>
           <thead>
@@ -72,11 +74,11 @@
       }
 
       root.innerHTML = rows.map(tableHtml).join("\n");
-      status.textContent = `Last updated: ${formatIso(payload.generated_at)} • ${rows.length} suite leaderboards`;
+      status.textContent = `Last updated: ${formatIso(payload.generated_at)} • ${rows.length} suite leaderboards • bootstrap track`;
     } catch (error) {
       root.innerHTML = '<div class="card">No data found.</div>';
       status.classList.add("error");
-      status.textContent = "Missing /data/leaderboards.json. Run: python -m rastion build-site-data";
+      status.textContent = "Missing /data/leaderboards.json. Run: rastion build-site-data";
       console.error(error);
     }
   }

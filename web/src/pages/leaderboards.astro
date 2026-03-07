@@ -8,8 +8,11 @@ import LeaderboardsTable from "../components/LeaderboardsTable.astro";
     <h1>Leaderboards</h1>
     <p>
       Rankings are suite-scoped, TSP-only, and generated from curated TSPLIB instances with fixed budgets and seeds.
-      Phase 1 does not publish a fake "best routing solver" global ranking.
+      The current published track is a bootstrap track: official within Rastion, intentionally narrow, and explicit
+      about what the current suite corpus does and does not prove. Phase 1 does not publish a fake "best routing
+      solver" global ranking.
     </p>
+    <p><a href="../methodology/">Read the methodology and caveats</a></p>
   </section>
   <div class="grid" style="margin-top: 1rem;">
     <LeaderboardsTable />

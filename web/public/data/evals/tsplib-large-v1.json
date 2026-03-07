@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T15:45:51.649242+00:00",
+  "generated_at": "2026-03-06T16:27:49.901436+00:00",
   "suite": {
     "id": "tsplib-large-v1",
     "title": "TSPLIB Large v1",
@@ -53,7 +53,7 @@
           "method_class": "metaheuristic",
           "listing_tier": "official",
           "score": 3193.0,
-          "avg_runtime_ms": 62.047403999713424,
+          "avg_runtime_ms": 66.2456950003616,
           "status": "ok",
           "error": null,
           "run_record": {
@@ -63,7 +63,7 @@
             "problem_variant": "tsp",
             "instance_id": "a280",
             "score": 3193.0,
-            "runtime": 62.047403999713424,
+            "runtime": 66.2456950003616,
             "status": "ok",
             "seed_policy": {
               "seeds": [
@@ -75,7 +75,7 @@
               "time_budget_ms": 2000,
               "repeat": 1
             },
-            "generated_at": "2026-03-06T15:45:51.649242+00:00",
+            "generated_at": "2026-03-06T16:27:49.901436+00:00",
             "artifact_path": "data/evals/tsplib-large-v1.json",
             "environment": {
               "python": "3.12.3",
@@ -91,7 +91,7 @@
           "method_class": "heuristic",
           "listing_tier": "official",
           "score": 3265.0,
-          "avg_runtime_ms": 10.9855220002828,
+          "avg_runtime_ms": 11.541063999175094,
           "status": "ok",
           "error": null,
           "run_record": {
@@ -101,7 +101,7 @@
             "problem_variant": "tsp",
             "instance_id": "a280",
             "score": 3265.0,
-            "runtime": 10.9855220002828,
+            "runtime": 11.541063999175094,
             "status": "ok",
             "seed_policy": {
               "seeds": [
@@ -113,7 +113,7 @@
               "time_budget_ms": 2000,
               "repeat": 1
             },
-            "generated_at": "2026-03-06T15:45:51.649242+00:00",
+            "generated_at": "2026-03-06T16:27:49.901436+00:00",
             "artifact_path": "data/evals/tsplib-large-v1.json",
             "environment": {
               "python": "3.12.3",
@@ -151,7 +151,7 @@
               "time_budget_ms": 2000,
               "repeat": 1
             },
-            "generated_at": "2026-03-06T15:45:51.649242+00:00",
+            "generated_at": "2026-03-06T16:27:49.901436+00:00",
             "artifact_path": "data/evals/tsplib-large-v1.json",
             "environment": {
               "python": "3.12.3",
@@ -173,7 +173,7 @@
         "ok": 1
       },
       "mean_score": 3193.0,
-      "mean_runtime_ms": 62.047403999713424,
+      "mean_runtime_ms": 66.2456950003616,
       "completed_instances": 1,
       "total_instances": 1
     },
@@ -187,7 +187,7 @@
         "ok": 1
       },
       "mean_score": 3265.0,
-      "mean_runtime_ms": 10.9855220002828,
+      "mean_runtime_ms": 11.541063999175094,
       "completed_instances": 1,
       "total_instances": 1
     },

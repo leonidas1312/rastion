@@ -1,0 +1,81 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+const base = import.meta.env.BASE_URL;
+---
+<BaseLayout title="Rastion • Methodology" description="How Rastion defines official TSP bootstrap suites, seeds, budgets, and ranking caveats.">
+  <section class="hero">
+    <p class="kicker">Methodology</p>
+    <h1>Bootstrap TSP Evaluation, Explained</h1>
+    <p>
+      Rastion's current official evals are intentionally narrow. They exist to make the Phase 1 catalog reproducible,
+      not to overstate what three shipped solvers and three repo-local TSPLIB instances can prove about TSP at large.
+    </p>
+    <div class="hero-actions">
+      <a class="button-primary" href={`${base}leaderboards/`}>View leaderboards</a>
+      <a class="button-secondary" href={`${base}suites/`}>View suite definitions</a>
+    </div>
+  </section>
+
+  <div class="grid cards" style="margin-top: 1rem;">
+    <article class="card">
+      <p class="kicker">Why "bootstrap"?</p>
+      <h2>Official, but Early</h2>
+      <p>
+        Each current official suite contains one TSPLIB instance from the repo corpus: `berlin52`, `ch150`, and
+        `a280`. That is enough to publish deterministic artifacts and compare adapters honestly, but not enough to make
+        sweeping claims about TSP dominance.
+      </p>
+    </article>
+    <article class="card">
+      <p class="kicker">What stays fixed?</p>
+      <h2>Instances, Budgets, and Seeds</h2>
+      <p>
+        Every suite publishes its instance list, iteration budget, optional wall-clock budget, and seed policy. The
+        published artifacts are intended to be rerunnable and auditable from the repo.
+      </p>
+    </article>
+    <article class="card">
+      <p class="kicker">What gets ranked?</p>
+      <h2>Suite-Scoped Results Only</h2>
+      <p>
+        Leaderboards are per suite. Rastion does not collapse exact, heuristic, and experimental entries into a single
+        routing-wide trophy page because that would misrepresent the evidence currently published.
+      </p>
+    </article>
+  </div>
+
+  <section class="card" style="margin-top: 1rem;">
+    <p class="kicker">Ranking Rules</p>
+    <h2>How A Solver Ends Up On The Table</h2>
+    <ul class="list-reset">
+      <li>It must have a valid solver card.</li>
+      <li>It must expose a working adapter discoverable by Rastion.</li>
+      <li>It must declare TSP support for Phase 1.</li>
+      <li>Its eval runs are recorded with status, runtime, and artifact paths.</li>
+      <li>Optional dependency failures stay visible instead of being hidden from the output.</li>
+    </ul>
+  </section>
+
+  <section class="card" style="margin-top: 1rem;">
+    <p class="kicker">Interpretation Guardrails</p>
+    <h2>Claims You Can Make, and Claims You Cannot</h2>
+    <div class="grid cards">
+      <article class="card">
+        <h3>Reasonable claims</h3>
+        <ul class="list-reset">
+          <li>This solver performed best on the current Rastion bootstrap suites.</li>
+          <li>This adapter is reproducible under the published budget and seed policy.</li>
+          <li>This card documents method class, limits, and known failure modes.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Unreasonable claims</h3>
+        <ul class="list-reset">
+          <li>This is the best TSP solver in general.</li>
+          <li>This proves routing superiority across variants.</li>
+          <li>This means the project already supports VRP.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+</BaseLayout>

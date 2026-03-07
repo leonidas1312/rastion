@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rastion"
-version = "0.1.0"
-description = "Local MVP for tensor/matrix optimization IR with plugin-based solvers"
+version = "0.1.2"
+description = "Routing solver hub for Python with executable solver cards, official TSP evals, and replayable TSPLIB demos"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }

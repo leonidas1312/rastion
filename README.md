@@ -56,8 +56,11 @@ pip install -e '.[ortools]'
 Generate all static site artifacts:
 
 ```bash
-python -m rastion build-site-data
+rastion build-site-data
 ```
+
+The installed `rastion` console script is the recommended entrypoint for docs and contributor workflows.
+`python -m rastion ...` remains compatible if you prefer module execution.
 
 Run the Astro site:
 
@@ -72,39 +75,39 @@ npm run dev
 Validate solver cards and suite specs:
 
 ```bash
-python -m rastion validate-cards
+rastion validate-cards
 ```
 
 Export the public catalog and suite metadata:
 
 ```bash
-python -m rastion export-catalog --out web/public/data/catalog.json
-python -m rastion export-suites --out web/public/data/suites.json
+rastion export-catalog --out web/public/data/catalog.json
+rastion export-suites --out web/public/data/suites.json
 ```
 
 Run an official suite and export the suite artifact:
 
 ```bash
-python -m rastion eval-suite tsplib-small-v1
+rastion eval-suite tsplib-small-v1
 ```
 
 Export all leaderboards:
 
 ```bash
-python -m rastion export-leaderboards --out web/public/data/leaderboards.json
+rastion export-leaderboards --out web/public/data/leaderboards.json
 ```
 
 Generate the TSP arena artifact:
 
 ```bash
-python -m rastion tsp-arena --out web/public/data/tsp_arena.json --iters 2000 --seed 0 --emit-every 50
+rastion tsp-arena --out web/public/data/tsp_arena.json --iters 2000 --seed 0 --emit-every 50
 ```
 
 Compatibility alias:
 
 ```bash
-python -m rastion demo
-python -m rastion demo-site
+rastion demo
+rastion demo-site
 ```
 
 ## Add A TSP Solver
@@ -114,10 +117,11 @@ Phase 1 public listings require:
 1. a working adapter under `plugins_local/`
 2. a valid solver card under `catalog/solvers/<solver-id>/card.json`
 3. a solver detail markdown file
-4. successful validation with `python -m rastion validate-cards`
+4. successful validation with `rastion validate-cards`
 5. official suite output from the TSP suite set
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the exact flow.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the exact flow and [docs/add-a-tsp-solver.md](docs/add-a-tsp-solver.md)
+for the full walkthrough.
 
 ## Official Suite Policy
 
@@ -129,12 +133,25 @@ Leaderboards are:
 - suite-scoped
 - generated from fixed seeds and budgets
 
-Rastion intentionally does not publish a fake global “best routing solver” ranking.
+Rastion intentionally does not publish a fake global "best routing solver" ranking.
+
+Current suite scope is intentionally labeled as a bootstrap track:
+
+- there are three official Phase 1 suites
+- each suite currently contains one TSPLIB instance
+- this makes the methodology honest, reproducible, and easy to audit
+- it does not justify broad claims about general TSP dominance
+
+Read the public framing in:
+
+- [docs/launch-announcement.md](docs/launch-announcement.md)
+- [docs/add-a-tsp-solver.md](docs/add-a-tsp-solver.md)
 
 ## Repo Layout
 
 - `catalog/solvers/`: solver cards and detail markdown
 - `catalog/suites/`: official suite definitions
+- `docs/`: launch and contributor content for the freeze window
 - `plugins_local/`: executable solver adapters
 - `rastion/catalog/`: catalog loading, validation, exports, and evals
 - `rastion/tsp/`: TSPLIB ingestion and TSP arena utilities
