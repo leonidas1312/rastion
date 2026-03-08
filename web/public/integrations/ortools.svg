@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 48" role="img" aria-labelledby="title">
+  <title>Google OR-Tools</title>
+  <rect width="220" height="48" rx="14" fill="#f1f7ff"/>
+  <circle cx="24" cy="24" r="14" fill="#1a73e8"/>
+  <path d="M24 15a9 9 0 1 1 0 18a9 9 0 1 0 0-18z" fill="#ffffff"/>
+  <text x="48" y="22" fill="#5f6368" font-family="IBM Plex Sans, Arial, sans-serif" font-size="11" font-weight="600">Google</text>
+  <text x="48" y="33" fill="#1d2424" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16" font-weight="600">OR-Tools</text>
+</svg>

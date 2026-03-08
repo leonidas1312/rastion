@@ -4,8 +4,8 @@ Use this checklist before pushing the public `v0.1` release.
 
 ## Product framing
 
-- README starts with the public TSP hub catchphrase.
-- Homepage, About, Solvers, and Arena all read as one coherent TSP product.
+- README starts with the evaluation-and-publishing thesis.
+- Homepage, About, Solvers, and Arena all read as one coherent TSP-first product.
 - No public-facing page leads with broader routing or VRP framing.
 - Old pages that do not fit `v0.1` are redirected or noindexed.
 

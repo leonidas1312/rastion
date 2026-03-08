@@ -4,16 +4,16 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 const base = import.meta.env.BASE_URL;
 ---
 <BaseLayout
-  title="Rastion • Official Results"
-  description="Official TSP suite results now live inside the Arena page."
-  canonical="/arena/"
-  redirectTo="/arena/#official-results"
+  title="Rastion • Evaluation Contract"
+  description="Public evaluation details now live in the About page and solver cards."
+  canonical="/about/"
+  redirectTo="/about/#evaluation"
   noIndex={true}
 >
   <RedirectNotice
-    target={`${base}arena/#official-results`}
-    title="Official results moved into Arena"
-    description="The standalone Leaderboards page has been folded into Arena. Official suite results now live below the replay and trace views."
-    ctaLabel="Open Arena results"
+    target={`${base}about/#evaluation`}
+    title="Standalone leaderboards were retired"
+    description="Rastion now treats evaluation as a publication contract, not a standalone leaderboard surface. Read the contract on the About page or inspect coverage on each solver card."
+    ctaLabel="Open evaluation details"
   />
 </BaseLayout>

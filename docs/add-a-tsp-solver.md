@@ -35,6 +35,7 @@ Keep the card honest about:
 - determinism
 - optional dependencies
 - known failure modes
+- whether the adapter wraps an external framework
 
 ## 4. Validate the catalog
 
@@ -80,7 +81,7 @@ Verify that the new solver appears in:
 
 - the solver catalog
 - its detail page
-- suite-scoped leaderboard results
+- suite-scoped result exports
 - the TSPLIB arena export if it participates there
 
 ## 8. Run the release smoke flow
@@ -91,4 +92,4 @@ Before publishing or opening a PR, run:
 ./scripts/release_smoke.sh
 ```
 
-That is the fastest way to ensure the repo still behaves like a coherent public TSP hub.
+That is the fastest way to ensure the repo still behaves like a coherent public publication surface.

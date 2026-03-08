@@ -1,6 +1,6 @@
 # Rastion v0.1 Launch Draft
 
-Rastion is now a public hub for TSP solvers.
+Rastion is now a public publishing surface for executable TSP solvers.
 
 What is live today:
 
@@ -30,8 +30,8 @@ Why the current evals are called bootstrap suites:
 
 Recommended one-paragraph launch copy:
 
-> Rastion is a public hub for TSP solvers, with solver cards, reproducible evals, and replayable TSPLIB demos. The v0.1 release is intentionally narrow and honest: TSP only, suite-scoped results, and artifact-backed output instead of marketing claims.
+> Rastion is the evaluation and publishing layer for executable TSP solvers, with solver cards, reproducible evals, and replayable TSPLIB demos. The v0.1 release is intentionally narrow and honest: TSP only, suite-scoped result exports, and artifact-backed output instead of marketing claims.
 
 Suggested short social post:
 
-> Shipping Rastion v0.1: a public hub for TSP solvers. Live now: executable solver cards, reproducible TSPLIB leaderboards, and replayable demos. Narrow on purpose. Honest about limits. Publishing now to see if people actually want more.
+> Shipping Rastion v0.1: executable solver cards, reproducible TSPLIB result exports, and replayable demos. Narrow on purpose. Honest about limits. Publishing now to see if people actually want more.

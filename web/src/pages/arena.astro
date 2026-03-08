@@ -1,5 +1,4 @@
 ---
-import LeaderboardsTable from "../components/LeaderboardsTable.astro";
 import PageIntro from "../components/PageIntro.astro";
 import TrustNote from "../components/TrustNote.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
@@ -8,10 +7,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   <PageIntro
     eyebrow="Arena"
     title="TSP Arena"
-    lede="Arena is the public results surface for Rastion's TSP release. Replay one exported TSPLIB run at a time, inspect the recorded trace, and read the official suite results from the same generated data."
+    lede="Arena is the replay surface for Rastion's public TSP release. Inspect one exported TSPLIB run at a time, compare it with the best-known distance, and read the recorded optimization trace behind the route."
   >
     <TrustNote slot="note" href="../about/#evaluation" linkLabel="Official eval context">
-      Best-known distances come from the TSPLIB reference. Arena instance results and official suite results use the same generated exports.
+      Best-known distances come from the TSPLIB reference. Arena replays use the same generated exports that back the published solver cards.
     </TrustNote>
   </PageIntro>
 
@@ -48,9 +47,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     </section>
 
     <section class="card">
-      <h2>Instance Results</h2>
-      <p class="subtle">These rows cover the currently selected exported TSPLIB run only. Official suite standings appear below.</p>
-      <p class="status" id="arena-status">Loading solver results...</p>
+      <h2>Solver Runs</h2>
+      <p class="subtle">These rows cover the currently selected exported TSPLIB run only. Use them as per-instance evidence, not as a global ranking.</p>
+      <p class="status" id="arena-status">Loading solver runs...</p>
       <div class="table-wrap">
         <table>
           <thead>
@@ -63,7 +62,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
               <th>Status</th>
             </tr>
           </thead>
-          <tbody id="arena-leaderboard-body">
+          <tbody id="arena-runs-body">
             <tr><td colspan="6">Waiting for data...</td></tr>
           </tbody>
         </table>
@@ -77,15 +76,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     </section>
   </div>
 
-  <section class="section-block" id="official-results">
-    <div class="section-heading">
-      <p class="kicker">Official suite results</p>
-      <h2>Versioned evaluation tables</h2>
-      <p>These tables come from the generated suite exports checked into `web/public/data`. They keep suite definitions, budgets, seeds, and standings visible alongside the replay surface.</p>
-    </div>
-    <LeaderboardsTable />
-  </section>
-
   <script>
     import { renderArenaChart } from "../components/ArenaChart";
     import { renderTspMap } from "../components/TspMap";
@@ -95,7 +85,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     const solverFocus = document.querySelector("#solver-focus");
     const meta = document.querySelector("#arena-meta");
     const status = document.querySelector("#arena-status");
-    const body = document.querySelector("#arena-leaderboard-body");
+    const body = document.querySelector("#arena-runs-body");
     const chartCanvas = document.querySelector("#arena-chart");
     const mapCanvas = document.querySelector("#tsp-map");
     const selectedSolver = document.querySelector("#arena-selected-solver");
@@ -172,7 +162,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       const bestRow = bestSuccessfulRow(allRows);
 
       body.innerHTML = allRows.map(rowHtml).join("\n");
-      status.textContent = `Suite updated: ${formatIso(bundle.generated_at)} • Instance: ${instance.name}`;
+      status.textContent = `Replay export updated: ${formatIso(bundle.generated_at)} • Instance: ${instance.name}`;
       meta.textContent = `${instance.source || "tsplib"} • depot=${instance.depot} • nodes=${instance.n_vars}${instance.reference ? ` • ${instance.reference.label}: ${formatDistance(instance.reference.distance)}` : ""}`;
 
       const focusBefore = solverFocus.value;
@@ -198,7 +188,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       } else if (selectedRow) {
         selectedSummary.textContent = `Best distance ${formatDistance(selectedRow.final?.best_value)} • gap ${formatGap(selectedRow.gap_to_reference_pct)} • runtime ${Number(selectedRow.final?.runtime_ms ?? 0)} ms`;
       } else {
-        selectedSummary.textContent = "No successful solver export for this instance.";
+        selectedSummary.textContent = "No successful exported run for this instance.";
       }
 
       if (instance.reference) {

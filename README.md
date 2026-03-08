@@ -1,52 +1,46 @@
 # Rastion
 
-Rastion publishes executable TSP solver cards, reproducible suite results, and replayable TSPLIB arena exports.
+Rastion is the evaluation and publishing layer for executable routing solvers.
 
-`v0.1` is intentionally narrow:
+The current public release is intentionally narrow:
 
-- TSP only
-- suite-scoped results
-- small, auditable bootstrap suites
+- TSP-first
+- suite-scoped result exports
+- replayable TSPLIB arena bundles
 - no global ranking across unrelated problem families
 
-## What You Can Do Today
+## What It Gives You
 
-- browse solver cards under `catalog/solvers/*`
-- run official TSPLIB suites from `catalog/suites/*.json`
-- publish suite-scoped leaderboards
-- replay exported TSPLIB routes in the arena
-- use the same generated artifacts locally and on GitHub Pages
+- published solver cards under `catalog/solvers/*`
+- versioned suite definitions under `catalog/suites/*.json`
+- generated public exports under `web/public/data/*`
+- a replay surface for exported TSPLIB runs
+- one repo-verified flow from local adapter to public evidence
 
-## 5-Minute Setup
+## 5-Minute Quickstart
 
-Create a local virtual environment:
+Create a virtual environment:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-Minimal install:
-
-```bash
-pip install -e .
-```
-
-Full local verification setup:
+Install the full verification stack:
 
 ```bash
 pip install -e ".[dev,ortools]"
 ```
 
-Run the published local verification flow:
+Run the repo-verified flow:
 
 ```bash
 ./scripts/release_smoke.sh
 ```
 
-That script creates and reuses `.venv/` automatically.
+That script installs dependencies, runs tests, validates cards, regenerates public data, and builds the Astro site.
 
-Start the site locally:
+If you want to inspect the site locally afterward:
 
 ```bash
 cd web
@@ -54,35 +48,19 @@ npm install
 npm run dev
 ```
 
-## Run The Official Flow
+## Public Surfaces
 
-Validate solver cards and suite specs:
+### Solver cards
 
-```bash
-rastion validate-cards
-```
+Each public card points to a real adapter and keeps the install path, method, references, limits, and failure modes visible.
 
-Run an official suite and export its artifact:
+### Arena
 
-```bash
-rastion eval-suite tsplib-small-v1
-```
+Arena is the replay surface. It shows exported route geometry, progress traces, and gap-to-BKS information for published TSPLIB runs.
 
-Generate the public website artifacts:
+### Evaluation contract
 
-```bash
-rastion build-site-data --iters 800 --seed 0 --emit-every 50
-```
-
-Build the Astro site:
-
-```bash
-cd web
-npm ci
-npm run build
-```
-
-The public website contract for `v0.1` is:
+Public claims come from generated artifacts, not handwritten marketing copy. The current public contract is:
 
 - `web/public/data/catalog.json`
 - `web/public/data/suites.json`
@@ -90,64 +68,77 @@ The public website contract for `v0.1` is:
 - `web/public/data/evals/*.json`
 - `web/public/data/tsp_arena.json`
 
-## Use Rastion Yourself
+`leaderboards.json` remains a compatibility filename. Public copy should read these as result exports, not as a promise of universal leaderboard semantics.
 
-The shortest repo-verified path from clone to visible output is documented in:
+## Published Integrations
 
-- [docs/use-rastion-yourself.md](docs/use-rastion-yourself.md)
-- [docs/publish-checklist.md](docs/publish-checklist.md)
+Rastion does not need to become a generic wrapper framework to work with external tools.
 
-## Current Solver Track
+The guardrail is simple: an integration only becomes part of the public surface once it has:
 
-The current public track is intentionally small:
+1. a working adapter
+2. a public solver card
+3. honest documentation
+4. generated suite output
+5. optional Arena participation when the adapter is TSP-capable
 
-- `Nearest Neighbor` is the transparent baseline
-- `2-Opt Local Search` is the stronger built-in baseline
-- `OR-Tools Routing` is the optional external comparison point
+Today the public catalog includes transparent built-in baselines plus one OR-Tools-backed comparison point.
 
-The current official suites are also intentionally small:
+## Run The Publication Flow Manually
 
-- `tsplib-small-v1`
-- `tsplib-medium-v1`
-- `tsplib-large-v1`
+Validate solver cards and suite specs:
 
-Each suite currently contains one TSPLIB instance. That is enough to make the methodology honest, reproducible, and easy to audit. It is not enough to claim broad TSP dominance.
+```bash
+rastion validate-cards
+```
 
-## Limits And Non-Goals
+Generate a suite export:
 
-`v0.1` does not support:
+```bash
+rastion eval-suite tsplib-small-v1
+```
 
-- CVRP or VRPTW execution
-- multi-vehicle route rendering
-- global rankings across problem families
+Rebuild the public website data:
 
-Future work can expand beyond TSP after the current contracts have enough usage and test coverage to justify it.
+```bash
+rastion build-site-data --iters 800 --seed 0 --emit-every 50
+```
 
-## Why Publish Now
+Build the site:
 
-Rastion is at the right stage to publish because the core loop is real:
+```bash
+cd web
+npm ci
+npm run build
+```
 
-- cards are executable, not just marketing copy
-- results are reproducible and artifact-backed
-- route demos are replayable from exported TSPLIB runs
+## Contributing
 
-Publishing now is meant to answer one question: is this useful enough to keep investing in?
-
-## Contributing A Solver
-
-Public TSP listings require:
+Public listings require:
 
 1. a working adapter under `plugins_local/`
 2. a valid solver card under `catalog/solvers/<solver-id>/card.json`
 3. a solver detail markdown file
 4. successful validation with `rastion validate-cards`
-5. official suite output from the TSP suite set
+5. generated suite output from the current TSP suite set
 6. regenerated public site artifacts
 
-Use:
+Start with:
 
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 - [docs/add-a-tsp-solver.md](docs/add-a-tsp-solver.md)
+- [docs/use-rastion-yourself.md](docs/use-rastion-yourself.md)
+
+## Non-Goals
+
+`v0.1` does not claim:
+
+- CVRP or VRPTW execution
+- multi-vehicle route rendering
+- ecosystem breadth without published evidence
+- global rankings across problem families
+
+Future expansion only makes sense after the current publication contract gets enough usage and scrutiny.
 
 ## Repo Layout
 
@@ -162,8 +153,6 @@ Use:
 ## GitHub Pages
 
 `web/astro.config.mjs` derives the base path from CI automatically.
-
-Project Pages:
 
 - repository pages default to `/<repo>/`
 - local dev defaults to `/`

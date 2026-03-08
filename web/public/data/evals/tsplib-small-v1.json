@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-07T19:04:53.074519+00:00",
+  "generated_at": "2026-03-07T20:29:46.944346+00:00",
   "suite": {
     "id": "tsplib-small-v1",
     "title": "TSPLIB Small v1",
@@ -60,7 +60,7 @@
           "method_class": "hybrid",
           "listing_tier": "experimental",
           "score": 7902.0,
-          "avg_runtime_ms": 1001.7473199986853,
+          "avg_runtime_ms": 1001.2936940001964,
           "gap_to_reference_pct": 4.77326968973747,
           "status": "ok",
           "error": null,
@@ -71,7 +71,7 @@
             "problem_variant": "tsp",
             "instance_id": "berlin52",
             "score": 7902.0,
-            "runtime": 1001.7473199986853,
+            "runtime": 1001.2936940001964,
             "status": "ok",
             "seed_policy": {
               "seeds": [
@@ -83,7 +83,7 @@
               "time_budget_ms": 1000,
               "repeat": 1
             },
-            "generated_at": "2026-03-07T19:04:53.074519+00:00",
+            "generated_at": "2026-03-07T20:29:46.944346+00:00",
             "artifact_path": "data/evals/tsplib-small-v1.json",
             "environment": {
               "python": "3.12.3",
@@ -99,7 +99,7 @@
           "method_class": "metaheuristic",
           "listing_tier": "official",
           "score": 8448.0,
-          "avg_runtime_ms": 5.142795998835936,
+          "avg_runtime_ms": 4.920285002299352,
           "gap_to_reference_pct": 12.012728719172634,
           "status": "ok",
           "error": null,
@@ -110,7 +110,7 @@
             "problem_variant": "tsp",
             "instance_id": "berlin52",
             "score": 8448.0,
-            "runtime": 5.142795998835936,
+            "runtime": 4.920285002299352,
             "status": "ok",
             "seed_policy": {
               "seeds": [
@@ -122,7 +122,7 @@
               "time_budget_ms": 1000,
               "repeat": 1
             },
-            "generated_at": "2026-03-07T19:04:53.074519+00:00",
+            "generated_at": "2026-03-07T20:29:46.944346+00:00",
             "artifact_path": "data/evals/tsplib-small-v1.json",
             "environment": {
               "python": "3.12.3",
@@ -138,7 +138,7 @@
           "method_class": "heuristic",
           "listing_tier": "official",
           "score": 8980.0,
-          "avg_runtime_ms": 0.40595199970994145,
+          "avg_runtime_ms": 0.37470500319614075,
           "gap_to_reference_pct": 19.066560594006894,
           "status": "ok",
           "error": null,
@@ -149,7 +149,7 @@
             "problem_variant": "tsp",
             "instance_id": "berlin52",
             "score": 8980.0,
-            "runtime": 0.40595199970994145,
+            "runtime": 0.37470500319614075,
             "status": "ok",
             "seed_policy": {
               "seeds": [
@@ -161,7 +161,7 @@
               "time_budget_ms": 1000,
               "repeat": 1
             },
-            "generated_at": "2026-03-07T19:04:53.074519+00:00",
+            "generated_at": "2026-03-07T20:29:46.944346+00:00",
             "artifact_path": "data/evals/tsplib-small-v1.json",
             "environment": {
               "python": "3.12.3",
@@ -183,7 +183,7 @@
         "ok": 1
       },
       "mean_score": 7902.0,
-      "mean_runtime_ms": 1001.7473199986853,
+      "mean_runtime_ms": 1001.2936940001964,
       "mean_gap_to_reference_pct": 4.77326968973747,
       "completed_instances": 1,
       "total_instances": 1
@@ -198,7 +198,7 @@
         "ok": 1
       },
       "mean_score": 8448.0,
-      "mean_runtime_ms": 5.142795998835936,
+      "mean_runtime_ms": 4.920285002299352,
       "mean_gap_to_reference_pct": 12.012728719172634,
       "completed_instances": 1,
       "total_instances": 1
@@ -213,7 +213,7 @@
         "ok": 1
       },
       "mean_score": 8980.0,
-      "mean_runtime_ms": 0.40595199970994145,
+      "mean_runtime_ms": 0.37470500319614075,
       "mean_gap_to_reference_pct": 19.066560594006894,
       "completed_instances": 1,
       "total_instances": 1

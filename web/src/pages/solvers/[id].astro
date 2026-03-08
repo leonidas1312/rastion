@@ -56,7 +56,7 @@ const DetailContent = detailModule?.Content;
     <div slot="actions" class="intro-actions">
       <a class="button-primary" href={card.repository}>Repository</a>
       {card.homepage && <a class="button-secondary" href={card.homepage}>Homepage</a>}
-      <a class="button-secondary" href={`${base}arena/#official-results`}>Official results in Arena</a>
+      <a class="button-secondary" href={`${base}arena/`}>Open replay surface</a>
     </div>
     <TrustNote slot="note" href={`${base}about/#evaluation`} linkLabel="How to read the results">
       Published results on this page come from the generated suite exports in `web/public/data`.
@@ -104,7 +104,7 @@ const DetailContent = detailModule?.Content;
       <section class="stack-lg">
         <div class="section-heading">
           <p class="kicker">Results and references</p>
-          <h2>Official coverage and supporting detail</h2>
+          <h2>Published coverage and supporting detail</h2>
         </div>
         <article class="section-panel">
           <h3>Suite results</h3>
@@ -141,7 +141,7 @@ const DetailContent = detailModule?.Content;
                     </table>
                   </div>
                 </div>
-                <p class="subtle">These results come from the current official Phase 1 suites.</p>
+                <p class="subtle">These results come from the current published Phase 1 suites.</p>
               </>
             ) : (
               <p class="subtle">No generated suite artifacts found yet. Run <code>rastion build-site-data</code>.</p>
@@ -208,7 +208,7 @@ const DetailContent = detailModule?.Content;
           <dd>{card.limits.tested_max_nodes} nodes</dd>
         </div>
         <div>
-          <dt>Official suites</dt>
+          <dt>Published suites</dt>
           <dd>{suiteRows.length}</dd>
         </div>
         <div>

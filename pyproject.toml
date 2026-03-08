@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rastion"
 version = "0.1.2"
-description = "Routing solver hub for Python with executable solver cards, official TSP evals, and replayable TSPLIB demos"
+description = "Evaluation and publishing layer for executable routing solvers with public TSP cards and replayable evidence"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }

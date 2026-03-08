@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 48" role="img" aria-labelledby="title">
+  <title>Python</title>
+  <rect width="180" height="48" rx="14" fill="#fff7e8"/>
+  <rect x="10" y="10" width="28" height="28" rx="9" fill="#346f9f"/>
+  <rect x="18" y="18" width="12" height="12" rx="4" fill="#ffd24a"/>
+  <text x="52" y="31" fill="#1d2424" font-family="IBM Plex Sans, Arial, sans-serif" font-size="18" font-weight="600">Python</text>
+</svg>

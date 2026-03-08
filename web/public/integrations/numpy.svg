@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 48" role="img" aria-labelledby="title">
+  <title>NumPy</title>
+  <rect width="180" height="48" rx="14" fill="#eef6ff"/>
+  <path d="M20 12h16l10 10v14H30L20 26V12z" fill="#4f8cc9"/>
+  <path d="M31 17h5l5 5v9h-5l-5-5v-9z" fill="#ffffff"/>
+  <text x="58" y="31" fill="#1d2424" font-family="IBM Plex Sans, Arial, sans-serif" font-size="18" font-weight="600">NumPy</text>
+</svg>

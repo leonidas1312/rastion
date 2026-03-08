@@ -375,6 +375,10 @@ main {
   max-width: 45rem;
 }
 
+.section-heading-compact {
+  max-width: 36rem;
+}
+
 .section-heading p {
   color: var(--muted);
 }
@@ -391,6 +395,48 @@ main {
   gap: 0.85rem;
 }
 
+.integration-shell {
+  gap: 1.2rem;
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--surface-strong) 82%, transparent), color-mix(in srgb, var(--primary-soft) 32%, var(--surface))),
+    var(--surface);
+}
+
+.integration-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.integration-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.6rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-strong) 86%, transparent);
+  color: var(--text);
+  box-shadow: 0 10px 24px rgba(29, 36, 36, 0.06);
+}
+
+.integration-chip:hover {
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+.integration-chip img {
+  height: 2.6rem;
+  width: auto;
+  display: block;
+}
+
+.integration-chip span {
+  font-size: 0.94rem;
+  font-weight: 500;
+}
+
 .destination-card h3,
 .card h2,
 .card h3,
@@ -403,6 +449,38 @@ main {
 .section-panel {
   display: grid;
   gap: 0.9rem;
+}
+
+.quickstart-shell {
+  gap: 1.25rem;
+}
+
+.quickstart-grid,
+.vision-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.quickstart-card {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-strong) 88%, transparent);
+}
+
+.artifact-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.artifact-list code {
+  width: fit-content;
+  padding: 0.25rem 0.45rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface-strong) 78%, var(--primary-soft));
 }
 
 .card p,
@@ -701,7 +779,9 @@ pre {
   .detail-layout,
   .grid-main-aside,
   .footer-inner,
-  .grid-two {
+  .grid-two,
+  .quickstart-grid,
+  .vision-grid {
     grid-template-columns: 1fr;
   }
 
@@ -758,8 +838,14 @@ pre {
 
   .hero-actions,
   .intro-actions,
-  .controls {
+  .controls,
+  .integration-strip {
     align-items: stretch;
+  }
+
+  .integration-chip {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   a.button-primary,

@@ -24,7 +24,7 @@ from rastion.solvers.autosolver import AutoSolver
 from rastion.solvers.registry import get_solver, list_solvers
 from rastion.tsp.arena import write_tsp_arena_bundle
 
-app = typer.Typer(help="Rastion public TSP hub CLI")
+app = typer.Typer(help="Rastion evaluation and publishing CLI")
 console = Console()
 
 DEFAULT_WEB_DATA_DIR = Path("web/public/data")
@@ -283,7 +283,7 @@ def export_leaderboards_command(
         cards_dir=cards_dir,
         suites_dir=suites_dir,
     )
-    console.print(f"Exported {int(payload.get('count', 0))} leaderboards to {out}")
+    console.print(f"Exported {int(payload.get('count', 0))} result bundles to {out}")
 
 
 @app.command("tsp-arena")
@@ -379,7 +379,7 @@ def demo_site_command(
     seed: int = typer.Option(0, "--seed", help="Deterministic random seed"),
     emit_every: int = typer.Option(50, "--emit-every", min=1, help="Arena event cadence"),
 ) -> None:
-    console.print("[yellow]demo-site is retained as an alias. Use build-site-data for the public TSP hub flow.[/yellow]")
+    console.print("[yellow]demo-site is retained as an alias. Use build-site-data for the public publication flow.[/yellow]")
     build_site_data_command(iters=iters, seed=seed, emit_every=emit_every)
 
 

@@ -10,8 +10,8 @@ Use this during the freeze to capture the minimum media set for GitHub, social p
 2. `solver-card-two-opt.png`
    Capture the `tsp-two-opt` detail page with the rendered README section visible.
 
-3. `leaderboards-bootstrap.png`
-   Capture the leaderboards page with the bootstrap methodology note and one suite table visible.
+3. `about-evaluation-contract.png`
+   Capture the About page with the evaluation contract section and one suite table visible.
 
 4. `suites-bootstrap-policy.png`
    Capture the suites page with the bootstrap track explanation and suite table.
@@ -23,5 +23,5 @@ Use this during the freeze to capture the minimum media set for GitHub, social p
 
 - Keep browser width in a desktop range so the cards and tables are readable.
 - Prefer light mode for launch consistency unless the post specifically compares themes.
-- Show the bootstrap framing when capturing leaderboards or suites so the evaluation story stays honest.
+- Show the evaluation framing when capturing About or suites so the publication story stays honest.
 - Use current generated artifacts from `rastion build-site-data` before recording anything.

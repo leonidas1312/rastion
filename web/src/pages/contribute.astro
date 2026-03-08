@@ -8,11 +8,11 @@ const base = import.meta.env.BASE_URL;
 <BaseLayout title="Rastion • Contribute" description="Repo workflow for adding a TSP solver card, running the suites, and regenerating public data." canonical="/contribute/">
   <PageIntro
     eyebrow="Contribute"
-    title="Add a TSP solver to Rastion"
-    lede="A public listing needs four things: a working adapter, a valid solver card, official suite output, and regenerated site artifacts."
+    title="Publish a TSP adapter without weakening the product contract"
+    lede="A public listing is more than code discovery. Each adapter needs a real card, generated evidence, and public copy that stays honest about scope."
   >
-    <TrustNote slot="note" href={`${base}about/#limits`} linkLabel="Current scope">
-      The current public flow covers TSP only and publishes suite-scoped results.
+    <TrustNote slot="note" href={`${base}about/#publication-rules`} linkLabel="Publication rules">
+      The current public flow covers TSP only and publishes suite-scoped result exports.
     </TrustNote>
   </PageIntro>
 
@@ -26,15 +26,15 @@ const base = import.meta.env.BASE_URL;
         <h3>1. Install locally</h3>
         <pre><code>pip install -e ".[dev,ortools]"
 rastion --help</code></pre>
-        <p>This installs the local development and optional OR-Tools dependencies used by the release flow.</p>
+        <p>This installs the verification stack plus the optional OR-Tools dependency used by the current experimental adapter.</p>
       </article>
       <article class="destination-card">
         <h3>2. Add the adapter</h3>
-        <p>Create a local plugin under <code>plugins_local/</code> that exposes <code>get_solver()</code> and supports <code>tsp</code>.</p>
+        <p>Create a local plugin under <code>plugins_local/</code> that exposes <code>get_solver()</code> and supports <code>tsp</code>. If it wraps an external framework, keep that dependency surface explicit.</p>
       </article>
       <article class="destination-card">
         <h3>3. Add the card and README</h3>
-        <p>Create <code>catalog/solvers/&lt;solver-id&gt;/card.json</code> and <code>catalog/solvers/&lt;solver-id&gt;/README.md</code>.</p>
+        <p>Create <code>catalog/solvers/&lt;solver-id&gt;/card.json</code> and <code>catalog/solvers/&lt;solver-id&gt;/README.md</code> with honest installation, limits, references, and failure modes.</p>
       </article>
       <article class="destination-card">
         <h3>4. Validate</h3>
@@ -42,16 +42,17 @@ rastion --help</code></pre>
         <p>Validation checks ids, adapter paths, discoverability, and required detail markdown.</p>
       </article>
       <article class="destination-card">
-        <h3>5. Run the official suites</h3>
+        <h3>5. Generate evidence</h3>
         <pre><code>rastion eval-suite tsplib-small-v1
 rastion eval-suite tsplib-medium-v1
 rastion eval-suite tsplib-large-v1</code></pre>
+        <p>Public claims are tied to generated suite outputs. One good local run is not enough.</p>
       </article>
       <article class="destination-card">
         <h3>6. Regenerate site data</h3>
         <pre><code>./scripts/release_smoke.sh
 cd web && npm run build</code></pre>
-        <p>Verify that the solver appears in the catalog, suite output, solver detail page, and TSPLIB arena export.</p>
+        <p>Verify that the adapter appears in the catalog, result exports, solver detail page, and TSPLIB arena bundle when applicable.</p>
       </article>
     </div>
   </section>
@@ -76,7 +77,7 @@ cd web && npm run build</code></pre>
       <ul class="list-reset">
         <li>v0.1 public listings are TSP only.</li>
         <li>Future work beyond TSP is intentionally outside the current release.</li>
-        <li>Official leaderboards stay tied to the curated suite set.</li>
+        <li>Result exports stay tied to the curated suite set.</li>
       </ul>
     </article>
   </section>

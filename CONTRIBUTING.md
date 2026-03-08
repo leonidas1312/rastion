@@ -1,7 +1,6 @@
 # Contributing
 
-Rastion `v0.1` is a public TSP hub. Contributions should preserve that contract: executable adapters, explicit
-metadata, and reproducible suite outputs.
+Rastion `v0.1` is a TSP-first publishing surface for executable routing solvers. Contributions should preserve that contract: explicit adapters, honest metadata, generated evidence, and restrained public claims.
 
 ## Add A Solver
 
@@ -14,7 +13,7 @@ metadata, and reproducible suite outputs.
 rastion validate-cards
 ```
 
-5. Run the official TSP suites:
+5. Run the current TSP suites:
 
 ```bash
 rastion eval-suite tsplib-small-v1
@@ -30,13 +29,13 @@ rastion build-site-data
 
 For a repo-verified walkthrough, use [docs/add-a-tsp-solver.md](docs/add-a-tsp-solver.md).
 
-## Listing Rules
+## Publication Rules
 
 - Phase 1 public listings are `tsp` only.
 - Public listings require executable adapters plus solver cards.
-- Official leaderboards are suite-scoped and curated.
-- The current official suites are a bootstrap track, not a claim of broad TSP supremacy.
-- Work beyond TSP is future scope, not current product surface.
+- Public result exports are suite-scoped and curated.
+- The current suites are a bootstrap track, not a claim of broad TSP supremacy.
+- External frameworks belong on the public site only after they ship as real adapters with generated evidence.
 
 ## Engineering Rules
 

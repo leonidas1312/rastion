@@ -17,85 +17,99 @@ const suiteRows = Array.isArray(leaderboards.leaderboards) ? leaderboards.leader
 const solverCount = solverRows.length;
 const suiteCount = suiteRows.length;
 ---
-<BaseLayout title="Rastion • About" description="Method, scope, and export structure for Rastion's public TSP site." canonical="/about/">
+<BaseLayout title="Rastion • About" description="Product philosophy, scope, and evaluation contract for Rastion's public TSP release." canonical="/about/">
   <PageIntro
     eyebrow="About"
-    title="How the public TSP site is put together"
-    lede="Rastion publishes one small TSP dataset across two public surfaces: solver cards and an Arena page that combines official results with replayable TSPLIB runs."
+    title="How Rastion thinks about public solver publishing"
+    lede="Rastion is the evaluation and publishing layer for executable routing solvers. The public TSP release is intentionally narrow so every claim can stay inspectable."
   >
-    <TrustNote slot="note" href="#evaluation" linkLabel="Jump to evaluation details">
-      The current public dataset contains {solverCount} solver cards and {suiteCount} official suite exports.
+    <TrustNote slot="note" href="#evaluation" linkLabel="Jump to evaluation contract">
+      The current release contains {solverCount} published solver cards and {suiteCount} generated result exports.
     </TrustNote>
   </PageIntro>
 
-  <section class="section-block section-panel" id="positioning">
+  <section class="section-block section-panel" id="philosophy">
     <div class="section-heading">
-      <p class="kicker">What ships</p>
-      <h2>One dataset, two public surfaces</h2>
-      <p>The site reads generated JSON from `web/public/data` and renders it as solver pages plus one Arena surface for replay and official results. The point is not to cover every routing problem; it is to make one TSP workflow legible end to end.</p>
+      <p class="kicker">Philosophy</p>
+      <h2>Opinionated, inspectable, and narrow on purpose</h2>
+      <p>Rastion does not try to be a neutral marketplace for every routing backend. The product value is the publication contract: executable adapters, public cards, generated evidence, and a replay surface that lets readers inspect the actual run.</p>
     </div>
   </section>
 
-  <section class="section-block" id="phase-1">
+  <section class="section-block" id="scope">
+    <div class="section-heading">
+      <p class="kicker">Scope</p>
+      <h2>What the current public release does and does not cover</h2>
+    </div>
+    <div class="vision-grid">
+      <article class="destination-card">
+        <h3>In bounds</h3>
+        <ul class="list-reset">
+          <li>TSP-first published adapters with executable cards.</li>
+          <li>Generated suite exports stored in `web/public/data`.</li>
+          <li>A replay-oriented Arena for TSPLIB route inspection.</li>
+        </ul>
+      </article>
+      <article class="destination-card">
+        <h3>Out of bounds</h3>
+        <ul class="list-reset">
+          <li>No global ranking across unrelated routing families.</li>
+          <li>No public promise of CVRP or VRPTW breadth in v0.1.</li>
+          <li>No ecosystem strip entries without a real published adapter behind them.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="section-block section-panel" id="public-surface">
     <div class="section-heading">
       <p class="kicker">Public surface</p>
       <h2>What readers can inspect today</h2>
     </div>
     <div class="destination-grid">
       <article class="destination-card">
-        <h3>Solvers</h3>
-        <p>Executable TSP solver cards with installation, limits, references, and current suite coverage.</p>
+        <h3>Solver cards</h3>
+        <p>Executable adapter listings with install commands, limits, references, and suite coverage.</p>
       </article>
       <article class="destination-card">
-        <h3>Arena</h3>
-        <p>Replayable route geometry, best-distance-over-time traces, and official suite results for the exported TSPLIB runs.</p>
+        <h3>Arena replays</h3>
+        <p>TSPLIB route geometry, progress traces, and BKS-relative evidence for exported runs.</p>
       </article>
       <article class="destination-card">
         <h3>Contributor flow</h3>
-        <p>A repo-verified workflow for turning a local solver adapter into a published card and export set.</p>
+        <p>A repo-verified path for turning a local adapter into a public card and generated exports.</p>
       </article>
     </div>
-  </section>
-
-  <section class="section-block section-panel" id="limits">
-    <div class="section-heading">
-      <p class="kicker">Current scope</p>
-      <h2>What is in bounds for v0.1</h2>
-    </div>
-    <ul class="list-reset">
-      <li>Phase 1 is TSP only.</li>
-      <li>Official results stay tied to the listed suites and instances.</li>
-      <li>Broader routing variants stay out of the public contract until they have matching cards, evals, and replays.</li>
-    </ul>
   </section>
 
   <section class="section-block section-panel" id="evaluation">
     <div class="section-heading">
-      <p class="kicker">How evaluation works</p>
+      <p class="kicker">Evaluation contract</p>
       <h2>Versioned suites with stored artifacts</h2>
-      <p>Each official suite fixes its TSPLIB instance, iteration budget, time budget, and seed list. The generated JSON captures the per-instance result rows, aggregate standings, and the artifact path that produced the table.</p>
+      <p>Each public result export fixes its TSPLIB instance, budget policy, and seed policy. The generated JSON stores the per-instance rows, aggregate standings, and the artifact path that produced the output.</p>
     </div>
     <ul class="list-reset">
       <li>Suites are versioned and curated.</li>
       <li>Budgets and seeds are explicit in the exported definitions.</li>
       <li>Gap-to-BKS is computed from the TSPLIB reference distance for the shipped instance.</li>
+      <li>`leaderboards.json` remains a compatibility filename, not a product promise of global leaderboard semantics.</li>
     </ul>
   </section>
 
   <section class="section-block" id="official-suites">
     <div class="section-heading">
-      <p class="kicker">Official suites</p>
+      <p class="kicker">Published suites</p>
       <h2>Current suite definitions</h2>
-      <p>The suite table is the source for the official Arena results section and the arena instance set.</p>
+      <p>The suite table defines the current publication contract and the instance set that powers the shipped TSPLIB evidence.</p>
     </div>
     <SuitesTable />
   </section>
 
   <section class="section-block" id="current-solvers">
     <div class="section-heading">
-      <p class="kicker">Current solver set</p>
-      <h2>Published cards in this release</h2>
-      <p>The catalog mixes a transparent greedy baseline, a built-in local-search baseline, and one external comparison point from OR-Tools.</p>
+      <p class="kicker">Published adapters</p>
+      <h2>Cards in the current release</h2>
+      <p>The public catalog mixes transparent baselines with one external comparison point from OR-Tools. New integrations only belong here once they ship as real cards with generated evidence.</p>
     </div>
     <div class="destination-grid">
       {solverRows.map((row) => (
@@ -105,7 +119,7 @@ const suiteCount = suiteRows.length;
           <p>{row.summary}</p>
           <div class="panel-meta">
             <span>Tested scale: {row.limits?.tested_max_nodes ?? "n/a"} nodes</span>
-            <span>{Array.isArray(row.official_suite_ids) ? row.official_suite_ids.length : 0} official suite{Array.isArray(row.official_suite_ids) && row.official_suite_ids.length === 1 ? "" : "s"}</span>
+            <span>{Array.isArray(row.official_suite_ids) ? row.official_suite_ids.length : 0} published suite{Array.isArray(row.official_suite_ids) && row.official_suite_ids.length === 1 ? "" : "s"}</span>
           </div>
         </article>
       ))}
@@ -119,9 +133,23 @@ const suiteCount = suiteRows.length;
     </div>
     <div class="panel-meta">
       <code>web/public/data/catalog.json</code>
+      <code>web/public/data/suites.json</code>
       <code>web/public/data/leaderboards.json</code>
       <code>web/public/data/evals/*.json</code>
       <code>web/public/data/tsp_arena.json</code>
     </div>
+  </section>
+
+  <section class="section-block section-panel" id="publication-rules">
+    <div class="section-heading">
+      <p class="kicker">Publication rules</p>
+      <h2>What a new integration must satisfy</h2>
+    </div>
+    <ul class="list-reset">
+      <li>A working adapter under `plugins_local/` or an equivalent supported plugin path.</li>
+      <li>A public solver card and detail README with honest limits and failure modes.</li>
+      <li>Generated suite output that can be rebuilt from the repo flow.</li>
+      <li>A restrained public claim that matches the published evidence and current TSP scope.</li>
+    </ul>
   </section>
 </BaseLayout>
